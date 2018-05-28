@@ -429,29 +429,6 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method to get all the Processor entity from the pgfe
-     *
-     * @param pgfe
-     * @param processorsFromTemplate
-     * @return
-     */
-    private Set<ProcessorEntity> getProcessorEntityForUndeploy(ProcessGroupFlowEntity pgfe,
-                                                               Set<ProcessorDTO> processorsFromTemplate) {
-
-        Set<ProcessorEntity> resultProcessors = new LinkedHashSet<>();
-        Set<ProcessorEntity> allProcessGroups = pgfe.getProcessGroupFlow().getFlow().getProcessors();
-
-        Set<String> processorNameFromTemplate = getAllProcessorsNameFromTemplate(processorsFromTemplate);
-
-        for (ProcessorEntity pe : allProcessGroups) {
-            if (processorNameFromTemplate.contains(pe.getComponent().getName())) {
-                resultProcessors.add(pe);
-            }
-
-        }
-        return resultProcessors;
-    }
 
     /**
      * This is the method which is used to get all the remote process group from
