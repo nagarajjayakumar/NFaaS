@@ -83,4 +83,39 @@ public class InputPort {
 
         return resp;
     }
+
+    /**
+     * Call the NIFI rest api to delete the input port
+     * https://localhost:8080/nifi-api/input-ports/b3b53358-a6f5-1789-332e-fa552a5fe01a?version=0&clientId=ca8915b0-30be-1fca-4c85-739031a5f7cf
+     *
+     * @param portEntity
+     * @param state
+     * @return
+     */
+    public PortEntity deleteInputPortEntity(PortEntity portEntity, String state) {
+
+        String peId = portEntity.getId();
+
+        // https://"+nifiServerHostnameAndPort+"/nifi-api/process-groups/a57d7d2a-86bd-4b43-357a-34abb1bd85d6?version=0&clientId=deaebc77-015b-1000-31ea-162516e98255
+        String version = String.valueOf(commonService.getClientIdAndVersion(portEntity).getVersion());
+        String clientId = String.valueOf(commonService.getClientIdAndVersion(portEntity).getClientId());
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/input-ports/" + peId + "?version="
+                + version + "&clientId=" + clientId;
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        PortEntity resp = null;
+        HttpEntity<PortEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity, PortEntity.class,
+                params);
+
+        resp = response.getBody();
+
+        logger.debug(resp.toString());
+        return resp;
+
+    }
 }
