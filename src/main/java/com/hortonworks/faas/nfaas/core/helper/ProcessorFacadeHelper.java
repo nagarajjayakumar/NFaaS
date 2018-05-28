@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class ProcessorFacadeHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(OutputPortFacadeHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProcessorFacadeHelper.class);
 
     @Autowired
     TemplateFacadeHelper templateFacadeHelper;
@@ -24,7 +24,7 @@ public class ProcessorFacadeHelper {
      * @param processorsFromTemplate
      * @return
      */
-    private Set<ProcessorEntity> getProcessorEntityForUndeploy(ProcessGroupFlowEntity pgfe,
+    public Set<ProcessorEntity> getProcessorEntityForUndeploy(ProcessGroupFlowEntity pgfe,
                                                                Set<ProcessorDTO> processorsFromTemplate) {
 
         Set<ProcessorEntity> resultProcessors = new LinkedHashSet<>();
