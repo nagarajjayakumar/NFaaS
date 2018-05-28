@@ -425,53 +425,9 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method to get all the input port entity from the pgfe
-     *
-     * @param pgfe
-     * @param inputPortFromTemplate
-     * @return
-     */
-    private Set<PortEntity> getInputPortsEntityForUndeploy(ProcessGroupFlowEntity pgfe,
-                                                           Set<PortDTO> inputPortFromTemplate) {
 
-        Set<PortEntity> resultInputPorts = new LinkedHashSet<>();
-        Set<PortEntity> allInputPorts = pgfe.getProcessGroupFlow().getFlow().getInputPorts();
 
-        Set<String> inputPortsNameFromTemplate = getAllInputPortNameFromTemplate(inputPortFromTemplate);
 
-        for (PortEntity pe : allInputPorts) {
-            if (inputPortsNameFromTemplate.contains(pe.getComponent().getName())) {
-                resultInputPorts.add(pe);
-            }
-
-        }
-        return resultInputPorts;
-    }
-
-    /**
-     * This is the method to get all the Output port entity from the pgfe
-     *
-     * @param pgfe
-     * @param outputPortFromTemplate
-     * @return
-     */
-    private Set<PortEntity> getOutputPortsEntityForUndeploy(ProcessGroupFlowEntity pgfe,
-                                                            Set<PortDTO> outputPortFromTemplate) {
-
-        Set<PortEntity> resultOutputPorts = new LinkedHashSet<>();
-        Set<PortEntity> allOutputPorts = pgfe.getProcessGroupFlow().getFlow().getOutputPorts();
-
-        Set<String> outputPortsNameFromTemplate = getAllOutputPortNameFromTemplate(outputPortFromTemplate);
-
-        for (PortEntity pe : allOutputPorts) {
-            if (outputPortsNameFromTemplate.contains(pe.getComponent().getName())) {
-                resultOutputPorts.add(pe);
-            }
-
-        }
-        return resultOutputPorts;
-    }
 
     /**
      * This is the method to get all the Processor entity from the pgfe
