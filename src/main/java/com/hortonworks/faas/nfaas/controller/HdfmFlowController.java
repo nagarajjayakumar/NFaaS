@@ -1710,22 +1710,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method to get the latest Processor Entity
-     *
-     * @param processorEntity https://localhost:8080/nifi-api/processors/
-     * @return
-     */
-    private ProcessorEntity getLatestProcessorEntity(ProcessorEntity processorEntity) {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/processors/" + processorEntity.getId()
-                + "/";
-        HttpEntity<ProcessorEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                ProcessorEntity.class, params);
-        return response.getBody();
-    }
+
 
 
 

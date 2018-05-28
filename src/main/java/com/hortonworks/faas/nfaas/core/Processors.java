@@ -120,4 +120,21 @@ public class Processors {
         return resp;
 
     }
+
+    /**
+     * This is the method to get the latest Processor Entity
+     *
+     * @param processorEntity https://localhost:8080/nifi-api/processors/
+     * @return
+     */
+    public ProcessorEntity getLatestProcessorEntity(ProcessorEntity processorEntity) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/processors/" + processorEntity.getId()
+                + "/";
+        HttpEntity<ProcessorEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                ProcessorEntity.class, params);
+        return response.getBody();
+    }
 }
