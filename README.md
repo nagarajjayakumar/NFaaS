@@ -13,8 +13,8 @@ Integrated with NIFI Secured cluster – via NIFI bearer token services
 In built NIFI template validator
 
 
-HDFM – Config
-==============
+nFaaS – Config
+=================
 
 Minimal Configuration
 
