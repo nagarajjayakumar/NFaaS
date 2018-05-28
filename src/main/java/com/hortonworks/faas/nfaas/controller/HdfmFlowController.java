@@ -430,33 +430,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method which is used to get all the remote process group from
-     * the Pgfe
-     *
-     * @param pgfe
-     * @param remoteProcessGroupsFromTemplate
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private Set<RemoteProcessGroupEntity> getRemoteProcessGroupEntityForUndeploy(ProcessGroupFlowEntity pgfe,
-                                                                                 Set<RemoteProcessGroupDTO> remoteProcessGroupsFromTemplate) {
 
-        Set<RemoteProcessGroupEntity> resultRemotePG = new LinkedHashSet<>();
-        Set<RemoteProcessGroupEntity> allRemoteProcessGroups = pgfe.getProcessGroupFlow().getFlow()
-                .getRemoteProcessGroups();
-
-        Set<String> remoteProcessorGroupNameFromTemplate = getAllRemoteProcessorGroupNameFromTemplate(
-                remoteProcessGroupsFromTemplate);
-
-        for (RemoteProcessGroupEntity rpge : allRemoteProcessGroups) {
-            if (remoteProcessorGroupNameFromTemplate.contains(rpge.getComponent().getName())) {
-                resultRemotePG.add(rpge);
-            }
-
-        }
-        return resultRemotePG;
-    }
 
     /**
      * Method is used to instantiate the template and deploy and Start the

@@ -1,8 +1,10 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
 import org.apache.nifi.web.api.dto.PortDTO;
+import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
 import org.apache.nifi.web.api.entity.PortEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
+import org.apache.nifi.web.api.entity.RemoteProcessGroupEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,26 +21,30 @@ public class RemoteProcessGroupFacadeHelper {
     TemplateFacadeHelper templateFacadeHelper;
 
     /**
-     * This is the method to get all the input port entity from the pgfe
+     * This is the method which is used to get all the remote process group from
+     * the Pgfe
      *
      * @param pgfe
-     * @param inputPortFromTemplate
+     * @param remoteProcessGroupsFromTemplate
      * @return
      */
-    public Set<PortEntity> getInputPortsEntityForUndeploy(ProcessGroupFlowEntity pgfe,
-                                                           Set<PortDTO> inputPortFromTemplate) {
+    @SuppressWarnings("unused")
+    private Set<RemoteProcessGroupEntity> getRemoteProcessGroupEntityForUndeploy(ProcessGroupFlowEntity pgfe,
+                                                                                 Set<RemoteProcessGroupDTO> remoteProcessGroupsFromTemplate) {
 
-        Set<PortEntity> resultInputPorts = new LinkedHashSet<>();
-        Set<PortEntity> allInputPorts = pgfe.getProcessGroupFlow().getFlow().getInputPorts();
+        Set<RemoteProcessGroupEntity> resultRemotePG = new LinkedHashSet<>();
+        Set<RemoteProcessGroupEntity> allRemoteProcessGroups = pgfe.getProcessGroupFlow().getFlow()
+                .getRemoteProcessGroups();
 
-        Set<String> inputPortsNameFromTemplate = templateFacadeHelper.getAllInputPortNameFromTemplate(inputPortFromTemplate);
+        Set<String> remoteProcessorGroupNameFromTemplate = templateFacadeHelper.getAllRemoteProcessorGroupNameFromTemplate(
+                remoteProcessGroupsFromTemplate);
 
-        for (PortEntity pe : allInputPorts) {
-            if (inputPortsNameFromTemplate.contains(pe.getComponent().getName())) {
-                resultInputPorts.add(pe);
+        for (RemoteProcessGroupEntity rpge : allRemoteProcessGroups) {
+            if (remoteProcessorGroupNameFromTemplate.contains(rpge.getComponent().getName())) {
+                resultRemotePG.add(rpge);
             }
 
         }
-        return resultInputPorts;
+        return resultRemotePG;
     }
 }
