@@ -24,9 +24,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ProcessGroups {
+public class ProcessGroup {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessGroups.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProcessGroup.class);
 
     Environment env;
 
@@ -47,7 +47,7 @@ public class ProcessGroups {
     CommonService commonService;
 
     @Autowired
-    ProcessGroups(Environment env) {
+    ProcessGroup(Environment env) {
         this.env = env;
         this.trasnsportMode = env.getProperty("nifi.trasnsportMode");
         this.nifiSecuredCluster = Boolean.parseBoolean(env.getProperty("nifi.securedCluster"));

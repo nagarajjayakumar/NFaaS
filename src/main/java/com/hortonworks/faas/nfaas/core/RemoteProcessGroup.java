@@ -16,9 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RemoteProcessGroups {
+public class RemoteProcessGroup {
 
-    private static final Logger logger = LoggerFactory.getLogger(RemoteProcessGroups.class);
+    private static final Logger logger = LoggerFactory.getLogger(RemoteProcessGroup.class);
 
     Environment env;
 
@@ -39,8 +39,8 @@ public class RemoteProcessGroups {
     CommonService commonService;
 
     @Autowired
-    RemoteProcessGroups(Environment env) {
-        logger.info("Intialized RemoteProcessGroups !!! ");
+    RemoteProcessGroup(Environment env) {
+        logger.info("Intialized RemoteProcessGroup !!! ");
         this.env = env;
         this.trasnsportMode = env.getProperty("nifi.trasnsportMode");
         this.nifiSecuredCluster = Boolean.parseBoolean(env.getProperty("nifi.securedCluster"));
