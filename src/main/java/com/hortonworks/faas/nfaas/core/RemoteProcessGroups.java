@@ -90,5 +90,22 @@ public class RemoteProcessGroups {
     }
 
 
+    /**
+     * This is the method which is used to get the get the remote process groups
+     * for the remote process grp ID ..
+     *
+     * @param rpgeId
+     * @return /remote-process-groups/{id} Gets a remote process group
+     */
+    public RemoteProcessGroupEntity getLatestRemoteProcessGroupEntity(String rpgeId) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/remote-process-groups/" + rpgeId + "/";
+        HttpEntity<RemoteProcessGroupEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                RemoteProcessGroupEntity.class, params);
+        return response.getBody();
+    }
+
 
 }
