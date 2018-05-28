@@ -1,10 +1,7 @@
 package com.hortonworks.faas.nfaas.core;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.nifi.web.api.entity.FlowEntity;
-import org.apache.nifi.web.api.entity.InstantiateTemplateRequestEntity;
-import org.apache.nifi.web.api.entity.ProcessGroupEntity;
-import org.apache.nifi.web.api.entity.TemplateEntity;
+import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +14,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Template {
 
@@ -123,6 +122,46 @@ public class Template {
         FlowEntity flowEntity = restTemplate.postForObject(uri, requestEntity, FlowEntity.class);
 
         return flowEntity;
+    }
+
+    /**
+     * This is the method to get all the templates
+     * https://"+nifiServerHostnameAndPort+"/nifi-api/flow/templates
+     *
+     * @param
+     */
+    public TemplatesEntity getAllTemplates() {
+        // https://"+nifiServerHostnameAndPort+"/nifi-api/flow/templates
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/templates/";
+        HttpEntity<TemplatesEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                TemplatesEntity.class, params);
+        return response.getBody();
+    }
+
+    /**
+     * This is the method to delete the template that already exists
+     *
+     * @param templateId
+     *
+     * https://"+nifiServerHostnameAndPort+"/nifi-api/templates/
+     */
+    public void deleteTemplate(String templateId) {
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/templates/" + templateId + "/";
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        HttpEntity<TemplateEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
+                TemplateEntity.class, params);
+
+        TemplateEntity resp = response.getBody();
+        logger.debug(resp.toString());
+
     }
 
 }

@@ -1721,42 +1721,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method to get all the templates
-     *
-     * @param processGroupEntity
-     */
-    private TemplatesEntity getAllTemplates() {
-        // https://"+nifiServerHostnameAndPort+"/nifi-api/flow/templates
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/templates/";
-        HttpEntity<TemplatesEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                TemplatesEntity.class, params);
-        return response.getBody();
-    }
 
-    /**
-     * This is the method to delete the template that already exists
-     *
-     * @param processGroupEntity https://"+nifiServerHostnameAndPort+"/nifi-api/templates/
-     */
-    private void deleteTemplate(String templateId) {
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/templates/" + templateId + "/";
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        HttpEntity<TemplateEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
-                TemplateEntity.class, params);
-
-        TemplateEntity resp = response.getBody();
-        logger.debug(resp.toString());
-
-    }
 
     /**
      * Place the request for the Deletion
