@@ -1715,23 +1715,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method which is used to get the remote process groups for the
-     * Process GROUP ID .. /process-groups/{id}/remote-process-groups
-     *
-     * @param pgId
-     * @return
-     */
-    private RemoteProcessGroupsEntity getLatestRemoteProcessGroupsEntity(String pgId) {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId
-                + "/remote-process-groups/";
-        HttpEntity<RemoteProcessGroupsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                RemoteProcessGroupsEntity.class, params);
-        return response.getBody();
-    }
+
 
     /**
      * This is the method which is used to get the get the remote process groups

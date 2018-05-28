@@ -4,6 +4,7 @@ import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.entity.ControllerServicesEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
+import org.apache.nifi.web.api.entity.RemoteProcessGroupsEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,6 +219,24 @@ public class ProcessGroups {
         }
 
         return processGroupNameFromTemplate;
+    }
+
+    /**
+     * This is the method which is used to get the remote process groups for the
+     * Process GROUP ID .. /process-groups/{id}/remote-process-groups
+     *
+     * @param pgId
+     * @return
+     */
+    public RemoteProcessGroupsEntity getLatestRemoteProcessGroupsEntity(String pgId) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId
+                + "/remote-process-groups/";
+        HttpEntity<RemoteProcessGroupsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                RemoteProcessGroupsEntity.class, params);
+        return response.getBody();
     }
 
 
