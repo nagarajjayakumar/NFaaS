@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,9 +28,7 @@ public class ControllerServices {
     private String trasnsportMode = "http";
     private boolean nifiSecuredCluster = false;
     private String nifiServerHostnameAndPort = "localhost:9090";
-    private String templateFileLocation = "classpath:Hello_NiFi_Web_Service.xml";
-    private String templateFileURI = "https://cwiki.apache.org/confluence/download/attachments/57904847/Hello_NiFi_Web_Service.xml?version=1&modificationDate=1449369797000&api=v2";
-    private String templateFileLoadFrom = "FILE";
+
 
     @Autowired
     Security security;
@@ -43,8 +39,6 @@ public class ControllerServices {
     @Autowired
     CommonService commonService;
 
-    @Autowired
-    private ResourceLoader resourceLoader;
 
     @Autowired
     ControllerServices(Environment env) {
@@ -54,9 +48,6 @@ public class ControllerServices {
         this.trasnsportMode = env.getProperty("nifi.trasnsportMode");
         this.nifiSecuredCluster = Boolean.parseBoolean(env.getProperty("nifi.securedCluster"));
         this.nifiServerHostnameAndPort = env.getProperty("nifi.hostnameAndPort");
-        this.templateFileLocation = env.getProperty("bootrest.templateFileLocation");
-        this.templateFileURI = env.getProperty("bootrest.templateFileURI");
-        this.templateFileLoadFrom = env.getProperty("bootrest.templateFileLoadFrom");
     }
 
     /**
@@ -248,13 +239,5 @@ public class ControllerServices {
         controllerServiceEntityDest.setComponent(component);
     }
 
-    private Resource loadResourceUsingLoadFromParam() {
-        Resource resource = resourceLoader.getResource(templateFileLocation);
-
-        if ("URI".equalsIgnoreCase(templateFileLoadFrom)) {
-            resource = resourceLoader.getResource(templateFileURI);
-        }
-        return resource;
-    }
 
 }
