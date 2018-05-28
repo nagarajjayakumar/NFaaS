@@ -1,4 +1,4 @@
-package com.hortonworks.faas.nfaas.core.helpers;
+package com.hortonworks.faas.nfaas.core.helper;
 
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
