@@ -85,4 +85,39 @@ public class Processors {
 
         return resp;
     }
+
+    /**
+     * Call the NIFI rest api to delete the Processor
+     * https://localhost:8080/nifi-api/processors/01213907-015b-1000-2760-95063f855d50?version=0&clientId=ca8915b0-30be-1fca-4c85-739031a5f7cf
+     *
+     * @param processor
+     * @param state
+     * @return
+     */
+    public ProcessorEntity deleteProcessorEntity(ProcessorEntity processor, String state) {
+
+        String peId = processor.getId();
+
+        // https://"+nifiServerHostnameAndPort+"/nifi-api/process-groups/a57d7d2a-86bd-4b43-357a-34abb1bd85d6?version=0&clientId=deaebc77-015b-1000-31ea-162516e98255
+        String version = String.valueOf(commonService.getClientIdAndVersion(processor).getVersion());
+        String clientId = String.valueOf(commonService.getClientIdAndVersion(processor).getClientId());
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/processors/" + peId + "?version="
+                + version + "&clientId=" + clientId;
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        ProcessorEntity resp = null;
+        HttpEntity<ProcessorEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
+                ProcessorEntity.class, params);
+
+        resp = response.getBody();
+
+        logger.debug(resp.toString());
+        return resp;
+
+    }
 }
