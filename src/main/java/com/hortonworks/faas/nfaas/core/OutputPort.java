@@ -120,4 +120,20 @@ public class OutputPort {
         return resp;
 
     }
+
+    /**
+     * This is the method to get the latest Output port entity
+     *
+     * @param portEntity
+     * @return
+     */
+    public PortEntity getLatestOutputPortEntity(PortEntity portEntity) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/output-ports/" + portEntity.getId() + "/";
+        HttpEntity<PortEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity, PortEntity.class,
+                params);
+        return response.getBody();
+    }
 }

@@ -1706,37 +1706,9 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method to get the latest Input Port Entity
-     *
-     * @param portEntity
-     * @return
-     */
-    private PortEntity getLatestInputPortEntity(PortEntity portEntity) {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/input-ports/" + portEntity.getId() + "/";
-        HttpEntity<PortEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity, PortEntity.class,
-                params);
-        return response.getBody();
-    }
 
-    /**
-     * This is the method to get the latest Output port entity
-     *
-     * @param portEntity
-     * @return
-     */
-    private PortEntity getLatestOutputPortEntity(PortEntity portEntity) {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/output-ports/" + portEntity.getId() + "/";
-        HttpEntity<PortEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity, PortEntity.class,
-                params);
-        return response.getBody();
-    }
+
+
 
     /**
      * This is the method to get the latest Processor Entity

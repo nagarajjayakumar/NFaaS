@@ -118,4 +118,20 @@ public class InputPort {
         return resp;
 
     }
+
+    /**
+     * This is the method to get the latest Input Port Entity
+     *
+     * @param portEntity
+     * @return
+     */
+    public PortEntity getLatestInputPortEntity(PortEntity portEntity) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/input-ports/" + portEntity.getId() + "/";
+        HttpEntity<PortEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity, PortEntity.class,
+                params);
+        return response.getBody();
+    }
 }
