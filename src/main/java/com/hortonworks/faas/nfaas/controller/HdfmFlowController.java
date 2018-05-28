@@ -1723,50 +1723,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * Place the request for the Deletion
-     * https://localhost:8080/nifi-api/flowfile-queues/910e1c9c-015b-1000-a23d-97627b6ff030/drop-requests
-     *
-     * @param connection
-     * @return
-     */
-    private DropRequestEntity placeRequestForDeletion(ConnectionEntity connection) {
-        String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flowfile-queues/" + connection.getId()
-                + "/drop-requests";
 
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        ResponseEntity<DropRequestEntity> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity,
-                DropRequestEntity.class);
-        DropRequestEntity dre = response.getBody();
-
-        return dre;
-    }
-
-    /**
-     * Actual method to delete the queue content
-     *
-     * @param dre
-     * @return
-     */
-    private DropRequestEntity deleteTheQueueContent(DropRequestEntity dre) {
-        final String uri = dre.getDropRequest().getUri();
-
-        Map<String, String> params = new HashMap<String, String>();
-
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        HttpEntity<DropRequestEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
-                DropRequestEntity.class, params);
-
-        DropRequestEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-
-        return resp;
-    }
 
 
 
