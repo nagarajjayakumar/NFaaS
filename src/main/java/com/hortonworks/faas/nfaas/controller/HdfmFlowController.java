@@ -1732,50 +1732,7 @@ public class HdfmFlowController {
 
 
 
-    private Set<String> getAllInputPortNameFromTemplate(Set<PortDTO> inputPortFromTemplate) {
-        Set<String> inputPortNameFromTemplate = new LinkedHashSet<>();
 
-        for (PortDTO portDTO : inputPortFromTemplate) {
-            inputPortNameFromTemplate.add(portDTO.getName());
-        }
-
-        return inputPortNameFromTemplate;
-    }
-
-    private Set<String> getAllOutputPortNameFromTemplate(Set<PortDTO> outputPortFromTemplate) {
-        Set<String> outputPortNameFromTemplate = new LinkedHashSet<>();
-
-        for (PortDTO portDTO : outputPortFromTemplate) {
-            outputPortNameFromTemplate.add(portDTO.getName());
-        }
-
-        return outputPortNameFromTemplate;
-    }
-
-    private Set<String> getAllProcessorsNameFromTemplate(Set<ProcessorDTO> processorsFromTemplate) {
-        Set<String> processorNameFromTemplate = new LinkedHashSet<>();
-
-        for (ProcessorDTO processorDTO : processorsFromTemplate) {
-            processorNameFromTemplate.add(processorDTO.getName());
-        }
-
-        return processorNameFromTemplate;
-    }
-
-    /**
-     * @param remoteProcessGroupsFromTemplate
-     * @return
-     */
-    private Set<String> getAllRemoteProcessorGroupNameFromTemplate(
-            Set<RemoteProcessGroupDTO> remoteProcessGroupsFromTemplate) {
-        Set<String> remoteProcessorGroupNameFromTemplate = new LinkedHashSet<>();
-
-        for (RemoteProcessGroupDTO remoteProcessGroupDTO : remoteProcessGroupsFromTemplate) {
-            remoteProcessorGroupNameFromTemplate.add(remoteProcessGroupDTO.getName());
-        }
-
-        return remoteProcessorGroupNameFromTemplate;
-    }
 
 
 
