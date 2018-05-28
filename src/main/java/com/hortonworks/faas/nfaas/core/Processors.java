@@ -1,8 +1,8 @@
 package com.hortonworks.faas.nfaas.core;
 
-import org.apache.nifi.web.api.dto.PortDTO;
+import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.apache.nifi.web.api.dto.RevisionDTO;
-import org.apache.nifi.web.api.entity.PortEntity;
+import org.apache.nifi.web.api.entity.ProcessorEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -16,10 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OutputPort {
+public class Processors {
 
-
-    private static final Logger logger = LoggerFactory.getLogger(OutputPort.class);
+    private static final Logger logger = LoggerFactory.getLogger(Processors.class);
 
     Environment env;
 
@@ -40,7 +39,7 @@ public class OutputPort {
     CommonService commonService;
 
     @Autowired
-    OutputPort(Environment env) {
+    Processors(Environment env) {
         logger.info("Intialized OutputPort !!! ");
         this.env = env;
         this.trasnsportMode = env.getProperty("nifi.trasnsportMode");
@@ -49,37 +48,38 @@ public class OutputPort {
     }
 
     /**
-     * Call the NIFI rest api to start/stop the ports
-     * https://localhost:8080/nifi-api/output-ports/{Port ID}
+     * Call the NIFI rest api to start/stop the Processor
+     * https://localhost:8080/nifi-api/processors/
      *
-     * @param portEntity
+     * @param processor
      * @param state
      * @return
      */
-    public PortEntity startOrStopOutputPortEntity(PortEntity portEntity, String state) {
-        String portId = portEntity.getComponent().getId();
+    public ProcessorEntity startOrStopProcessorEntity(ProcessorEntity processor, String state) {
 
-        PortEntity portEntityReq = new PortEntity();
-        PortDTO component = new PortDTO();
-        portEntityReq.setComponent(component);
+        String processorId = processor.getComponent().getId();
+
+        ProcessorEntity processorEntityReq = new ProcessorEntity();
+        ProcessorDTO component = new ProcessorDTO();
+        processorEntityReq.setComponent(component);
         RevisionDTO revision = new RevisionDTO();
 
-        BeanUtils.copyProperties(portEntity.getRevision(), revision);
+        BeanUtils.copyProperties(processor.getRevision(), revision);
 
-        portEntityReq.getComponent().setId(portId);
-        portEntityReq.getComponent().setState(state);
-        portEntityReq.setRevision(revision);
+        processorEntityReq.getComponent().setId(processorId);
+        processorEntityReq.getComponent().setState(state);
+        processorEntityReq.setRevision(revision);
 
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/output-ports/" + portId + "/";
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/processors/" + processorId + "/";
 
         Map<String, String> params = new HashMap<String, String>();
         HttpHeaders headers = security.getAuthorizationHeader();
-        HttpEntity<PortEntity> requestEntity = new HttpEntity<>(portEntityReq, headers);
+        HttpEntity<ProcessorEntity> requestEntity = new HttpEntity<>(processorEntityReq, headers);
 
-        HttpEntity<PortEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, PortEntity.class,
-                params);
+        HttpEntity<ProcessorEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
+                ProcessorEntity.class, params);
 
-        PortEntity resp = response.getBody();
+        ProcessorEntity resp = response.getBody();
 
         logger.debug(resp.toString());
 

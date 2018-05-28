@@ -55,7 +55,7 @@ public class InputPort {
      * @param state
      * @return
      */
-    private PortEntity startOrStopInputPortEntity(PortEntity portEntity, String state) {
+    public PortEntity startOrStopInputPortEntity(PortEntity portEntity, String state) {
         String portId = portEntity.getComponent().getId();
 
         PortEntity portEntityReq = new PortEntity();

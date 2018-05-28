@@ -1253,44 +1253,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * Call the NIFI rest api to start/stop the Processor
-     * https://localhost:8080/nifi-api/processors/
-     *
-     * @param processor
-     * @param state
-     * @return
-     */
-    private ProcessorEntity startOrStopProcessorEntity(ProcessorEntity processor, String state) {
 
-        String processorId = processor.getComponent().getId();
-
-        ProcessorEntity processorEntityReq = new ProcessorEntity();
-        ProcessorDTO component = new ProcessorDTO();
-        processorEntityReq.setComponent(component);
-        RevisionDTO revision = new RevisionDTO();
-
-        BeanUtils.copyProperties(processor.getRevision(), revision);
-
-        processorEntityReq.getComponent().setId(processorId);
-        processorEntityReq.getComponent().setState(state);
-        processorEntityReq.setRevision(revision);
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/processors/" + processorId + "/";
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders headers = getAuthorizationHeader();
-        HttpEntity<ProcessorEntity> requestEntity = new HttpEntity<>(processorEntityReq, headers);
-
-        HttpEntity<ProcessorEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
-                ProcessorEntity.class, params);
-
-        ProcessorEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-
-        return resp;
-    }
 
     /**
      * This is the method which us used to enable or disable the remote process
