@@ -1255,47 +1255,6 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method which us used to enable or disable the remote process
-     * Group components
-     * http://localhost:8080/nifi-api/remote-process-groups/f2fe8ad1-015b-1000-64fd-caf013397f4a
-     *
-     * @param remoteProcessGroupEntity
-     * @param state
-     */
-    private RemoteProcessGroupEntity enableOrDisableRemoteProcessGroupComponents(
-            RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
-
-        String rpgId = remoteProcessGroupEntity.getComponent().getId();
-
-        RemoteProcessGroupEntity remoteProcessGroupEntityReq = new RemoteProcessGroupEntity();
-
-        RemoteProcessGroupDTO component = new RemoteProcessGroupDTO();
-        remoteProcessGroupEntityReq.setComponent(component);
-
-        RevisionDTO revision = new RevisionDTO();
-
-        BeanUtils.copyProperties(remoteProcessGroupEntity.getRevision(), revision);
-
-        remoteProcessGroupEntityReq.getComponent().setId(rpgId);
-        remoteProcessGroupEntityReq.getComponent().setTransmitting(Boolean.valueOf(state));
-        remoteProcessGroupEntityReq.setRevision(revision);
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/remote-process-groups/" + rpgId + "/";
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders headers = getAuthorizationHeader();
-        HttpEntity<RemoteProcessGroupEntity> requestEntity = new HttpEntity<>(remoteProcessGroupEntityReq, headers);
-
-        HttpEntity<RemoteProcessGroupEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
-                RemoteProcessGroupEntity.class, params);
-
-        RemoteProcessGroupEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-
-        return resp;
-    }
 
     /**
      * Call the NIFI rest api to delete the input port

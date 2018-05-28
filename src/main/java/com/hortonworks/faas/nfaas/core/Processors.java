@@ -40,7 +40,7 @@ public class Processors {
 
     @Autowired
     Processors(Environment env) {
-        logger.info("Intialized OutputPort !!! ");
+        logger.info("Intialized Processors !!! ");
         this.env = env;
         this.trasnsportMode = env.getProperty("nifi.trasnsportMode");
         this.nifiSecuredCluster = Boolean.parseBoolean(env.getProperty("nifi.securedCluster"));
