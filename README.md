@@ -1,16 +1,16 @@
-# nfaas
-Nifi Flow as a Service
+# nFaaS
+NiFi Flow as a Service
 ========================
 
-Automation tool for delivering Nifi flow as a Servive
+Automation tool for delivering NiFi flow as a Service
 
 Built based on micro services + Angular JS architecture    
 
 Embedded authentication and Oauth2 authorization server 
 
-Integrated with NIFI Secured cluster – via NIFI bearer token services
+Integrated with NiFi Secured cluster – via NiFi bearer token services
 
-In built NIFI template validator
+In built NiFi template validator
 
 
 nFaaS – Config
@@ -34,4 +34,4 @@ Un-deploy process group based on PGID – For Development Cluster only
 
 Configuration is externalized 
 
-Runs on embedded tomcat server – Generated artificat war file
+Runs on embedded tomcat server – Generated artifact war file

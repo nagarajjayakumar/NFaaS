@@ -327,17 +327,7 @@ public class HdfmFlowController {
 
     }
 
-    @CrossOrigin
-    @PreAuthorize("#oauth2.hasScope('read')")
-    @RequestMapping(value = "/load/process/all", produces = "application/json")
-    public @ResponseBody
-    ProcessGroupFlowEntity loadAllProcessGroups() {
-        restTemplate = ignoreCertAndHostVerification(restTemplate);
-        logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
-        ProcessGroupFlowEntity pge = getRootProcessGroupFlowEntity();
-        logger.info(pge.toString());
-        return pge;
-    }
+
 
     @CrossOrigin
     @PreAuthorize("#oauth2.hasScope('read')")
@@ -429,61 +419,11 @@ public class HdfmFlowController {
         return pgfe;
     }
 
-    @CrossOrigin
-    @PreAuthorize("#oauth2.hasScope('read')")
-    @RequestMapping(value = "/processor-groups/deploy/{pgId}", produces = "application/json")
-    public @ResponseBody
-    ProcessGroupEntity deployProcessGroupByPgId(@PathVariable("pgId") String pgId) {
-        restTemplate = ignoreCertAndHostVerification(restTemplate);
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-        deployAndStartProcessGroup(pge);
-        logger.info(pge.toString());
-        return pge;
-    }
 
-    /**
-     * This is the method which is used to get the working process Group ID
-     *
-     * @param pgfe
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private ProcessGroupEntity getAboutToDeployProcessGroupId(ProcessGroupFlowEntity pgfe) {
-        String aboutToDeployTemplateName = env.getProperty("bootrest.templateName").replaceAll("\\s", "");
-        Set<ProcessGroupEntity> processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
 
-        for (ProcessGroupEntity pge : processGroups) {
-            if (aboutToDeployTemplateName.equalsIgnoreCase(pge.getComponent().getName().replaceAll("\\s", ""))) {
-                return pge;
 
-            }
-        }
-        return null;
-    }
 
-    /**
-     * This is the method to get all the processGroupEntity from the pgfe
-     *
-     * @param pgfe
-     * @param processGroupsFromTemplate
-     * @return
-     */
-    private Set<ProcessGroupEntity> getProcessGroupEntityForUndeploy(ProcessGroupFlowEntity pgfe,
-                                                                     Set<ProcessGroupDTO> processGroupsFromTemplate) {
 
-        Set<ProcessGroupEntity> resultProcessGroups = new LinkedHashSet<>();
-        Set<ProcessGroupEntity> allProcessGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
-
-        Set<String> processGroupNameFromTemplate = getAllProcessGroupNameFromTemplate(processGroupsFromTemplate);
-
-        for (ProcessGroupEntity pge : allProcessGroups) {
-            if (processGroupNameFromTemplate.contains(pge.getComponent().getName())) {
-                resultProcessGroups.add(pge);
-            }
-
-        }
-        return resultProcessGroups;
-    }
 
     /**
      * This is the method to get all the input port entity from the pgfe
@@ -589,7 +529,7 @@ public class HdfmFlowController {
      * Method is used to instantiate the template and deploy and Start the
      * components.
      *
-     * @param pge
+     * @param processGroupEntity
      */
     private FlowEntity deployAndStartProcessGroup(ProcessGroupEntity processGroupEntity) {
 
@@ -1230,158 +1170,6 @@ public class HdfmFlowController {
         return pgfe;
     }
 
-    /**
-     * Enable or disbale the contoller service state
-     *
-     * @param controllerServiceEntity
-     * @param state
-     */
-    private void changeControllServiceState(ControllerServiceEntity controllerServiceEntity, String state) {
-        String contServid = controllerServiceEntity.getId();
-
-        ControllerServiceEntity controllerServiceEntityReq = new ControllerServiceEntity();
-        controllerServiceEntityReq.setId(contServid);
-        copyRevision(controllerServiceEntity, controllerServiceEntityReq);
-
-        copyControllerServiceEntityState(controllerServiceEntity, controllerServiceEntityReq);
-
-        controllerServiceEntityReq.getComponent().setState(state);
-
-        updateLastModified(controllerServiceEntityReq);
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/controller-services/" + contServid + "/";
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders headers = getAuthorizationHeader();
-        HttpEntity<ControllerServiceEntity> requestEntity = new HttpEntity<>(controllerServiceEntityReq, headers);
-
-        try {
-            HttpEntity<ControllerServiceEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
-                    ControllerServiceEntity.class, params);
-
-            ControllerServiceEntity resp = response.getBody();
-
-            logger.debug(resp.toString());
-        } catch (HttpClientErrorException clientErrorException) {
-            if (clientErrorException.getRawStatusCode() != HttpStatus.CONFLICT.value())
-                throw new RuntimeException(clientErrorException.getMessage());
-            else
-                logger.error("Controller Services is in invalid state.. Please validate --> "
-                        + controllerServiceEntity.getComponent().getName());
-        }
-    }
-
-    /**
-     * Method is to Stop the referencing components of the Controller Services.
-     *
-     * @param revision
-     * @param referencingComponents
-     */
-    private void disableControllerServiceUsingRef(ControllerServiceEntity controllerServiceEntity, String state) {
-
-        UpdateControllerServiceReferenceRequestEntity updateContServRefReq = new UpdateControllerServiceReferenceRequestEntity();
-
-        updateContServRefReq.setId(controllerServiceEntity.getId());
-        updateContServRefReq.setState(state);
-
-        updateLastModified(controllerServiceEntity);
-
-        Map<String, RevisionDTO> refCompRevisions = new HashMap<>();
-
-        updateContServRefReq.setReferencingComponentRevisions(refCompRevisions);
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/controller-services/"
-                + controllerServiceEntity.getId() + "/references/";
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders headers = getAuthorizationHeader();
-        HttpEntity<UpdateControllerServiceReferenceRequestEntity> requestEntity = new HttpEntity<>(updateContServRefReq,
-                headers);
-
-        HttpEntity<ControllerServiceReferencingComponentsEntity> response = restTemplate.exchange(uri, HttpMethod.PUT,
-                requestEntity, ControllerServiceReferencingComponentsEntity.class, params);
-
-        ControllerServiceReferencingComponentsEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-
-    }
-
-    /**
-     * Method is to Stop the referencing components of the Controller Services.
-     *
-     * @param revision
-     * @param referencingComponents
-     */
-    private void stopReferencingComponents(ControllerServiceEntity controllerServiceEntity, String state) {
-
-        String contServid = controllerServiceEntity.getId();
-        Set<ControllerServiceReferencingComponentEntity> referencingComponents = controllerServiceEntity.getComponent()
-                .getReferencingComponents();
-
-        UpdateControllerServiceReferenceRequestEntity updateContServRefReq = new UpdateControllerServiceReferenceRequestEntity();
-
-        updateContServRefReq.setId(contServid);
-        updateContServRefReq.setState(state);
-
-        Map<String, RevisionDTO> refCompRevisions = new HashMap<>();
-
-        for (ControllerServiceReferencingComponentEntity csRefComp : referencingComponents) {
-            refCompRevisions.put(csRefComp.getId(), updateLastModified(csRefComp));
-        }
-
-        updateContServRefReq.setReferencingComponentRevisions(refCompRevisions);
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/controller-services/" + contServid
-                + "/references/";
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders headers = getAuthorizationHeader();
-        HttpEntity<UpdateControllerServiceReferenceRequestEntity> requestEntity = new HttpEntity<>(updateContServRefReq,
-                headers);
-
-        HttpEntity<ControllerServiceReferencingComponentsEntity> response = restTemplate.exchange(uri, HttpMethod.PUT,
-                requestEntity, ControllerServiceReferencingComponentsEntity.class, params);
-
-        ControllerServiceReferencingComponentsEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-
-    }
-
-    /**
-     * Delete teh controller Service
-     *
-     * @param controllerServiceEntity
-     * @param state
-     */
-    private ControllerServiceEntity deleteControllerService(ControllerServiceEntity controllerServiceEntity,
-                                                            String state) {
-
-        logger.info("Delete Controller Service Entity Starts --> " + controllerServiceEntity.getComponent().getName());
-        String contServid = controllerServiceEntity.getId();
-
-        // https://"+nifiServerHostnameAndPort+"/nifi-api/controller-services/b369d993-48ae-4c0e-5ddc-ac8b8f316c4b?version=2&clientId=deaebc77-015b-1000-31ea-162516e98255
-        String version = String.valueOf(getClientIdAndVersion(controllerServiceEntity).getVersion());
-        String clientId = String.valueOf(getClientIdAndVersion(controllerServiceEntity).getClientId());
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/controller-services/" + contServid
-                + "?version=" + version + "&clientId=" + clientId;
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        HttpEntity<ControllerServiceEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
-                ControllerServiceEntity.class, params);
-
-        ControllerServiceEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-        logger.info("Delete Controller Service Entity Ends --> " + controllerServiceEntity.getComponent().getName());
-        return resp;
-
-    }
 
     /**
      * This is the method which is used to delete the remote process group
@@ -1461,33 +1249,7 @@ public class HdfmFlowController {
         enableOrDisableRemoteProcessGroupComponents(remoteProcessGroupEntity, state);
     }
 
-    /**
-     * Call the NIFI rest api to start/stop the process group
-     *
-     * @param processGroupFlowEntity
-     * @param state
-     */
-    private void startOrStopProcessGroupComponents(ProcessGroupFlowEntity processGroupFlowEntity, String state) {
-        String pgId = processGroupFlowEntity.getProcessGroupFlow().getId();
 
-        ScheduleComponentsEntity scheduleComponentsEntityReq = new ScheduleComponentsEntity();
-
-        scheduleComponentsEntityReq.setId(pgId);
-        scheduleComponentsEntityReq.setState(state);
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/process-groups/" + pgId + "/";
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders headers = getAuthorizationHeader();
-        HttpEntity<ScheduleComponentsEntity> requestEntity = new HttpEntity<>(scheduleComponentsEntityReq, headers);
-
-        HttpEntity<ProcessGroupFlowEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
-                ProcessGroupFlowEntity.class, params);
-
-        ProcessGroupFlowEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-    }
 
     /**
      * Call the NIFI rest api to start/stop the ports
@@ -1750,39 +1512,7 @@ public class HdfmFlowController {
 
     }
 
-    /**
-     * delete the process group ...
-     *
-     * @param pge
-     * @param state
-     * @return
-     */
-    private ProcessGroupEntity deleteProcessGroup(ProcessGroupEntity pge, String state) {
 
-        String pgId = pge.getId();
-
-        // https://"+nifiServerHostnameAndPort+"/nifi-api/process-groups/a57d7d2a-86bd-4b43-357a-34abb1bd85d6?version=0&clientId=deaebc77-015b-1000-31ea-162516e98255
-        String version = String.valueOf(getClientIdAndVersion(pge).getVersion());
-        String clientId = String.valueOf(getClientIdAndVersion(pge).getClientId());
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId + "?version="
-                + version + "&clientId=" + clientId;
-
-        Map<String, String> params = new HashMap<String, String>();
-
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        ProcessGroupEntity resp = null;
-        HttpEntity<ProcessGroupEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
-                ProcessGroupEntity.class, params);
-
-        resp = response.getBody();
-
-        logger.debug(resp.toString());
-        return resp;
-
-    }
 
     /**
      * This is the method to upload the template
@@ -1923,7 +1653,7 @@ public class HdfmFlowController {
     /**
      * Check the Output Port service entity status
      *
-     * @param controllerServiceEntity
+     * @param processorEntity
      * @param state
      */
     private ProcessorEntity checkProcessorEntityStatus(ProcessorEntity processorEntity, String state) {
@@ -2296,40 +2026,9 @@ public class HdfmFlowController {
         return inputTemplateDTO;
     }
 
-    /**
-     * get All Controller Services By Process Group
-     *
-     * @param pgId
-     * @return
-     */
-    private ControllerServicesEntity getAllControllerServicesByProcessGroup(String pgId) {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/process-groups/" + pgId
-                + "/controller-services/";
-        HttpEntity<ControllerServicesEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                ControllerServicesEntity.class, params);
-        return response.getBody();
-    }
 
-    /**
-     * get the latest controller services status
-     *
-     * @param controllerServiceEntity
-     * @return
-     */
-    private ControllerServiceEntity getLatestControllerServiceEntity(ControllerServiceEntity controllerServiceEntity) {
 
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/controller-services/"
-                + controllerServiceEntity.getId() + "/";
-        HttpEntity<ControllerServiceEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                ControllerServiceEntity.class, params);
-        return response.getBody();
-    }
+
 
     /**
      * This is the method to get the latest Input Port Entity
@@ -2380,55 +2079,8 @@ public class HdfmFlowController {
         return response.getBody();
     }
 
-    /**
-     * this is the method to get the Latest process Group Entity
-     *
-     * @param pgId
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private ProcessGroupFlowEntity getLatestProcessGroupFlowEntity(ProcessGroupFlowEntity processGroupFlowEntity) {
-        String pgId = processGroupFlowEntity.getProcessGroupFlow().getId();
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/process-groups/" + pgId + "/";
-        HttpEntity<ProcessGroupFlowEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                ProcessGroupFlowEntity.class, params);
-        return response.getBody();
-    }
 
-    /**
-     * this is the method to get the Latest process flow Group Entity
-     *
-     * @param pgId
-     * @return
-     */
-    private ProcessGroupFlowEntity getLatestProcessGroupFlowEntity(String pgId) {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/process-groups/" + pgId + "?recursive=true";
-        HttpEntity<ProcessGroupFlowEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                ProcessGroupFlowEntity.class, params);
-        return response.getBody();
-    }
 
-    /**
-     * this is the method to get the Latest process Group Entity
-     *
-     * @param pgId
-     * @return
-     */
-    private ProcessGroupEntity getLatestProcessGroupEntity(String pgId) {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId + "/";
-        HttpEntity<ProcessGroupEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                ProcessGroupEntity.class, params);
-        return response.getBody();
-    }
 
     /**
      * This is the method which is used to get the remote process groups for the
@@ -2465,23 +2117,7 @@ public class HdfmFlowController {
         return response.getBody();
     }
 
-    /**
-     * This is the method which is used to get the root process group Flow
-     * Entity
-     *
-     * @return
-     */
-    private ProcessGroupFlowEntity getRootProcessGroupFlowEntity() {
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
 
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/process-groups/root";
-
-        HttpEntity<ProcessGroupFlowEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
-                ProcessGroupFlowEntity.class, params);
-        return response.getBody();
-    }
 
     /**
      * This is the method to get all the templates
@@ -2565,98 +2201,12 @@ public class HdfmFlowController {
         return resp;
     }
 
-    /**
-     * Call the NIFI API to get the Access Token.
-     * https://localhost:8080/nifi-api/access/token/
-     *
-     * @return
-     */
-    private String getAccessToken() {
-        String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/access/token/";
 
-        Map<String, String> params = new HashMap<String, String>();
 
-        MultiValueMap<String, String> bodyMap = new LinkedMultiValueMap<String, String>();
-        bodyMap.add("username", nifiUsername);
-        bodyMap.add("password", nifiPassword);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(bodyMap,
-                headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, request, String.class, params);
 
-        String token = response.getBody();
-
-        return token;
-    }
-
-    /**
-     * Update the last Modified for the entity.
-     *
-     * @param entity
-     * @return
-     */
-    private RevisionDTO updateLastModified(ComponentEntity entity) {
-        RevisionDTO revision = getClientIdAndVersion(entity);
-        revision.setLastModifier(getUser());
-        return revision;
-    }
-
-    /**
-     * This is the method to get the client ID and version for the Component
-     * Entity
-     *
-     * @param entity
-     * @return
-     */
-    private RevisionDTO getClientIdAndVersion(ComponentEntity entity) {
-        RevisionDTO revision = new RevisionDTO();
-
-        if (null != entity) {
-            return entity.getRevision();
-        }
-
-        return revision;
-    }
-
-    private void copyRevision(ComponentEntity controllerServiceEntitySrc, ComponentEntity controllerServiceEntityDest) {
-        RevisionDTO revision = new RevisionDTO();
-        revision.setClientId(controllerServiceEntitySrc.getRevision().getClientId());
-        revision.setVersion(controllerServiceEntitySrc.getRevision().getVersion());
-        revision.setLastModifier(controllerServiceEntitySrc.getRevision().getLastModifier());
-
-        controllerServiceEntityDest.setRevision(revision);
-
-    }
-
-    private void copyControllerServiceEntityState(ControllerServiceEntity controllerServiceEntitySrc,
-                                                  ControllerServiceEntity controllerServiceEntityDest) {
-        ControllerServiceDTO component = new ControllerServiceDTO();
-        component.setId(controllerServiceEntitySrc.getId());
-        controllerServiceEntityDest.setComponent(component);
-    }
-
-    private Resource loadResourceUsingLoadFromParam() {
-        Resource resource = resourceLoader.getResource(templateFileLocation);
-
-        if ("URI".equalsIgnoreCase(templateFileLoadFrom)) {
-            resource = resourceLoader.getResource(templateFileURI);
-        }
-        return resource;
-    }
-
-    private Set<String> getAllProcessGroupNameFromTemplate(Set<ProcessGroupDTO> processGroupsFromTemplate) {
-        Set<String> processGroupNameFromTemplate = new LinkedHashSet<>();
-
-        for (ProcessGroupDTO processGroupDTO : processGroupsFromTemplate) {
-            processGroupNameFromTemplate.add(processGroupDTO.getName());
-        }
-
-        return processGroupNameFromTemplate;
-    }
 
     private Set<String> getAllInputPortNameFromTemplate(Set<PortDTO> inputPortFromTemplate) {
         Set<String> inputPortNameFromTemplate = new LinkedHashSet<>();
@@ -2703,80 +2253,8 @@ public class HdfmFlowController {
         return remoteProcessorGroupNameFromTemplate;
     }
 
-    private String getUser() {
-        // TODO Auto-generated method stub
-        return "hdfm";
-    }
 
-    private Double getXaxis() {
-        double rangeMin = 1500;
-        double rangeMax = 2000;
-        Random r = new Random();
-        double randomValue = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
-        return randomValue;
-    }
 
-    private Double getYaxis() {
-        double rangeMin = 1000;
-        double rangeMax = 1500;
-        Random r = new Random();
-        double randomValue = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
-        return randomValue;
-    }
 
-    /**
-     * WARNING!!! testing/development purpose only!!!
-     *
-     * @param restTemplate
-     * @throws Exception
-     */
-    public RestTemplate ignoreCertAndHostVerification(RestTemplate restTemplate) {
-        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-
-        SSLContext sslContext = null;
-        try {
-            sslContext = org.apache.http.ssl.SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy)
-                    .build();
-        } catch (KeyManagementException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-
-        CloseableHttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .setSSLSocketFactory(csf).build();
-
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-
-        requestFactory.setHttpClient(httpClient);
-
-        restTemplate.setRequestFactory(requestFactory);
-        return restTemplate;
-    }
-
-    /**
-     * This is the method used to get the Authorization Headers
-     *
-     * @return
-     */
-    private HttpHeaders getAuthorizationHeader() {
-        HttpHeaders requestHeaders = new HttpHeaders();
-        String token = "anonymous";
-
-        // For secured Cluster
-        if (this.nifiSecuredCluster) {
-            token = getAccessToken();
-        }
-
-        requestHeaders.add(authorizationHeaderKey, authorizationHeaderValue + token);
-        return requestHeaders;
-    }
 
 }
