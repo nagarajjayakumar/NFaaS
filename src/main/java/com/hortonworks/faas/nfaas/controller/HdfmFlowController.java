@@ -355,30 +355,30 @@ public class HdfmFlowController extends BasicFlowController{
         for (ProcessGroupEntity processorGroup : processGroups) {
             logger.info("Step 1 :: stopAllEntitySpecifiedInTemplate PG starts --> "
                     + processorGroup.getComponent().getName());
-            cse = getAllControllerServicesByProcessGroup(processorGroup.getId());
+            cse = processGroup.getAllControllerServicesByProcessGroup(processorGroup.getId());
 
             logger.info("Step 1.1 :: disable the Controller Services For the Process Group Started "
                     + processorGroup.getId());
-            disableAllControllerServices(cse);
+            controllerServiceFacadeHelper.disableAllControllerServices(cse);
             logger.info("Step 1.1 :: disable the Controller Services For the Process Group Ended " + cse.toString());
 
             logger.info("Step 1.2 :: Stop all the processor For the Process Group Started " + processorGroup.getId());
-            stopAllProcessors(processorGroup.getId());
+            processorFacadeHelper.stopAllProcessors(processorGroup.getId());
             logger.info("Step 1.2 :: Stop all the processor For the Process Group Started " + processorGroup.getId());
 
             logger.info(
                     "Step 1.3 :: disable all the processor For the Process Group Started " + processorGroup.getId());
-            disableRemoteProcessGroup(processorGroup.getId());
+            remoteProcessGroupFacadeHelper.disableRemoteProcessGroup(processorGroup.getId());
             logger.info(
                     "Step 1.3 :: disable all the processor For the Process Group Started " + processorGroup.getId());
 
             logger.info("Step 1 :: stopAllEntitySpecifiedInTemplate PG Ends --> "
                     + processorGroup.getComponent().getName());
         }
-        pgfe = getLatestProcessGroupFlowEntity(pgId);
+        pgfe = processGroupFlow.getLatestProcessGroupFlowEntity(pgId);
         processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
 
-        stopAndUnDeployProcessGroup(pgfe, pgId);
+        processGroupFacadeHelper.stopAndUnDeployProcessGroup(pgfe, pgId);
 
 //		pgfe = getLatestProcessGroupFlowEntity(pgId);
 //		processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();

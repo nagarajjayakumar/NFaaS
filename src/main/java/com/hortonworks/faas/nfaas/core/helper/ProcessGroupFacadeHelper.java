@@ -28,7 +28,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
      *
      * @param processGroupFlowEntity
      */
-    private void stopAndUnDeployProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
+    public void stopAndUnDeployProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
         logger.info("stopAndUnDeployProcessGroup Starts for --> " + pgId);
         ProcessGroupFlowEntity pgfe = processorGroupFlowFacadeHelper.stopProcessGroupComponents(processGroupFlowEntity, null, pgId);
         logger.info(pgfe.toString());
@@ -108,7 +108,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
      * @param processGroupEntity
      * @return
      */
-    private String getTemplateId(ProcessGroupEntity processGroupEntity) {
+    public String getTemplateId(ProcessGroupEntity processGroupEntity) {
         try {
 
             String templateId = templateFacadeHelper.checkTemplateExist();
@@ -173,7 +173,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
     }
 
 
-    private Set<String> getAllProcessGroupNameFromTemplate(Set<ProcessGroupDTO> processGroupsFromTemplate) {
+    public Set<String> getAllProcessGroupNameFromTemplate(Set<ProcessGroupDTO> processGroupsFromTemplate) {
         Set<String> processGroupNameFromTemplate = new LinkedHashSet<>();
 
         for (ProcessGroupDTO processGroupDTO : processGroupsFromTemplate) {
