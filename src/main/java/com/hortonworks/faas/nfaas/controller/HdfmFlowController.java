@@ -128,6 +128,30 @@ public class HdfmFlowController {
         return pgfe;
     }
 
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/load/process/all", produces = "application/json")
+    public @ResponseBody
+    ProcessGroupFlowEntity loadAllProcessGroups() {
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
+        logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
+        ProcessGroupFlowEntity pge = processGroupFlow.getRootProcessGroupFlowEntity();
+        logger.info(pge.toString());
+        return pge;
+    }
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/processor-groups/deploy/{pgId}", produces = "application/json")
+    public @ResponseBody
+    ProcessGroupEntity deployProcessGroupByPgId(@PathVariable("pgId") String pgId) {
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
+        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
+        deployAndStartProcessGroup(pge);
+        logger.info(pge.toString());
+        return pge;
+    }
+
     /**
      * This is the method which is used to undeploy the FLOW
      *
@@ -419,19 +443,6 @@ public class HdfmFlowController {
         return pgfe;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Method is used to instantiate the template and deploy and Start the
      * components.
@@ -485,11 +496,6 @@ public class HdfmFlowController {
         return flowEntity;
 
     }
-
-
-
-
-
 
 
 }

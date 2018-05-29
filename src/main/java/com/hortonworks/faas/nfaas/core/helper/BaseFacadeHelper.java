@@ -26,7 +26,6 @@ public class BaseFacadeHelper {
     @Autowired
     Template template;
 
-
     @Autowired
     RemoteProcessGroup remoteProcessGroup;
 
