@@ -1122,73 +1122,11 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * Check for the reference component. check for the state else sleep for 10
-     * sec
-     *
-     * @param controllerServiceEntity
-     * @param state
-     */
-    private void checkReferenceComponentStatus(ControllerServiceEntity controllerServiceEntity, String state) {
-        int count = 0;
-        int innerCount = 0;
-        ControllerServiceEntity cse = null;
-
-        while (true && count < WAIT_IN_SEC) {
-            cse = getLatestControllerServiceEntity(controllerServiceEntity);
-
-            Set<ControllerServiceReferencingComponentEntity> referencingComponents = cse.getComponent()
-                    .getReferencingComponents();
-
-            for (ControllerServiceReferencingComponentEntity csrRefComp : referencingComponents) {
-
-                if (!state.equalsIgnoreCase(csrRefComp.getComponent().getState())) {
-                    break;
-                }
-                innerCount++;
-            }
-
-            if (referencingComponents.size() == innerCount) {
-                break;
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-
-            }
-            count++;
-            innerCount = 0;
-        }
-
-    }
 
 
 
-    /**
-     * This is the method to delete teh root proces group queu content
-     *
-     * @param rootPgId
-     * @param state
-     */
-    private void deleteRootProcessGroupQueueContentIfAny(String rootPgId) {
-        ProcessGroupFlowEntity pgfe = null;
-        pgfe = getLatestProcessGroupFlowEntity(rootPgId);
-
-        Set<ConnectionEntity> connections = pgfe.getProcessGroupFlow().getFlow().getConnections();
-
-        int queuedCountInConnections = 0;
-        DropRequestEntity dre = null;
-        for (ConnectionEntity connection : connections) {
-            queuedCountInConnections = Integer.parseInt(connection.getStatus().getAggregateSnapshot().getQueuedCount().replaceAll(",", ""));
-            if (queuedCountInConnections > 0) {
-                dre = placeRequestForDeletion(connection);
-                dre = deleteTheQueueContent(dre);
-            }
-        }
 
 
-    }
 
 
 

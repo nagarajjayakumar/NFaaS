@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class ControllerServices {
+public class ControllerService {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(ControllerServices.class);
+    private static final Logger logger = LoggerFactory.getLogger(ControllerService.class);
 
     Environment env;
 
@@ -41,7 +41,7 @@ public class ControllerServices {
 
 
     @Autowired
-    ControllerServices(Environment env) {
+    ControllerService(Environment env) {
 
         logger.info("Intialized ProcessGroupFlow !!! ");
         this.env = env;
@@ -210,7 +210,7 @@ public class ControllerServices {
      * @param controllerServiceEntity
      * @return
      */
-    private ControllerServiceEntity getLatestControllerServiceEntity(ControllerServiceEntity controllerServiceEntity) {
+    public ControllerServiceEntity getLatestControllerServiceEntity(ControllerServiceEntity controllerServiceEntity) {
 
         Map<String, String> params = new HashMap<String, String>();
         HttpHeaders requestHeaders = security.getAuthorizationHeader();
