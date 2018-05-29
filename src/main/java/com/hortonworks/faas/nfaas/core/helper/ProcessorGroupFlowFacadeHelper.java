@@ -51,7 +51,7 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
                                                               String pgId) {
         stopProcessGroupComponents(processGroupFlowEntity, EntityState.STOPPED.getState());
         checkProcessGroupComponentStatus(processGroupFlowEntity, EntityState.STOPPED.getState(), pgId);
-        ProcessGroupFlowEntity pge = getLatestProcessGroupFlowEntity(
+        ProcessGroupFlowEntity pge = processGroupFlow.getLatestProcessGroupFlowEntity(
                 processGroupFlowEntity.getProcessGroupFlow().getId());
         return pge;
     }
@@ -93,7 +93,7 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
                         }
                         // Check for the queue content
                         if (queuedCount > 0) {
-                            deleteTheQueueContent(processGroupEntity);
+                            flowFileQueue.deleteTheQueueContent(processGroupEntity);
                             break;
                         }
 
