@@ -39,7 +39,7 @@ public class Processor {
     CommonService commonService;
 
     @Autowired
-    Processors(Environment env) {
+    Processor(Environment env) {
         logger.info("Intialized Processors !!! ");
         this.env = env;
         this.trasnsportMode = env.getProperty("nifi.trasnsportMode");
