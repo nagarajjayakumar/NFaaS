@@ -40,10 +40,10 @@ import org.springframework.web.client.RestTemplate;
 @ComponentScan({"com.hortonworks.faas.nfaas", "org.apache.nifi.web.api.dto","com.hortonworks.faas.nfaas.core"})
 @PropertySource(ignoreResourceNotFound = false, value = "classpath:application.properties")
 @PropertySource(ignoreResourceNotFound = true, value = "file:/etc/hdfm/hdfm.properties")
-public class HdfFlowMigratorApp {
+public class NFaaSApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(HdfFlowMigratorApp.class, args);
+        SpringApplication.run(NFaaSApp.class, args);
     }
 
     @Bean

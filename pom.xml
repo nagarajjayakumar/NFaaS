@@ -17,7 +17,7 @@
       </parent>
         
          <properties> 
-	        <start-class>com.hortonworks.faas.nfaas.app.HdfFlowMigratorApp</start-class>
+	        <start-class>com.hortonworks.faas.nfaas.app.NFaaSApp</start-class>
 	        <kryo.version>4.0.0</kryo.version>
 	        <xstream.version>1.4.9</xstream.version>
 	        <!-- testing -->
