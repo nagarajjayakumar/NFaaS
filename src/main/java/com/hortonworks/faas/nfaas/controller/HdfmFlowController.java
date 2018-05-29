@@ -522,43 +522,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method which is used to start the Port Entity ,,,,
-     *
-     * @param portEntity
-     * @return
-     */
-    private PortEntity startOutputPortEntity(PortEntity portEntity) {
-        PortEntity pe = getLatestOutputPortEntity(portEntity);
-        pe = startOrStopOutputPortEntity(pe, EntityState.RUNNING.getState());
-        pe = checkOutputPortStatus(pe, EntityState.RUNNING.getState());
-        return pe;
-    }
 
-    /**
-     * This is the method which is used to stop the Port Entity ,,,,
-     *
-     * @param portEntity
-     * @return
-     */
-    private PortEntity stopOutputPortEntity(PortEntity portEntity) {
-        PortEntity pe = getLatestOutputPortEntity(portEntity);
-        pe = startOrStopOutputPortEntity(pe, EntityState.STOPPED.getState());
-        pe = checkOutputPortStatus(pe, EntityState.STOPPED.getState());
-        return pe;
-    }
-
-    /**
-     * This is the method which is used to stop the Port Entity ,,,,
-     *
-     * @param portEntity
-     * @return
-     */
-    private void deleteOutputPortEntity(PortEntity portEntity) {
-        PortEntity pe = getLatestOutputPortEntity(portEntity);
-        pe = deleteOutputPortEntity(pe, EntityState.DELETE.getState());
-        logger.info(pe.toString());
-    }
 
     /**
      * This is the method which is used to Start the Processor Entity ,,,,
@@ -656,35 +620,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * Check the Output Port service entity status
-     *
-     * @param controllerServiceEntity
-     * @param state
-     */
-    private PortEntity checkOutputPortStatus(PortEntity portEntity, String state) {
-        int count = 0;
 
-        PortEntity pe = null;
-
-        while (true && count < WAIT_IN_SEC) {
-            pe = getLatestOutputPortEntity(portEntity);
-
-            if (state.equalsIgnoreCase(pe.getComponent().getState()))
-                break;
-
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-
-            }
-
-            count++;
-        }
-
-        return pe;
-
-    }
 
     /**
      * Check the Output Port service entity status

@@ -1,5 +1,6 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
+import com.hortonworks.faas.nfaas.config.EntityState;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.entity.PortEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class OutputPortFacadeHelper extends BaseFacadeHelper {
 
@@ -36,6 +38,75 @@ public class OutputPortFacadeHelper extends BaseFacadeHelper {
 
         }
         return resultOutputPorts;
+    }
+
+    /**
+     * This is the method which is used to start the Port Entity ,,,,
+     *
+     * @param portEntity
+     * @return
+     */
+    private PortEntity startOutputPortEntity(PortEntity portEntity) {
+        PortEntity pe = outputPort.getLatestOutputPortEntity(portEntity);
+        pe = outputPort.startOrStopOutputPortEntity(pe, EntityState.RUNNING.getState());
+        pe = this.checkOutputPortStatus(pe, EntityState.RUNNING.getState());
+        return pe;
+    }
+
+    /**
+     * This is the method which is used to stop the Port Entity ,,,,
+     *
+     * @param portEntity
+     * @return
+     */
+    private PortEntity stopOutputPortEntity(PortEntity portEntity) {
+        PortEntity pe = outputPort.getLatestOutputPortEntity(portEntity);
+        pe = outputPort.startOrStopOutputPortEntity(pe, EntityState.STOPPED.getState());
+        pe = this.checkOutputPortStatus(pe, EntityState.STOPPED.getState());
+        return pe;
+    }
+
+    /**
+     * This is the method which is used to stop the Port Entity ,,,,
+     *
+     * @param portEntity
+     * @return
+     */
+    private void deleteOutputPortEntity(PortEntity portEntity) {
+        PortEntity pe = outputPort.getLatestOutputPortEntity(portEntity);
+        pe = outputPort.deleteOutputPortEntity(pe, EntityState.DELETE.getState());
+        logger.info(pe.toString());
+    }
+
+
+    /**
+     * Check the Output Port service entity status
+     *
+     * @param portEntity
+     * @param state
+     */
+    private PortEntity checkOutputPortStatus(PortEntity portEntity, String state) {
+        int count = 0;
+
+        PortEntity pe = null;
+
+        while (true && count < WAIT_IN_SEC) {
+            pe = outputPort.getLatestOutputPortEntity(portEntity);
+
+            if (state.equalsIgnoreCase(pe.getComponent().getState()))
+                break;
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+
+            }
+
+            count++;
+        }
+
+        return pe;
+
     }
 
 }
