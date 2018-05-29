@@ -1,6 +1,5 @@
 package com.hortonworks.faas.nfaas.controller;
 
-import com.hortonworks.faas.nfaas.core.Security;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
@@ -18,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Set;
 
 @RestController
-public class HdfmFlowController extends BasicFlowController{
+public class HdfmFlowController extends BasicFlowController {
 
     private static final Logger logger = LoggerFactory.getLogger(HdfmFlowController.class);
 
@@ -420,7 +419,7 @@ public class HdfmFlowController extends BasicFlowController{
      */
     private FlowEntity deployAndStartProcessGroup(ProcessGroupEntity processGroupEntity) {
 
-        FlowEntity flowEntity = createTemplateInstanceByTemplateId(processGroupEntity);
+        FlowEntity flowEntity = templateFacadeHelper.createTemplateInstanceByTemplateId(processGroupEntity);
         Set<ProcessGroupEntity> processGroups = flowEntity.getFlow().getProcessGroups();
 
         Set<PortEntity> inputPorts = flowEntity.getFlow().getInputPorts();
@@ -431,7 +430,7 @@ public class HdfmFlowController extends BasicFlowController{
         PortEntity ippe = null;
         for (PortEntity ipPortEntity : inputPorts) {
             logger.info("deployAndStartProcessGroup inputports starts --> " + ipPortEntity.getComponent().getName());
-            ippe = startInputPortEntity(ipPortEntity);
+            ippe = inputPortFacadeHelper.startInputPortEntity(ipPortEntity);
             logger.info("deployAndStartProcessGroup inputports ends   --> " + ipPortEntity.getComponent().getName()
                     + ippe.toString());
         }
@@ -439,7 +438,7 @@ public class HdfmFlowController extends BasicFlowController{
         PortEntity oppe = null;
         for (PortEntity opPortEntity : outputPorts) {
             logger.info("deployAndStartProcessGroup outputPorts starts --> " + opPortEntity.getComponent().getName());
-            oppe = startOutputPortEntity(opPortEntity);
+            oppe = outputPortFacadeHelper.startOutputPortEntity(opPortEntity);
             logger.info("deployAndStartProcessGroup outputPorts ends   --> " + opPortEntity.getComponent().getName()
                     + oppe.toString());
         }
@@ -447,7 +446,7 @@ public class HdfmFlowController extends BasicFlowController{
         ProcessorEntity procent = null;
         for (ProcessorEntity processor : processors) {
             logger.info("deployAndStartProcessGroup processor starts --> " + processor.getComponent().getName());
-            procent = startProcessorEntity(processor);
+            procent = processorFacadeHelper.startProcessorEntity(processor);
             logger.info("deployAndStartProcessGroup processor ends   --> " + processor.getComponent().getName()
                     + procent.toString());
         }
@@ -455,10 +454,10 @@ public class HdfmFlowController extends BasicFlowController{
         ControllerServicesEntity cse = null;
         for (ProcessGroupEntity processorGroup : processGroups) {
             logger.info("deployAndStartProcessGroup PG starts --> " + processorGroup.getComponent().getName());
-            cse = getAllControllerServicesByProcessGroup(processorGroup.getId());
-            enableAllControllerServices(cse);
-            startAllProcessors(processorGroup);
-            enableRemoteProcessGroup(processorGroup.getId());
+            cse = processGroup.getAllControllerServicesByProcessGroup(processorGroup.getId());
+            controllerServiceFacadeHelper.enableAllControllerServices(cse);
+            processorFacadeHelper.startAllProcessors(processorGroup);
+            remoteProcessGroupFacadeHelper.enableRemoteProcessGroup(processorGroup.getId());
             logger.info("deployAndStartProcessGroup PG Ends --> " + processorGroup.getComponent().getName());
         }
 

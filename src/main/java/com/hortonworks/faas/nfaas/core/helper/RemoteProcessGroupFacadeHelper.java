@@ -29,7 +29,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @return
      */
     @SuppressWarnings("unused")
-    private Set<RemoteProcessGroupEntity> getRemoteProcessGroupEntityForUndeploy(ProcessGroupFlowEntity pgfe,
+    public Set<RemoteProcessGroupEntity> getRemoteProcessGroupEntityForUndeploy(ProcessGroupFlowEntity pgfe,
                                                                                  Set<RemoteProcessGroupDTO> remoteProcessGroupsFromTemplate) {
 
         Set<RemoteProcessGroupEntity> resultRemotePG = new LinkedHashSet<>();
@@ -94,7 +94,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @param remoteProcessGroupEntity
      * @return
      */
-    private RemoteProcessGroupEntity disableRemoteProcessGroupComponents(
+    public RemoteProcessGroupEntity disableRemoteProcessGroupComponents(
             RemoteProcessGroupEntity remoteProcessGroupEntity) {
         disableRemoteProcessGroupComponents(remoteProcessGroupEntity, EntityState.TRANSMIT_FALSE.getState());
 
@@ -111,7 +111,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @param remoteProcessGroupEntity
      * @param state
      */
-    private RemoteProcessGroupEntity checkRemoteProcessGroupComponentsStatus(
+    public RemoteProcessGroupEntity checkRemoteProcessGroupComponentsStatus(
             RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
         int count = 0;
 
@@ -141,7 +141,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      *
      * @param pgId
      */
-    private void enableRemoteProcessGroup(String pgId) {
+    public void enableRemoteProcessGroup(String pgId) {
 
         if (!remoteProcessGroup.isEnableRPG()) {
             logger.error("DEMO :: enable remote process group skipping ");
@@ -187,7 +187,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @param pgId
      */
     @SuppressWarnings("unused")
-    private void deleteAllRemoteProcessGroup(String pgId) {
+    public void deleteAllRemoteProcessGroup(String pgId) {
         logger.info("deleteAllRemoteProcessGroup Starts for --> " + pgId);
         ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
         RemoteProcessGroupsEntity remoteProcessGroupsEntity = remoteProcessGroup.getLatestRemoteProcessGroupsEntity(pgId);
@@ -213,7 +213,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @param remoteProcessGroupEntity
      *
      */
-    private RemoteProcessGroupEntity enableRemoteProcessGroupComponents(
+    public RemoteProcessGroupEntity enableRemoteProcessGroupComponents(
             RemoteProcessGroupEntity remoteProcessGroupEntity) {
         enableRemoteProcessGroupComponents(remoteProcessGroupEntity, EntityState.TRANSMIT_TRUE.getState());
 
@@ -228,7 +228,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @param remoteProcessGroupEntity
      * @param state
      */
-    private void disableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
+    public void disableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
         remoteProcessGroup.enableOrDisableRemoteProcessGroupComponents(remoteProcessGroupEntity, state);
     }
 
@@ -238,7 +238,7 @@ public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @param remoteProcessGroupEntity
      * @param state
      */
-    private void enableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
+    public void enableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
         remoteProcessGroup.enableOrDisableRemoteProcessGroupComponents(remoteProcessGroupEntity, state);
     }
 
