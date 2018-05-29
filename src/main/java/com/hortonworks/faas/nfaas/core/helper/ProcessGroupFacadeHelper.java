@@ -1,6 +1,7 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
 import com.hortonworks.faas.nfaas.config.EntityState;
+import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
 import org.apache.nifi.web.api.entity.TemplateEntity;
@@ -146,4 +147,40 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
         pge = deleteProcessGroup(pge);
         logger.info("deleteProcessGroup Ends for --> " + pgId);
     }
+
+    /**
+     * This is the method to get all the processGroupEntity from the pgfe
+     *
+     * @param pgfe
+     * @param processGroupsFromTemplate
+     * @return
+     */
+    public Set<ProcessGroupEntity> getProcessGroupEntityForUndeploy(ProcessGroupFlowEntity pgfe,
+                                                                    Set<ProcessGroupDTO> processGroupsFromTemplate) {
+
+        Set<ProcessGroupEntity> resultProcessGroups = new LinkedHashSet<>();
+        Set<ProcessGroupEntity> allProcessGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
+
+        Set<String> processGroupNameFromTemplate = getAllProcessGroupNameFromTemplate(processGroupsFromTemplate);
+
+        for (ProcessGroupEntity pge : allProcessGroups) {
+            if (processGroupNameFromTemplate.contains(pge.getComponent().getName())) {
+                resultProcessGroups.add(pge);
+            }
+
+        }
+        return resultProcessGroups;
+    }
+
+
+    private Set<String> getAllProcessGroupNameFromTemplate(Set<ProcessGroupDTO> processGroupsFromTemplate) {
+        Set<String> processGroupNameFromTemplate = new LinkedHashSet<>();
+
+        for (ProcessGroupDTO processGroupDTO : processGroupsFromTemplate) {
+            processGroupNameFromTemplate.add(processGroupDTO.getName());
+        }
+
+        return processGroupNameFromTemplate;
+    }
+
 }

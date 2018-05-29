@@ -159,7 +159,7 @@ public class HdfmFlowController extends BasicFlowController{
         // template.getSnippet().getRemoteProcessGroups();
 
         logger.info("About to stop all the entity Specified in the File Begin ...");
-        Set<ProcessGroupEntity> processGroups = processGroup.getProcessGroupEntityForUndeploy(pgfe, processGroupsFromTemplate);
+        Set<ProcessGroupEntity> processGroups = processGroupFacadeHelper.getProcessGroupEntityForUndeploy(pgfe, processGroupsFromTemplate);
         Set<PortEntity> inputPorts = inputPortFacadeHelper.getInputPortsEntityForUndeploy(pgfe, inputPortsFromTemplate);
         Set<PortEntity> outputPorts = outputPortFacadeHelper.getOutputPortsEntityForUndeploy(pgfe, outputPortsFromTemplate);
         Set<ProcessorEntity> processors = processorFacadeHelper.getProcessorEntityForUndeploy(pgfe, processorsFromTemplate);
@@ -245,10 +245,10 @@ public class HdfmFlowController extends BasicFlowController{
         Set<ProcessorDTO> processorsFromTemplate = template.getSnippet().getProcessors();
 
         logger.info("About to delete all the entity Specified in the File Begin ...");
-        Set<ProcessGroupEntity> processGroups = getProcessGroupEntityForUndeploy(pgfe, processGroupsFromTemplate);
-        Set<PortEntity> inputPorts = getInputPortsEntityForUndeploy(pgfe, inputPortsFromTemplate);
-        Set<PortEntity> outputPorts = getOutputPortsEntityForUndeploy(pgfe, outputPortsFromTemplate);
-        Set<ProcessorEntity> processors = getProcessorEntityForUndeploy(pgfe, processorsFromTemplate);
+        Set<ProcessGroupEntity> processGroups = processGroupFacadeHelper.getProcessGroupEntityForUndeploy(pgfe, processGroupsFromTemplate);
+        Set<PortEntity> inputPorts = inputPortFacadeHelper.getInputPortsEntityForUndeploy(pgfe, inputPortsFromTemplate);
+        Set<PortEntity> outputPorts = outputPortFacadeHelper.getOutputPortsEntityForUndeploy(pgfe, outputPortsFromTemplate);
+        Set<ProcessorEntity> processors = processorFacadeHelper.getProcessorEntityForUndeploy(pgfe, processorsFromTemplate);
 
         if (inputPorts.isEmpty()) {
             logger.info("Skiping 5 :: No Input Ports Found for the Template Name  ::"
@@ -257,7 +257,7 @@ public class HdfmFlowController extends BasicFlowController{
         for (PortEntity ipPortEntity : inputPorts) {
             logger.info("Step 5 :: deleteAllEntitySpecifiedInTemplate inputports starts --> "
                     + ipPortEntity.getComponent().getName());
-            deleteInputPortEntity(ipPortEntity);
+            inputPortFacadeHelper.deleteInputPortEntity(ipPortEntity);
             logger.info("Step 5 :: deleteAllEntitySpecifiedInTemplate inputports ends   --> "
                     + ipPortEntity.getComponent().getName());
         }
@@ -269,7 +269,7 @@ public class HdfmFlowController extends BasicFlowController{
         for (PortEntity opPortEntity : outputPorts) {
             logger.info("Step 6 :: deleteAllEntitySpecifiedInTemplate outputPorts starts --> "
                     + opPortEntity.getComponent().getName());
-            deleteOutputPortEntity(opPortEntity);
+            outputPortFacadeHelper.deleteOutputPortEntity(opPortEntity);
             logger.info("Step 6 :: deleteAllEntitySpecifiedInTemplate outputPorts ends   --> "
                     + opPortEntity.getComponent().getName());
         }
@@ -281,7 +281,7 @@ public class HdfmFlowController extends BasicFlowController{
         for (ProcessorEntity processor : processors) {
             logger.info("Step 7 :: deleteAllEntitySpecifiedInTemplate processor starts --> "
                     + processor.getComponent().getName());
-            deleteProcessorEntity(processor);
+            processorFacadeHelper.deleteProcessorEntity(processor);
             logger.info("Step 7 :: deleteAllEntitySpecifiedInTemplate processor ends   --> "
                     + processor.getComponent().getName());
         }
@@ -294,11 +294,11 @@ public class HdfmFlowController extends BasicFlowController{
         for (ProcessGroupEntity processorGroup : processGroups) {
             logger.info("Step 8 :: deleteAllEntitySpecifiedInTemplate PG starts --> "
                     + processorGroup.getComponent().getName());
-            cse = getAllControllerServicesByProcessGroup(processorGroup.getId());
+            cse = processGroup.getAllControllerServicesByProcessGroup(processorGroup.getId());
             if (null != cse) {
                 logger.info("Step 8.1 :: delete all the Controller Services For the Process Group Started "
                         + processorGroup.getId());
-                deleteAllControllerServices(cse);
+                controllerServiceFacadeHelper.deleteAllControllerServices(cse);
                 logger.info(
                         "Step 8.1 :: delete all the Controller Services For the Process Group Ended " + cse.toString());
             }
@@ -310,7 +310,7 @@ public class HdfmFlowController extends BasicFlowController{
                     + processorGroup.getId());
 
             logger.info("Step 8.3 :: delete all the processor For the Process Group Started " + processorGroup.getId());
-            deleteAllProcessors(processorGroup.getId());
+            processorFacadeHelper.deleteAllProcessors(processorGroup.getId());
             logger.info("Step 8.3 :: delete all the processor For the Process Group Started " + processorGroup.getId());
 
             logger.info("Step 8 :: deleteAllEntitySpecifiedInTemplate PG Ends --> "
