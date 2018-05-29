@@ -132,4 +132,8 @@ public class FlowFileQueue {
         }
 
     }
+
+    public Boolean isDeleteQueueContent(){
+        return deleteQueueContent;
+    }
 }

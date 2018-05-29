@@ -1,19 +1,37 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
+import com.hortonworks.faas.nfaas.core.CommonService;
+import com.hortonworks.faas.nfaas.core.Template;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
+import org.apache.nifi.web.api.dto.TemplateDTO;
 import org.apache.nifi.web.api.entity.FlowEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
+import org.apache.nifi.web.api.entity.TemplateEntity;
+import org.apache.nifi.web.api.entity.TemplatesEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class TemplateFacadeHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateFacadeHelper.class);
+
+    @Autowired
+    CommonService commonService;
+
+    @Autowired
+    Template template;
 
     public Set<String> getAllInputPortNameFromTemplate(Set<PortDTO> inputPortFromTemplate) {
         Set<String> inputPortNameFromTemplate = new LinkedHashSet<>();
@@ -69,6 +87,103 @@ public class TemplateFacadeHelper {
      */
     public FlowEntity createTemplateInstanceByTemplateId(ProcessGroupEntity processGroupEntity) {
 
+        String templateId = this.getTemplateId(processGroupEntity);
+
+        if (null == templateId || templateId.isEmpty()) {
+            throw new RuntimeException("Unable to upload the template ");
+        }
+        FlowEntity fe = createTemplateInstanceByTemplateId(processGroupEntity, templateId);
+        return fe;
+    }
+
+
+    /**
+     * Check the template exists
+     *
+     * @throws IOException
+     * @throws JAXBException
+     */
+    private String checkTemplateExist() throws IOException, JAXBException {
+        Resource resource = commonService.loadResourceUsingLoadFromParam();
+        InputStream inputStream = resource.getInputStream();
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(TemplateDTO.class);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        TemplateDTO inputTemplateDTO = (TemplateDTO) unmarshaller.unmarshal(inputStream);
+
+        TemplatesEntity templatesEntity = template.getAllTemplates();
+
+        Set<TemplateEntity> templates = templatesEntity.getTemplates();
+
+        TemplateDTO templateDTO = null;
+        for (TemplateEntity template : templates) {
+            templateDTO = template.getTemplate();
+
+            if (templateDTO.getName().equalsIgnoreCase(inputTemplateDTO.getName()))
+                return templateDTO.getId();
+
+        }
+
+        return null;
+
+    }
+
+    /**
+     * This is the method which is used to read the template from Load from
+     * Param of the property FIle
+     *
+     * @return
+     * @throws IOException
+     * @throws JAXBException
+     */
+    private TemplateDTO readTemplateUsingLoadFromParam() {
+        TemplateDTO inputTemplateDTO = null;
+        try {
+            Resource resource = commonService.loadResourceUsingLoadFromParam();
+            InputStream inputStream = resource.getInputStream();
+
+            JAXBContext jaxbContext = JAXBContext.newInstance(TemplateDTO.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            inputTemplateDTO = (TemplateDTO) unmarshaller.unmarshal(inputStream);
+        } catch (Exception ex) {
+            throw new RuntimeException(
+                    "Unable to parse the Input Template. Please upload the Valid template .." + template.templateFileLocation);
+        }
+        return inputTemplateDTO;
+    }
+
+
+    /**
+     * Method is used to get the template ID
+     *
+     * @param processGroupEntity
+     * @return
+     */
+    private String getTemplateId(ProcessGroupEntity processGroupEntity) {
+        try {
+
+            String templateId = checkTemplateExist();
+            if (templateId != null)
+                deleteTemplate(templateId);
+
+            TemplateEntity templateEntity = uploadTemplate(processGroupEntity);
+
+            return templateEntity.getTemplate().getId();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * Method is used to create the template Instance
+     *
+     * @param processGroupEntity
+     * @return
+     */
+    private FlowEntity createTemplateInstanceByTemplateId(ProcessGroupEntity processGroupEntity) {
+
         String templateId = getTemplateId(processGroupEntity);
 
         if (null == templateId || templateId.isEmpty()) {
@@ -77,4 +192,7 @@ public class TemplateFacadeHelper {
         FlowEntity fe = createTemplateInstanceByTemplateId(processGroupEntity, templateId);
         return fe;
     }
+
+
+
 }
