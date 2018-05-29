@@ -15,6 +15,8 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
 
     public static final Logger logger = LoggerFactory.getLogger(ProcessGroupFacadeHelper.class);
 
+    @Autowired
+    ProcessGroupFacadeHelper processGroupFacadeHelper;
     /**
      * Call the NIFI rest api to stop the process group
      *
@@ -119,6 +121,20 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
         }
     }
 
+    /**
+     * Check the Process Group Component Status
+     *
+     * @param processGroupFlowEntity
+     * @param state
+     */
+    public void checkProcessGroupComponentStatus(ProcessGroupFlowEntity processGroupFlowEntity, String state,
+                                                 String pgId) {
+        checkInternalProcessGroupStatus(processGroupFlowEntity, state);
+
+        ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
+
+        processGroupFacadeHelper.checkParentProcessGroupStatus(pge, state);
+    }
 
 
 }

@@ -38,7 +38,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
      *
      * @param processGroupFlowEntity
      */
-    private void stopProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
+    public void stopProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
         logger.info("stopProcessGroup Starts for --> " + pgId);
         ProcessGroupFlowEntity pgfe = processorGroupFlowFacadeHelper.stopProcessGroupComponents(processGroupFlowEntity, null, pgId);
         logger.info(pgfe.toString());
@@ -47,7 +47,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
     }
 
 
-    private void checkParentProcessGroupStatus(ProcessGroupEntity pge, String state) {
+    public void checkParentProcessGroupStatus(ProcessGroupEntity pge, String state) {
         int count = 0;
         int innerCount = 0;
 
@@ -119,20 +119,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
         }
         return "";
     }
-    /**
-     * Check the Process Group Component Status
-     *
-     * @param processGroupFlowEntity
-     * @param state
-     */
-    public void checkProcessGroupComponentStatus(ProcessGroupFlowEntity processGroupFlowEntity, String state,
-                                                  String pgId) {
-        processorGroupFlowFacadeHelper.checkInternalProcessGroupStatus(processGroupFlowEntity, state);
 
-        ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
-
-        checkParentProcessGroupStatus(pge, state);
-    }
 
     /**
      * Delete the Process group
@@ -140,7 +127,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
      * @param pge
      * @return
      */
-    private ProcessGroupEntity deleteProcessGroup(ProcessGroupEntity pge) {
+    public ProcessGroupEntity deleteProcessGroup(ProcessGroupEntity pge) {
         return processGroup.deleteProcessGroup(pge, EntityState.DELETE.getState());
     }
 
@@ -149,7 +136,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
      *
      * @param processGroupFlowEntity
      */
-    private void deleteProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
+    public void deleteProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
         logger.info("deleteProcessGroup Starts for --> " + pgId);
         ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
         pge = deleteProcessGroup(pge);

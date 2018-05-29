@@ -47,5 +47,8 @@ public class BaseFacadeHelper {
     @Autowired
     OutputPort outputPort;
 
+    @Autowired
+    Processor processor;
+
 
 }
