@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.core;
 import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
 import org.apache.nifi.web.api.dto.RevisionDTO;
 import org.apache.nifi.web.api.entity.RemoteProcessGroupEntity;
+import org.apache.nifi.web.api.entity.RemoteProcessGroupsEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -55,7 +56,7 @@ public class RemoteProcessGroup {
      * @param remoteProcessGroupEntity
      * @param state
      */
-    private RemoteProcessGroupEntity enableOrDisableRemoteProcessGroupComponents(
+    public RemoteProcessGroupEntity enableOrDisableRemoteProcessGroupComponents(
             RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
 
         String rpgId = remoteProcessGroupEntity.getComponent().getId();
@@ -104,6 +105,24 @@ public class RemoteProcessGroup {
         String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/remote-process-groups/" + rpgeId + "/";
         HttpEntity<RemoteProcessGroupEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
                 RemoteProcessGroupEntity.class, params);
+        return response.getBody();
+    }
+
+    /**
+     * This is the method which is used to get the remote process groups for the
+     * Process GROUP ID .. /process-groups/{id}/remote-process-groups
+     *
+     * @param pgId
+     * @return
+     */
+    public RemoteProcessGroupsEntity getLatestRemoteProcessGroupsEntity(String pgId) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId
+                + "/remote-process-groups/";
+        HttpEntity<RemoteProcessGroupsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                RemoteProcessGroupsEntity.class, params);
         return response.getBody();
     }
 

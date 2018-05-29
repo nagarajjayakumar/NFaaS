@@ -3,6 +3,8 @@ package com.hortonworks.faas.nfaas.core.helper;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
+import org.apache.nifi.web.api.entity.FlowEntity;
+import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,5 +58,23 @@ public class TemplateFacadeHelper {
         }
 
         return remoteProcessorGroupNameFromTemplate;
+    }
+
+
+    /**
+     * Method is used to create the template Instance
+     *
+     * @param processGroupEntity
+     * @return
+     */
+    public FlowEntity createTemplateInstanceByTemplateId(ProcessGroupEntity processGroupEntity) {
+
+        String templateId = getTemplateId(processGroupEntity);
+
+        if (null == templateId || templateId.isEmpty()) {
+            throw new RuntimeException("Unable to upload the template ");
+        }
+        FlowEntity fe = createTemplateInstanceByTemplateId(processGroupEntity, templateId);
+        return fe;
     }
 }

@@ -1,16 +1,19 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
+import com.hortonworks.faas.nfaas.config.EntityState;
+import com.hortonworks.faas.nfaas.core.ProcessGroup;
+import com.hortonworks.faas.nfaas.core.ProcessGroupFlow;
+import com.hortonworks.faas.nfaas.core.RemoteProcessGroup;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
-import org.apache.nifi.web.api.entity.PortEntity;
-import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
-import org.apache.nifi.web.api.entity.RemoteProcessGroupEntity;
+import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class RemoteProcessGroupFacadeHelper {
 
@@ -19,6 +22,17 @@ public class RemoteProcessGroupFacadeHelper {
 
     @Autowired
     TemplateFacadeHelper templateFacadeHelper;
+
+    @Autowired
+    RemoteProcessGroup remoteProcessGroup;
+
+    @Autowired
+    ProcessGroupFlow processGroupFlow;
+
+    @Autowired
+    ProcessGroup processGroup;
+
+    private int WAIT_IN_SEC = 10;
 
     /**
      * This is the method which is used to get all the remote process group from
@@ -47,4 +61,112 @@ public class RemoteProcessGroupFacadeHelper {
         }
         return resultRemotePG;
     }
+
+    /**
+     * This is the method to disable stop the process group.
+     *
+     * @param pgId
+     * @param pgId
+     */
+    public void disableRemoteProcessGroup(String pgId) {
+        logger.debug("disableRemoteProcessGroup Starts for --> " + pgId);
+
+        ProcessGroupFlowEntity pgfe = processGroupFlow.getLatestProcessGroupFlowEntity(pgId);
+        Set<ProcessGroupEntity> processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
+
+        for (ProcessGroupEntity processGroupEntity : processGroups) {
+            if (processGroupEntity.getActiveRemotePortCount() > 0) {
+                disableRemoteProcessGroup(processGroupEntity.getId());
+            }
+        }
+
+        ProcessGroupEntity pge =processGroup.getLatestProcessGroupEntity(pgId);
+        RemoteProcessGroupsEntity remoteProcessGroupsEntity = remoteProcessGroup.getLatestRemoteProcessGroupsEntity(pgId);
+
+        Set<RemoteProcessGroupEntity> remoteProcessGroups = remoteProcessGroupsEntity.getRemoteProcessGroups();
+
+        if (remoteProcessGroups.isEmpty()) {
+            logger.debug("No remote process group found for the PG " + pge.getComponent().getName());
+            logger.debug("disableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
+            return;
+        }
+
+        for (RemoteProcessGroupEntity rpge : remoteProcessGroups) {
+            logger.info("disableRemoteProcessGroup Starts for --> " + pge.getComponent().getName());
+            this.disableRemoteProcessGroupComponents(rpge);
+            logger.info("disableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
+        }
+        pge = processGroup.getLatestProcessGroupEntity(pgId);
+        logger.debug("disableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
+
+    }
+
+    /**
+     * This is the method which is used to disable the remote process group
+     * componets
+     *
+     * @param remoteProcessGroupEntity
+     * @return
+     */
+    private RemoteProcessGroupEntity disableRemoteProcessGroupComponents(
+            RemoteProcessGroupEntity remoteProcessGroupEntity) {
+        disableRemoteProcessGroupComponents(remoteProcessGroupEntity, EntityState.TRANSMIT_FALSE.getState());
+
+        checkRemoteProcessGroupComponentsStatus(remoteProcessGroupEntity, EntityState.TRANSMIT_FALSE.getState());
+        RemoteProcessGroupEntity rpge = remoteProcessGroup.getLatestRemoteProcessGroupEntity(remoteProcessGroupEntity.getId());
+        return rpge;
+
+    }
+
+
+    /**
+     * Check the remote Process Group Component Status
+     *
+     * @param remoteProcessGroupEntity
+     * @param state
+     */
+    private RemoteProcessGroupEntity checkRemoteProcessGroupComponentsStatus(
+            RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
+        int count = 0;
+
+        RemoteProcessGroupEntity rpge = null;
+
+        while (true && count < WAIT_IN_SEC) {
+            rpge = remoteProcessGroup.getLatestRemoteProcessGroupEntity(remoteProcessGroupEntity.getId());
+
+            if (state.equalsIgnoreCase(String.valueOf(rpge.getComponent().isTransmitting())))
+                break;
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+
+            }
+
+            count++;
+        }
+
+        return rpge;
+
+    }
+    /**
+     * Call the NIFI rest api to disable the process group
+     *
+     * @param remoteProcessGroupEntity
+     * @param state
+     */
+    private void disableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
+        remoteProcessGroup.enableOrDisableRemoteProcessGroupComponents(remoteProcessGroupEntity, state);
+    }
+
+    /**
+     * Call the NIFI rest api to enable the process group
+     *
+     * @param remoteProcessGroupEntity
+     * @param state
+     */
+    private void enableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
+        remoteProcessGroup.enableOrDisableRemoteProcessGroupComponents(remoteProcessGroupEntity, state);
+    }
+
 }

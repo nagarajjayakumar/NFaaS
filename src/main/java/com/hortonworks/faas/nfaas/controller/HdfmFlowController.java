@@ -486,72 +486,8 @@ public class HdfmFlowController {
 
     }
 
-    /**
-     * This is the method to stop and un-deploy the process group.
-     *
-     * @param pge
-     */
-    private void stopAndUnDeployProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
-        logger.info("stopAndUnDeployProcessGroup Starts for --> " + pgId);
-        ProcessGroupFlowEntity pgfe = stopProcessGroupComponents(processGroupFlowEntity, null, pgId);
-        logger.info(pgfe.toString());
-        disableRemoteProcessGroup(pgId);
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-        pge = deleteProcessGroup(pge);
-        logger.info("stopAndUnDeployProcessGroup Ends for --> " + pgId);
-    }
 
-    /**
-     * This is the method to stop the process group.
-     *
-     * @param pge
-     */
-    private void stopProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
-        logger.info("stopProcessGroup Starts for --> " + pgId);
-        ProcessGroupFlowEntity pgfe = stopProcessGroupComponents(processGroupFlowEntity, null, pgId);
-        logger.info(pgfe.toString());
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-        logger.info("stopProcessGroup Ends for --> " + pge.getComponent().getName());
-    }
 
-    /**
-     * This is the method to disable stop the process group.
-     *
-     * @param processGroupFlowEntity
-     * @param pgId
-     */
-    private void disableRemoteProcessGroup(String pgId) {
-        logger.debug("disableRemoteProcessGroup Starts for --> " + pgId);
-
-        ProcessGroupFlowEntity pgfe = getLatestProcessGroupFlowEntity(pgId);
-        Set<ProcessGroupEntity> processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
-
-        for (ProcessGroupEntity processGroupEntity : processGroups) {
-            if (processGroupEntity.getActiveRemotePortCount() > 0) {
-                disableRemoteProcessGroup(processGroupEntity.getId());
-            }
-        }
-
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-        RemoteProcessGroupsEntity remoteProcessGroupsEntity = getLatestRemoteProcessGroupsEntity(pgId);
-
-        Set<RemoteProcessGroupEntity> remoteProcessGroups = remoteProcessGroupsEntity.getRemoteProcessGroups();
-
-        if (remoteProcessGroups.isEmpty()) {
-            logger.debug("No remote process group found for the PG " + pge.getComponent().getName());
-            logger.debug("disableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
-            return;
-        }
-
-        for (RemoteProcessGroupEntity rpge : remoteProcessGroups) {
-            logger.info("disableRemoteProcessGroup Starts for --> " + pge.getComponent().getName());
-            disableRemoteProcessGroupComponents(rpge);
-            logger.info("disableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
-        }
-        pge = getLatestProcessGroupEntity(pgId);
-        logger.debug("disableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
-
-    }
 
     /**
      * This is the method to disable stop the process group.
@@ -739,38 +675,7 @@ public class HdfmFlowController {
 
     }
 
-    /**
-     * Method to stop all the process group components
-     *
-     * @param processGroupFlowEntity
-     * @return
-     */
-    private ProcessGroupFlowEntity stopProcessGroupComponents(ProcessGroupFlowEntity processGroupFlowEntity,
-                                                              ProcessGroupEntity processorGroup,
-                                                              String pgId) {
-        stopProcessGroupComponents(processGroupFlowEntity, EntityState.STOPPED.getState());
-        checkProcessGroupComponentStatus(processGroupFlowEntity, EntityState.STOPPED.getState(), pgId);
-        ProcessGroupFlowEntity pge = getLatestProcessGroupFlowEntity(
-                processGroupFlowEntity.getProcessGroupFlow().getId());
-        return pge;
-    }
 
-    /**
-     * This is the method which is used to disable the remote process group
-     * componets
-     *
-     * @param remoteProcessGroupEntity
-     * @return
-     */
-    private RemoteProcessGroupEntity disableRemoteProcessGroupComponents(
-            RemoteProcessGroupEntity remoteProcessGroupEntity) {
-        disableRemoteProcessGroupComponents(remoteProcessGroupEntity, EntityState.TRANSMIT_FALSE.getState());
-
-        checkRemoteProcessGroupComponentsStatus(remoteProcessGroupEntity, EntityState.TRANSMIT_FALSE.getState());
-        RemoteProcessGroupEntity rpge = getLatestRemoteProcessGroupEntity(remoteProcessGroupEntity.getId());
-        return rpge;
-
-    }
 
     /**
      * Call the NIFI rest api to enable the process group
@@ -855,16 +760,6 @@ public class HdfmFlowController {
     private ControllerServiceEntity deleteControllerService(ControllerServiceEntity controllerServiceEntity) {
 
         return deleteControllerService(controllerServiceEntity, EntityState.DELETE.getState());
-    }
-
-    /**
-     * Delete the Process group
-     *
-     * @param pge
-     * @return
-     */
-    private ProcessGroupEntity deleteProcessGroup(ProcessGroupEntity pge) {
-        return deleteProcessGroup(pge, EntityState.DELETE.getState());
     }
 
     /**
@@ -1114,47 +1009,9 @@ public class HdfmFlowController {
 
     }
 
-    /**
-     * Call the NIFI rest api to stop the process group
-     *
-     * @param processGroupFlowEntity
-     * @param state
-     */
-    private void stopProcessGroupComponents(ProcessGroupFlowEntity processGroupFlowEntity, String state) {
-        startOrStopProcessGroupComponents(processGroupFlowEntity, state);
 
-    }
 
-    /**
-     * Call the NIFI rest api to stop the process group
-     *
-     * @param processGroupFlowEntity
-     * @param state
-     */
-    private void startProcessGroupComponents(ProcessGroupFlowEntity processGroupFlowEntity, String state) {
-        startOrStopProcessGroupComponents(processGroupFlowEntity, state);
 
-    }
-
-    /**
-     * Call the NIFI rest api to disable the process group
-     *
-     * @param remoteProcessGroupEntity
-     * @param state
-     */
-    private void disableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
-        enableOrDisableRemoteProcessGroupComponents(remoteProcessGroupEntity, state);
-    }
-
-    /**
-     * Call the NIFI rest api to enable the process group
-     *
-     * @param remoteProcessGroupEntity
-     * @param state
-     */
-    private void enableRemoteProcessGroupComponents(RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
-        enableOrDisableRemoteProcessGroupComponents(remoteProcessGroupEntity, state);
-    }
 
 
 
@@ -1263,36 +1120,7 @@ public class HdfmFlowController {
 
     }
 
-    /**
-     * Check the remote Process Group Component Status
-     *
-     * @param remoteProcessGroupEntity
-     * @param state
-     */
-    private RemoteProcessGroupEntity checkRemoteProcessGroupComponentsStatus(
-            RemoteProcessGroupEntity remoteProcessGroupEntity, String state) {
-        int count = 0;
 
-        RemoteProcessGroupEntity rpge = null;
-
-        while (true && count < WAIT_IN_SEC) {
-            rpge = getLatestRemoteProcessGroupEntity(remoteProcessGroupEntity.getId());
-
-            if (state.equalsIgnoreCase(String.valueOf(rpge.getComponent().isTransmitting())))
-                break;
-
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-
-            }
-
-            count++;
-        }
-
-        return rpge;
-
-    }
 
     /**
      * Check for the reference component. check for the state else sleep for 10
@@ -1335,20 +1163,7 @@ public class HdfmFlowController {
 
     }
 
-    /**
-     * Check the Process Group Component Status
-     *
-     * @param processGroupFlowEntity
-     * @param state
-     */
-    private void checkProcessGroupComponentStatus(ProcessGroupFlowEntity processGroupFlowEntity, String state,
-                                                  String pgId) {
-        checkInternalProcessGroupStatus(processGroupFlowEntity, state);
 
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-
-        checkParentProcessGroupStatus(pge, state);
-    }
 
     /**
      * This is the method to delete teh root proces group queu content
@@ -1376,118 +1191,9 @@ public class HdfmFlowController {
     }
 
 
-    private void checkParentProcessGroupStatus(ProcessGroupEntity pge, String state) {
-        int count = 0;
-        int innerCount = 0;
-
-        while (true && count < WAIT_IN_SEC) {
-
-            Set<ProcessGroupEntity> processGroups = new LinkedHashSet<>();
-            processGroups.add(pge);
-
-            int queuedCount = 0;
-            for (ProcessGroupEntity processGroupEntity : processGroups) {
-                if (state.equalsIgnoreCase(EntityState.STOPPED.getState())) {
-                    queuedCount = Integer
-                            .parseInt(processGroupEntity.getStatus().getAggregateSnapshot().getQueuedCount().replaceAll(",", ""));
-                    // Check for the Runing count
-                    if (processGroupEntity.getRunningCount() > 0) {
-                        break;
-                    }
-                    // Check for the queue content
-                    if (queuedCount > 0) {
-                        deleteTheQueueContent(processGroupEntity);
-                        break;
-                    }
-
-                }
-
-                if (state.equalsIgnoreCase(EntityState.RUNNING.getState())
-                        && processGroupEntity.getStoppedCount() > 0) {
-                    break;
-                }
-
-                innerCount++;
-            }
-
-            if (processGroups.size() == innerCount) {
-                break;
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-
-            }
-            pge = getLatestProcessGroupEntity(pge.getId());
-            count++;
-            innerCount = 0;
-        }
-
-    }
-
-    private void checkInternalProcessGroupStatus(ProcessGroupFlowEntity processGroupFlowEntity, String state) {
-        int count = 0;
-        int innerCount = 0;
-        ProcessGroupFlowEntity pgfe = null;
-        //ProcessGroupFlowEntity currentPgfe = null;
 
 
-        while (true && count < WAIT_IN_SEC) {
-            pgfe = getLatestProcessGroupFlowEntity(processGroupFlowEntity.getProcessGroupFlow().getId());
 
-            Set<ProcessGroupEntity> processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
-
-            int queuedCount = 0;
-            for (ProcessGroupEntity processGroupEntity : processGroups) {
-
-				/*if(! processGroupEntity.getComponent().getContents().getProcessGroups().isEmpty()){
-					currentPgfe = getLatestProcessGroupFlowEntity(processGroupEntity.getId());
-					checkInternalProcessGroupStatus(currentPgfe, state);
-				}*/
-                /*
-                 * Stop only the necessary process groups for the given process
-                 * group ID
-                 */
-                if (processGroupEntity.getComponent().getParentGroupId()
-                        .equalsIgnoreCase(processGroupFlowEntity.getProcessGroupFlow().getId())) {
-
-                    if (state.equalsIgnoreCase(EntityState.STOPPED.getState())) {
-                        queuedCount = Integer
-                                .parseInt(processGroupEntity.getStatus().getAggregateSnapshot().getQueuedCount().replaceAll(",", ""));
-                        // Check for the Runing count
-                        if (processGroupEntity.getRunningCount() > 0) {
-                            break;
-                        }
-                        // Check for the queue content
-                        if (queuedCount > 0) {
-                            deleteTheQueueContent(processGroupEntity);
-                            break;
-                        }
-
-                    }
-
-                    if (state.equalsIgnoreCase(EntityState.RUNNING.getState())
-                            && processGroupEntity.getStoppedCount() > 0) {
-                        break;
-                    }
-                }
-                innerCount++;
-            }
-
-            if (processGroups.size() == innerCount) {
-                break;
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-
-            }
-            count++;
-            innerCount = 0;
-        }
-    }
 
     /**
      * Check the controller service entity status
