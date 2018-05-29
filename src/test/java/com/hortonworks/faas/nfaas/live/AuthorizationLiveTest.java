@@ -1,16 +1,15 @@
 package com.hortonworks.faas.nfaas.live;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.response.Response;
+import org.junit.Test;
+import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-import org.springframework.http.MediaType;
-
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AuthorizationLiveTest {
 

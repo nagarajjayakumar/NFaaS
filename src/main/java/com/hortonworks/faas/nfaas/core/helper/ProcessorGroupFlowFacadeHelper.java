@@ -1,7 +1,6 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
 import com.hortonworks.faas.nfaas.config.EntityState;
-import com.hortonworks.faas.nfaas.core.ProcessGroupFlow;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
 import org.slf4j.Logger;

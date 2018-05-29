@@ -1,7 +1,5 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
-import com.hortonworks.faas.nfaas.core.CommonService;
-import com.hortonworks.faas.nfaas.core.Template;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
@@ -12,7 +10,6 @@ import org.apache.nifi.web.api.entity.TemplateEntity;
 import org.apache.nifi.web.api.entity.TemplatesEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 
 import javax.xml.bind.JAXBContext;

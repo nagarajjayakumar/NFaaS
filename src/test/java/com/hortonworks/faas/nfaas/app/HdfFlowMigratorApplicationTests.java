@@ -1,5 +1,6 @@
 package com.hortonworks.faas.nfaas.app;
 
+import com.hortonworks.faas.nfaas.dto.Greet;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +15,6 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
-
-import com.hortonworks.faas.nfaas.dto.Greet;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

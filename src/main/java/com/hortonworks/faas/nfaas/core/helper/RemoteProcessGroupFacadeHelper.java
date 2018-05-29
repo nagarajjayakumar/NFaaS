@@ -1,15 +1,13 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
 import com.hortonworks.faas.nfaas.config.EntityState;
-import com.hortonworks.faas.nfaas.core.ProcessGroup;
-import com.hortonworks.faas.nfaas.core.ProcessGroupFlow;
-import com.hortonworks.faas.nfaas.core.RemoteProcessGroup;
-import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
-import org.apache.nifi.web.api.entity.*;
+import org.apache.nifi.web.api.entity.ProcessGroupEntity;
+import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
+import org.apache.nifi.web.api.entity.RemoteProcessGroupEntity;
+import org.apache.nifi.web.api.entity.RemoteProcessGroupsEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
