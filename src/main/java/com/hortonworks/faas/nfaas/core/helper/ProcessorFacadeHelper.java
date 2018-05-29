@@ -17,11 +17,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorFacadeHelper.class);
 
-    @Autowired
-    ProcessorGroupFlowFacadeHelper processorGroupFlowFacadeHelper;
 
-    @Autowired
-    ProcessGroupFacadeHelper processGroupFacadeHelper;
     /**
      * This is the method to get all the Processor entity from the pgfe
      *

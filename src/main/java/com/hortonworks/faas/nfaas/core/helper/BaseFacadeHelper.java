@@ -51,8 +51,8 @@ public class BaseFacadeHelper {
     @Autowired
     ProcessorGroupFlowFacadeHelper processorGroupFlowFacadeHelper;
 
-
-
+    @Autowired
+    ProcessGroupFacadeHelper processGroupFacadeHelper;
 
 
 }
