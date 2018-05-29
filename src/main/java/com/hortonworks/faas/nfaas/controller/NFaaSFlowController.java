@@ -17,9 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Set;
 
 @RestController
-public class HdfmFlowController extends BasicFlowController {
+public class NFaaSFlowController extends BasicFlowController {
 
-    private static final Logger logger = LoggerFactory.getLogger(HdfmFlowController.class);
+    private static final Logger logger = LoggerFactory.getLogger(NFaaSFlowController.class);
 
     Environment env;
 
@@ -43,7 +43,7 @@ public class HdfmFlowController extends BasicFlowController {
     private final String authorizationHeaderValue = "Bearer ";
 
     @Autowired
-    HdfmFlowController(Environment env) {
+    NFaaSFlowController(Environment env) {
         this.env = env;
         this.WAIT_IN_SEC = Integer.parseInt(env.getProperty("nifi.component.status.wait.sec"));
         this.nifiServerHostnameAndPort = env.getProperty("nifi.hostnameAndPort");
