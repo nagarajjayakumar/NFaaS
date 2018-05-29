@@ -1,8 +1,6 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
 import com.hortonworks.faas.nfaas.config.EntityState;
-import com.hortonworks.faas.nfaas.core.FlowFileQueue;
-import com.hortonworks.faas.nfaas.core.ProcessGroup;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
 import org.apache.nifi.web.api.entity.TemplateEntity;
@@ -14,9 +12,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
+public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessGroupFacadeHelper.class);
+
+    @Autowired
+    RemoteProcessGroupFacadeHelper remoteProcessGroupFacadeHelper;
+
 
     /**
      * This is the method to stop and un-deploy the process group.
@@ -27,7 +29,7 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
         logger.info("stopAndUnDeployProcessGroup Starts for --> " + pgId);
         ProcessGroupFlowEntity pgfe = processorGroupFlowFacadeHelper.stopProcessGroupComponents(processGroupFlowEntity, null, pgId);
         logger.info(pgfe.toString());
-        disableRemoteProcessGroup(pgId);
+        remoteProcessGroupFacadeHelper.disableRemoteProcessGroup(pgId);
         ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
         pge = this.deleteProcessGroup(pge);
         logger.info("stopAndUnDeployProcessGroup Ends for --> " + pgId);
@@ -106,11 +108,11 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
     private String getTemplateId(ProcessGroupEntity processGroupEntity) {
         try {
 
-            String templateId = checkTemplateExist();
+            String templateId = templateFacadeHelper.checkTemplateExist();
             if (templateId != null)
-                deleteTemplate(templateId);
+                template.deleteTemplate(templateId);
 
-            TemplateEntity templateEntity = uploadTemplate(processGroupEntity);
+            TemplateEntity templateEntity = template.uploadTemplate(processGroupEntity);
 
             return templateEntity.getTemplate().getId();
         } catch (Exception e) {

@@ -15,9 +15,6 @@ public class BaseFacadeHelper {
     ControllerService controllerService;
 
     @Autowired
-    ProcessorGroupFlowFacadeHelper processorGroupFlowFacadeHelper;
-
-    @Autowired
     FlowFileQueue flowFileQueues;
 
     @Autowired
@@ -29,8 +26,6 @@ public class BaseFacadeHelper {
     @Autowired
     Template template;
 
-    @Autowired
-    TemplateFacadeHelper templateFacadeHelper;
 
     @Autowired
     RemoteProcessGroup remoteProcessGroup;
@@ -49,6 +44,15 @@ public class BaseFacadeHelper {
 
     @Autowired
     Processor processor;
+
+    @Autowired
+    TemplateFacadeHelper templateFacadeHelper;
+
+    @Autowired
+    ProcessorGroupFlowFacadeHelper processorGroupFlowFacadeHelper;
+
+
+
 
 
 }

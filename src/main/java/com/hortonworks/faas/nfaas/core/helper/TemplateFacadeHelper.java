@@ -97,7 +97,7 @@ public class TemplateFacadeHelper extends  BaseFacadeHelper{
      * @throws IOException
      * @throws JAXBException
      */
-    private String checkTemplateExist() throws IOException, JAXBException {
+    public String checkTemplateExist() throws IOException, JAXBException {
         Resource resource = commonService.loadResourceUsingLoadFromParam();
         InputStream inputStream = resource.getInputStream();
 
