@@ -133,8 +133,9 @@ public class HdfmFlowController extends BasicFlowController{
 
         logger.info("#########################################################################################");
         logger.info("Undeploy the requested Flow BEGINS ");
+
         stopAllEntitySpecifiedInTemplate(pgfe, templateDto);
-        deleteRootProcessGroupQueueContentIfAny(rootPgId);
+        flowFileQueueFacadeHelper.deleteRootProcessGroupQueueContentIfAny(rootPgId);
         deleteAllEntitySpecifiedInTemplate(pgfe, templateDto);
 
         logger.info("Undeploy the requested Flow ENDS ");

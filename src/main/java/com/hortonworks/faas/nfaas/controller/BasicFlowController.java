@@ -1,6 +1,7 @@
 package com.hortonworks.faas.nfaas.controller;
 
 import com.hortonworks.faas.nfaas.core.*;
+import com.hortonworks.faas.nfaas.core.helper.FlowFileQueueFacadeHelper;
 import com.hortonworks.faas.nfaas.core.helper.ProcessGroupFacadeHelper;
 import com.hortonworks.faas.nfaas.core.helper.ProcessorGroupFlowFacadeHelper;
 import com.hortonworks.faas.nfaas.core.helper.TemplateFacadeHelper;
@@ -27,6 +28,9 @@ public class BasicFlowController {
 
     @Autowired
     ProcessGroupFacadeHelper processGroupFacadeHelper;
+
+    @Autowired
+    FlowFileQueueFacadeHelper flowFileQueueFacadeHelper;
 
 
     @Autowired
