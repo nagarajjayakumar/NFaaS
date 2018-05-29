@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class HdfFlowMigratorApplicationTests {
+public class nFaaSApplicationTests {
 
 	@Test
 	public void testBase(){
