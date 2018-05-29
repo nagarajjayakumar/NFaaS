@@ -56,7 +56,7 @@ public class ControllerService {
      * @param controllerServiceEntity
      * @param state
      */
-    private void changeControllServiceState(ControllerServiceEntity controllerServiceEntity, String state) {
+    public void changeControllServiceState(ControllerServiceEntity controllerServiceEntity, String state) {
         String contServid = controllerServiceEntity.getId();
 
         ControllerServiceEntity controllerServiceEntityReq = new ControllerServiceEntity();

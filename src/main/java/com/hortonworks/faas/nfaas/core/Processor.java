@@ -16,9 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Processors {
+public class Processor {
 
-    private static final Logger logger = LoggerFactory.getLogger(Processors.class);
+    private static final Logger logger = LoggerFactory.getLogger(Processor.class);
 
     Environment env;
 
