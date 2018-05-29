@@ -1,5 +1,6 @@
 package com.hortonworks.faas.nfaas.controller;
 
+import com.hortonworks.faas.nfaas.core.Security;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
@@ -17,31 +18,22 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Set;
 
 @RestController
-public class HdfmFlowController {
+public class HdfmFlowController extends BasicFlowController{
 
     private static final Logger logger = LoggerFactory.getLogger(HdfmFlowController.class);
 
     Environment env;
 
     private int WAIT_IN_SEC = 10;
-
     private String nifiServerHostnameAndPort = "localhost:9090";
-
     private String templateFileLocation = "classpath:Hello_NiFi_Web_Service.xml";
-
     private String templateFileURI = "https://cwiki.apache.org/confluence/download/attachments/57904847/Hello_NiFi_Web_Service.xml?version=1&modificationDate=1449369797000&api=v2";
-
     private String templateFileLoadFrom = "FILE";
-
     private boolean deleteQueueContent = false;
-
     private boolean undeployOnly = false;
-
     private String nifiUsername = "admin";
     private String nifiPassword = "BadPass#1";
-
     private String trasnsportMode = "http";
-
     private boolean nifiSecuredCluster = false;
     private boolean enableRPG = false;
 
@@ -80,12 +72,12 @@ public class HdfmFlowController {
     @RequestMapping(value = "/flow/deploy", produces = "application/json")
     public @ResponseBody
     ProcessGroupFlowEntity deployFlows() {
-        restTemplate = ignoreCertAndHostVerification(restTemplate);
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
         logger.info("bootrest.templateName " + env.getProperty("bootrest.templateName"));
         logger.info("Get Root Process Group ID ");
 
         // Return the recent Process Group Flow Entity ....
-        ProcessGroupFlowEntity pgfe = getRootProcessGroupFlowEntity();
+        ProcessGroupFlowEntity pgfe = processGroupFlow.getRootProcessGroupFlowEntity();
 
         String rootPgId = pgfe.getProcessGroupFlow().getId();
         logger.debug("Root PG ID is :: " + rootPgId);
@@ -100,7 +92,7 @@ public class HdfmFlowController {
         logger.info("#########################################################################################");
 
         // Return the recent Process Group Flow Entity ....
-        pgfe = getRootProcessGroupFlowEntity();
+        pgfe = processGroupFlow.getRootProcessGroupFlowEntity();
         logger.info(pgfe.toString());
         return pgfe;
     }
@@ -123,7 +115,7 @@ public class HdfmFlowController {
     public @ResponseBody
     ProcessGroupEntity deployProcessGroupByPgId(@PathVariable("pgId") String pgId) {
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
+        ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
         deployAndStartProcessGroup(pge);
         logger.info(pge.toString());
         return pge;
@@ -137,13 +129,13 @@ public class HdfmFlowController {
     private void undeployFLow(ProcessGroupFlowEntity pgfe, String rootPgId) {
 
         logger.info("Read the template from .." + templateFileLocation);
-        TemplateDTO template = readTemplateUsingLoadFromParam();
+        TemplateDTO templateDto = templateFacadeHelper.readTemplateUsingLoadFromParam();
 
         logger.info("#########################################################################################");
         logger.info("Undeploy the requested Flow BEGINS ");
-        stopAllEntitySpecifiedInTemplate(pgfe, template);
+        stopAllEntitySpecifiedInTemplate(pgfe, templateDto);
         deleteRootProcessGroupQueueContentIfAny(rootPgId);
-        deleteAllEntitySpecifiedInTemplate(pgfe, template);
+        deleteAllEntitySpecifiedInTemplate(pgfe, templateDto);
 
         logger.info("Undeploy the requested Flow ENDS ");
         logger.info("#########################################################################################");
@@ -327,7 +319,6 @@ public class HdfmFlowController {
         logger.info("About to delete all the entity Specified in the File ENDS ...");
 
     }
-
 
 
     @CrossOrigin

@@ -37,7 +37,7 @@ import org.springframework.web.client.RestTemplate;
 //@EnableAuthorizationServer
 @SpringBootApplication
 @EnableZuulProxy
-@ComponentScan({"com.hortonworks.faas.nfaas", "org.apache.nifi.web.api.dto"})
+@ComponentScan({"com.hortonworks.faas.nfaas", "org.apache.nifi.web.api.dto","com.hortonworks.faas.nfaas.core"})
 @PropertySource(ignoreResourceNotFound = false, value = "classpath:application.properties")
 @PropertySource(ignoreResourceNotFound = true, value = "file:/etc/hdfm/hdfm.properties")
 public class HdfFlowMigratorApp {

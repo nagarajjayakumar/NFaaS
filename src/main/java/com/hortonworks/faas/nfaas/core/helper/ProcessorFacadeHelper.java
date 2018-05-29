@@ -7,11 +7,13 @@ import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
 import org.apache.nifi.web.api.entity.ProcessorEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@Configuration
 public class ProcessorFacadeHelper extends BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorFacadeHelper.class);

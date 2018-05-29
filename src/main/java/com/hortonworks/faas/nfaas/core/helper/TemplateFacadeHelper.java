@@ -10,6 +10,7 @@ import org.apache.nifi.web.api.entity.TemplateEntity;
 import org.apache.nifi.web.api.entity.TemplatesEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 import javax.xml.bind.JAXBContext;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@Configuration
 public class TemplateFacadeHelper extends  BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateFacadeHelper.class);
@@ -127,7 +129,7 @@ public class TemplateFacadeHelper extends  BaseFacadeHelper{
      * @throws IOException
      * @throws JAXBException
      */
-    private TemplateDTO readTemplateUsingLoadFromParam() {
+    public TemplateDTO readTemplateUsingLoadFromParam() {
         TemplateDTO inputTemplateDTO = null;
         try {
             Resource resource = commonService.loadResourceUsingLoadFromParam();

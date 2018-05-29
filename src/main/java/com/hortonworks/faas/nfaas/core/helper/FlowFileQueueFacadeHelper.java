@@ -6,9 +6,11 @@ import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.Set;
 
+@Configuration
 public class FlowFileQueueFacadeHelper extends BaseFacadeHelper {
 
     public static final Logger logger = LoggerFactory.getLogger(FlowFileQueueFacadeHelper.class);

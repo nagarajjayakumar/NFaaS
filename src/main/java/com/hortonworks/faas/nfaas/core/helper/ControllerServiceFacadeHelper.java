@@ -6,10 +6,12 @@ import org.apache.nifi.web.api.entity.ControllerServiceReferencingComponentEntit
 import org.apache.nifi.web.api.entity.ControllerServicesEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@Configuration
 public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerServiceFacadeHelper.class);

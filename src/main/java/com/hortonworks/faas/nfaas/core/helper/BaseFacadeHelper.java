@@ -4,7 +4,9 @@ import com.hortonworks.faas.nfaas.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class BaseFacadeHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseFacadeHelper.class);

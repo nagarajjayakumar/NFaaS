@@ -8,11 +8,13 @@ import org.apache.nifi.web.api.entity.RemoteProcessGroupEntity;
 import org.apache.nifi.web.api.entity.RemoteProcessGroupsEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@Configuration
 public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteProcessGroupFacadeHelper.class);
