@@ -328,13 +328,13 @@ public class HdfmFlowController extends BasicFlowController{
     public @ResponseBody
     ControllerServicesEntity unDeployControllerServicesForProcessGroup(
             @PathVariable("pgId") String pgId) {
-        restTemplate = ignoreCertAndHostVerification(restTemplate);
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
         logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
-        ControllerServicesEntity cse = getAllControllerServicesByProcessGroup(pgId);
+        ControllerServicesEntity cse = processGroup.getAllControllerServicesByProcessGroup(pgId);
 
-        stopAndUnDeployControllerServices(cse);
+        controllerServiceFacadeHelper.stopAndUnDeployControllerServices(cse);
         logger.info(cse.toString());
-        cse = getAllControllerServicesByProcessGroup(pgId);
+        cse = processGroup.getAllControllerServicesByProcessGroup(pgId);
         return cse;
     }
 
@@ -343,11 +343,11 @@ public class HdfmFlowController extends BasicFlowController{
     @RequestMapping(value = "/processor-groups/undeploy/{pgId}", produces = "application/json")
     public @ResponseBody
     ProcessGroupFlowEntity unDeployProcessGroupByPgId(@PathVariable("pgId") String pgId) {
-        restTemplate = ignoreCertAndHostVerification(restTemplate);
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
         logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
 
         // https://"+nifiServerHostnameAndPort+"/nifi-api/flow/process-groups/a57d7d2a-86bd-4b43-113d-e0abfb83bd9b
-        ProcessGroupFlowEntity pgfe = getLatestProcessGroupFlowEntity(pgId);
+        ProcessGroupFlowEntity pgfe = processGroupFlow.getLatestProcessGroupFlowEntity(pgId);
 
         Set<ProcessGroupEntity> processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
 

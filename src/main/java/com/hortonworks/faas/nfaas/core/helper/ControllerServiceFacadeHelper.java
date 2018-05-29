@@ -23,7 +23,7 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
      * @param controllerServiceEntity
      * @param state
      */
-    private void checkReferenceComponentStatus(ControllerServiceEntity controllerServiceEntity, String state) {
+    public void checkReferenceComponentStatus(ControllerServiceEntity controllerServiceEntity, String state) {
         int count = 0;
         int innerCount = 0;
         ControllerServiceEntity cse = null;
@@ -63,7 +63,7 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
      *
      * @param controllerServicesEntity
      */
-    private void stopAndUnDeployControllerServices(ControllerServicesEntity controllerServicesEntity) {
+    public void stopAndUnDeployControllerServices(ControllerServicesEntity controllerServicesEntity) {
 
         Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
 
@@ -88,7 +88,7 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
      * @param controllerServicesEntity
      * @return
      */
-    private void enableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
+    public void enableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
         Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
         ControllerServiceEntity cse = null;
         for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
