@@ -68,7 +68,7 @@ public class CommonService {
 
     public String getUser() {
         // TODO Auto-generated method stub
-        return "hdfm";
+        return "nfaas";
     }
 
     public Double getXaxis() {
