@@ -489,170 +489,9 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * This is the method to disable stop the process group.
-     *
-     * @param processGroupFlowEntity
-     * @param pgId
-     */
-    private void enableRemoteProcessGroup(String pgId) {
-
-        if (!enableRPG) {
-            logger.error("DEMO :: enable remote process group skipping ");
-            return;
-        }
-
-        ProcessGroupFlowEntity pgfe = getLatestProcessGroupFlowEntity(pgId);
-        Set<ProcessGroupEntity> processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
-
-        for (ProcessGroupEntity processGroupEntity : processGroups) {
-            if (processGroupEntity.getInactiveRemotePortCount() > 0) {
-                enableRemoteProcessGroup(processGroupEntity.getId());
-            }
-        }
-
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-        RemoteProcessGroupsEntity remoteProcessGroupsEntity = getLatestRemoteProcessGroupsEntity(pgId);
-
-        Set<RemoteProcessGroupEntity> remoteProcessGroups = remoteProcessGroupsEntity.getRemoteProcessGroups();
-
-        if (remoteProcessGroups.isEmpty()) {
-            logger.debug("No remote process group found for the PG " + pge.getComponent().getName());
-            logger.debug("enableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
-            return;
-        }
-
-        for (RemoteProcessGroupEntity rpge : remoteProcessGroups) {
-            logger.info("enableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
-            enableRemoteProcessGroupComponents(rpge);
-            logger.info("enableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
-        }
-        pge = getLatestProcessGroupEntity(pgId);
 
 
-    }
 
-    /**
-     * This is the method which is used to delete all the remote process group
-     * for the PG
-     *
-     * @param id
-     */
-    @SuppressWarnings("unused")
-    private void deleteAllRemoteProcessGroup(String pgId) {
-        logger.info("deleteAllRemoteProcessGroup Starts for --> " + pgId);
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-        RemoteProcessGroupsEntity remoteProcessGroupsEntity = getLatestRemoteProcessGroupsEntity(pgId);
-
-        Set<RemoteProcessGroupEntity> remoteProcessGroups = remoteProcessGroupsEntity.getRemoteProcessGroups();
-
-        if (remoteProcessGroups.isEmpty()) {
-            logger.warn("No remote process group found for the PG " + pge.getComponent().getName());
-            return;
-        }
-
-        for (RemoteProcessGroupEntity rpge : remoteProcessGroups) {
-            deleteRemoteProcessGroupComponents(rpge);
-        }
-        pge = getLatestProcessGroupEntity(pgId);
-        logger.info("deleteAllRemoteProcessGroup Ends for --> " + pge.toString());
-
-    }
-
-    /**
-     * This is the method to stop and un-deploy the process group.
-     *
-     * @param pge
-     */
-    private void deleteProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
-        logger.info("deleteProcessGroup Starts for --> " + pgId);
-        ProcessGroupEntity pge = getLatestProcessGroupEntity(pgId);
-        pge = deleteProcessGroup(pge);
-        logger.info("deleteProcessGroup Ends for --> " + pgId);
-    }
-
-    /**
-     * Stop and Un deploy the controller Services.
-     *
-     * @param controllerServicesEntity
-     */
-    private void stopAndUnDeployControllerServices(ControllerServicesEntity controllerServicesEntity) {
-
-        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
-
-        ControllerServiceEntity cse = null;
-
-        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
-            logger.info("stopAndUnDeployControllerServices Starts for --> "
-                    + controllerServiceEntity.getComponent().getName());
-            cse = stopRefrencingComponents(controllerServiceEntity);
-            cse = disableControllerService(cse);
-            cse = deleteControllerService(cse);
-            logger.info("stopAndUnDeployControllerServices Ends for --> "
-                    + controllerServiceEntity.getComponent().getName());
-
-        }
-
-    }
-
-    /**
-     * Method is used to enable the controller services
-     *
-     * @param cse
-     * @return
-     */
-    private void enableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
-        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
-        ControllerServiceEntity cse = null;
-        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
-            if (EntityState.INVALID.getState().equalsIgnoreCase(controllerServiceEntity.getComponent().getState())) {
-                logger.error("Controller Services is in invalid state.. Please validate --> "
-                        + controllerServiceEntity.getComponent().getName());
-                continue;
-            }
-            logger.info("Controller Services Enable Starts --> " + controllerServiceEntity.getComponent().getName());
-            cse = enableControllerService(controllerServiceEntity);
-            logger.debug(cse.toString());
-            logger.info("Controller Services Enable Ends   --> " + controllerServiceEntity.getComponent().getName());
-        }
-    }
-
-    /**
-     * Method is used to enable the controller services
-     *
-     * @param cse
-     * @return
-     */
-    private void disableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
-        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
-        ControllerServiceEntity cse = null;
-        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
-            logger.info(
-                    "disableAllControllerServices Starts for --> " + controllerServiceEntity.getComponent().getName());
-            cse = stopRefrencingComponents(controllerServiceEntity);
-            cse = disableControllerService(cse);
-            logger.info(
-                    "disableAllControllerServices Ends for --> " + controllerServiceEntity.getComponent().getName());
-        }
-    }
-
-    /**
-     * Method is used to enable the controller services
-     *
-     * @param cse
-     * @return
-     */
-    private void deleteAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
-        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
-        ControllerServiceEntity cse = null;
-        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
-            logger.info(
-                    "deleteAllControllerServices Starts for --> " + controllerServiceEntity.getComponent().getName());
-            cse = deleteControllerService(controllerServiceEntity);
-            logger.info("deleteAllControllerServices Ends for --> " + controllerServiceEntity.getComponent().getName()
-                    + cse.toString());
-        }
-    }
 
     /**
      * This is the method to start all the Processors
@@ -677,21 +516,7 @@ public class HdfmFlowController {
 
 
 
-    /**
-     * Call the NIFI rest api to enable the process group
-     *
-     * @param remoteProcessGroupEntity
-     * @param state
-     */
-    private RemoteProcessGroupEntity enableRemoteProcessGroupComponents(
-            RemoteProcessGroupEntity remoteProcessGroupEntity) {
-        enableRemoteProcessGroupComponents(remoteProcessGroupEntity, EntityState.TRANSMIT_TRUE.getState());
 
-        checkRemoteProcessGroupComponentsStatus(remoteProcessGroupEntity, EntityState.TRANSMIT_TRUE.getState());
-        RemoteProcessGroupEntity rpge = getLatestRemoteProcessGroupEntity(remoteProcessGroupEntity.getId());
-        return rpge;
-
-    }
 
     /**
      * Stop the referencing component of the controller services
@@ -935,41 +760,7 @@ public class HdfmFlowController {
     }
 
 
-    /**
-     * This is the method which is used to delete the remote process group
-     * componets
-     * http://localhost:8080/nifi-api/remote-process-groups/f2fe8ad1-015b-1000-64fd-caf013397f4a?version=6&clientId=f2fe58d9-015b-1000-f615-591b1d0de0c2
-     *
-     * @param rpge
-     */
-    private RemoteProcessGroupEntity deleteRemoteProcessGroupComponents(
-            RemoteProcessGroupEntity remoteProcessGroupEntity) {
 
-        logger.info(
-                "Delete Remote Group Service Entity Starts --> " + remoteProcessGroupEntity.getComponent().getName());
-        String rpgeId = remoteProcessGroupEntity.getId();
-
-        // https://"+nifiServerHostnameAndPort+"/nifi-api/controller-services/b369d993-48ae-4c0e-5ddc-ac8b8f316c4b?version=2&clientId=deaebc77-015b-1000-31ea-162516e98255
-        String version = String.valueOf(getClientIdAndVersion(remoteProcessGroupEntity).getVersion());
-        String clientId = String.valueOf(getClientIdAndVersion(remoteProcessGroupEntity).getClientId());
-
-        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/remote-process-groups/" + rpgeId
-                + "?version=" + version + "&clientId=" + clientId;
-
-        Map<String, String> params = new HashMap<String, String>();
-        HttpHeaders requestHeaders = getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
-
-        HttpEntity<RemoteProcessGroupEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
-                RemoteProcessGroupEntity.class, params);
-
-        RemoteProcessGroupEntity resp = response.getBody();
-
-        logger.debug(resp.toString());
-        logger.info("Delete Remote Group Entity Ends --> " + remoteProcessGroupEntity.getComponent().getName());
-        return resp;
-
-    }
 
 
 

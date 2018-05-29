@@ -94,4 +94,8 @@ public class CommonService {
         return resource;
     }
 
+    public String getTemplateFileLocation(){
+        return this.templateFileLocation;
+    }
+
 }

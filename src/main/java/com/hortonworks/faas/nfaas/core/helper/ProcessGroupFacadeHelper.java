@@ -14,20 +14,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class ProcessGroupFacadeHelper {
+public class ProcessGroupFacadeHelper extends BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessGroupFacadeHelper.class);
-
-    private int WAIT_IN_SEC = 10;
-
-    @Autowired
-    ProcessorGroupFlowFacadeHelper processorGroupFlowFacadeHelper;
-
-    @Autowired
-    FlowFileQueue flowFileQueues;
-
-    @Autowired
-    ProcessGroup processGroup;
 
     /**
      * This is the method to stop and un-deploy the process group.
@@ -153,5 +142,17 @@ public class ProcessGroupFacadeHelper {
      */
     private ProcessGroupEntity deleteProcessGroup(ProcessGroupEntity pge) {
         return processGroup.deleteProcessGroup(pge, EntityState.DELETE.getState());
+    }
+
+    /**
+     * This is the method to stop and un-deploy the process group.
+     *
+     * @param processGroupFlowEntity
+     */
+    private void deleteProcessGroup(ProcessGroupFlowEntity processGroupFlowEntity, String pgId) {
+        logger.info("deleteProcessGroup Starts for --> " + pgId);
+        ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
+        pge = deleteProcessGroup(pge);
+        logger.info("deleteProcessGroup Ends for --> " + pgId);
     }
 }

@@ -23,15 +23,9 @@ import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class TemplateFacadeHelper {
+public class TemplateFacadeHelper extends  BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateFacadeHelper.class);
-
-    @Autowired
-    CommonService commonService;
-
-    @Autowired
-    Template template;
 
     public Set<String> getAllInputPortNameFromTemplate(Set<PortDTO> inputPortFromTemplate) {
         Set<String> inputPortNameFromTemplate = new LinkedHashSet<>();
@@ -92,7 +86,7 @@ public class TemplateFacadeHelper {
         if (null == templateId || templateId.isEmpty()) {
             throw new RuntimeException("Unable to upload the template ");
         }
-        FlowEntity fe = createTemplateInstanceByTemplateId(processGroupEntity, templateId);
+        FlowEntity fe = template.createTemplateInstanceByTemplateId(processGroupEntity, templateId);
         return fe;
     }
 
@@ -147,7 +141,7 @@ public class TemplateFacadeHelper {
             inputTemplateDTO = (TemplateDTO) unmarshaller.unmarshal(inputStream);
         } catch (Exception ex) {
             throw new RuntimeException(
-                    "Unable to parse the Input Template. Please upload the Valid template .." + template.templateFileLocation);
+                    "Unable to parse the Input Template. Please upload the Valid template .." + commonService.getTemplateFileLocation());
         }
         return inputTemplateDTO;
     }
@@ -164,9 +158,9 @@ public class TemplateFacadeHelper {
 
             String templateId = checkTemplateExist();
             if (templateId != null)
-                deleteTemplate(templateId);
+                template.deleteTemplate(templateId);
 
-            TemplateEntity templateEntity = uploadTemplate(processGroupEntity);
+            TemplateEntity templateEntity = template.uploadTemplate(processGroupEntity);
 
             return templateEntity.getTemplate().getId();
         } catch (Exception e) {
@@ -175,24 +169,6 @@ public class TemplateFacadeHelper {
         }
         return "";
     }
-
-    /**
-     * Method is used to create the template Instance
-     *
-     * @param processGroupEntity
-     * @return
-     */
-    private FlowEntity createTemplateInstanceByTemplateId(ProcessGroupEntity processGroupEntity) {
-
-        String templateId = getTemplateId(processGroupEntity);
-
-        if (null == templateId || templateId.isEmpty()) {
-            throw new RuntimeException("Unable to upload the template ");
-        }
-        FlowEntity fe = createTemplateInstanceByTemplateId(processGroupEntity, templateId);
-        return fe;
-    }
-
 
 
 }

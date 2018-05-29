@@ -11,14 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class ProcessorGroupFlowFacadeHelper {
+public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
 
     public static final Logger logger = LoggerFactory.getLogger(ProcessGroupFacadeHelper.class);
-
-    @Autowired
-    ProcessGroupFlow processGroupFlow;
-
-    private int WAIT_IN_SEC = 10;
 
     /**
      * Call the NIFI rest api to stop the process group

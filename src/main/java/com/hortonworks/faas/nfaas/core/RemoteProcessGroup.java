@@ -26,6 +26,7 @@ public class RemoteProcessGroup {
     private String trasnsportMode = "http";
     private boolean nifiSecuredCluster = false;
     private String nifiServerHostnameAndPort = "localhost:9090";
+    private boolean enableRPG = false;
 
     @Autowired
     Security security;
@@ -46,6 +47,7 @@ public class RemoteProcessGroup {
         this.trasnsportMode = env.getProperty("nifi.trasnsportMode");
         this.nifiSecuredCluster = Boolean.parseBoolean(env.getProperty("nifi.securedCluster"));
         this.nifiServerHostnameAndPort = env.getProperty("nifi.hostnameAndPort");
+        this.enableRPG = Boolean.parseBoolean(env.getProperty("bootrest.enableRPG"));
     }
 
     /**
@@ -124,6 +126,47 @@ public class RemoteProcessGroup {
         HttpEntity<RemoteProcessGroupsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
                 RemoteProcessGroupsEntity.class, params);
         return response.getBody();
+    }
+
+
+    /**
+     * This is the method which is used to delete the remote process group
+     * componets
+     * http://localhost:8080/nifi-api/remote-process-groups/f2fe8ad1-015b-1000-64fd-caf013397f4a?version=6&clientId=f2fe58d9-015b-1000-f615-591b1d0de0c2
+     *
+     * @param remoteProcessGroupEntity
+     */
+    public RemoteProcessGroupEntity deleteRemoteProcessGroupComponents(
+            RemoteProcessGroupEntity remoteProcessGroupEntity) {
+
+        logger.info(
+                "Delete Remote Group Service Entity Starts --> " + remoteProcessGroupEntity.getComponent().getName());
+        String rpgeId = remoteProcessGroupEntity.getId();
+
+        // https://"+nifiServerHostnameAndPort+"/nifi-api/controller-services/b369d993-48ae-4c0e-5ddc-ac8b8f316c4b?version=2&clientId=deaebc77-015b-1000-31ea-162516e98255
+        String version = String.valueOf(commonService.getClientIdAndVersion(remoteProcessGroupEntity).getVersion());
+        String clientId = String.valueOf(commonService.getClientIdAndVersion(remoteProcessGroupEntity).getClientId());
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/remote-process-groups/" + rpgeId
+                + "?version=" + version + "&clientId=" + clientId;
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        HttpEntity<RemoteProcessGroupEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
+                RemoteProcessGroupEntity.class, params);
+
+        RemoteProcessGroupEntity resp = response.getBody();
+
+        logger.debug(resp.toString());
+        logger.info("Delete Remote Group Entity Ends --> " + remoteProcessGroupEntity.getComponent().getName());
+        return resp;
+
+    }
+
+    public boolean isEnableRPG(){
+       return this.enableRPG;
     }
 
 

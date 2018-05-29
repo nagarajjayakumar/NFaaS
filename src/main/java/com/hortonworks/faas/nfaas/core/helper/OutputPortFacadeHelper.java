@@ -10,12 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class OutputPortFacadeHelper {
+public class OutputPortFacadeHelper extends BaseFacadeHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(OutputPortFacadeHelper.class);
-
-    @Autowired
-    TemplateFacadeHelper templateFacadeHelper;
 
     /**
      * This is the method to get all the Output port entity from the pgfe

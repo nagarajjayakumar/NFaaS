@@ -1,21 +1,19 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
-import com.hortonworks.faas.nfaas.core.ControllerService;
+import com.hortonworks.faas.nfaas.config.EntityState;
 import org.apache.nifi.web.api.entity.ControllerServiceEntity;
 import org.apache.nifi.web.api.entity.ControllerServiceReferencingComponentEntity;
+import org.apache.nifi.web.api.entity.ControllerServicesEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class ControllerServiceFacadeHelper {
+public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerServiceFacadeHelper.class);
 
-    @Autowired
-    ControllerService controllerService;
     /**
      * Check for the reference component. check for the state else sleep for 10
      * sec
@@ -56,5 +54,90 @@ public class ControllerServiceFacadeHelper {
         }
 
     }
+
+
+    /**
+     * Stop and Un deploy the controller Services.
+     *
+     * @param controllerServicesEntity
+     */
+    private void stopAndUnDeployControllerServices(ControllerServicesEntity controllerServicesEntity) {
+
+        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
+
+        ControllerServiceEntity cse = null;
+
+        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
+            logger.info("stopAndUnDeployControllerServices Starts for --> "
+                    + controllerServiceEntity.getComponent().getName());
+            cse = stopRefrencingComponents(controllerServiceEntity);
+            cse = disableControllerService(cse);
+            cse = deleteControllerService(cse);
+            logger.info("stopAndUnDeployControllerServices Ends for --> "
+                    + controllerServiceEntity.getComponent().getName());
+
+        }
+
+    }
+
+    /**
+     * Method is used to enable the controller services
+     *
+     * @param cse
+     * @return
+     */
+    private void enableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
+        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
+        ControllerServiceEntity cse = null;
+        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
+            if (EntityState.INVALID.getState().equalsIgnoreCase(controllerServiceEntity.getComponent().getState())) {
+                logger.error("Controller Services is in invalid state.. Please validate --> "
+                        + controllerServiceEntity.getComponent().getName());
+                continue;
+            }
+            logger.info("Controller Services Enable Starts --> " + controllerServiceEntity.getComponent().getName());
+            cse = enableControllerService(controllerServiceEntity);
+            logger.debug(cse.toString());
+            logger.info("Controller Services Enable Ends   --> " + controllerServiceEntity.getComponent().getName());
+        }
+    }
+
+    /**
+     * Method is used to enable the controller services
+     *
+     * @param cse
+     * @return
+     */
+    private void disableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
+        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
+        ControllerServiceEntity cse = null;
+        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
+            logger.info(
+                    "disableAllControllerServices Starts for --> " + controllerServiceEntity.getComponent().getName());
+            cse = stopRefrencingComponents(controllerServiceEntity);
+            cse = disableControllerService(cse);
+            logger.info(
+                    "disableAllControllerServices Ends for --> " + controllerServiceEntity.getComponent().getName());
+        }
+    }
+
+    /**
+     * Method is used to enable the controller services
+     *
+     * @param cse
+     * @return
+     */
+    private void deleteAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
+        Set<ControllerServiceEntity> controllerServicesEntities = controllerServicesEntity.getControllerServices();
+        ControllerServiceEntity cse = null;
+        for (ControllerServiceEntity controllerServiceEntity : controllerServicesEntities) {
+            logger.info(
+                    "deleteAllControllerServices Starts for --> " + controllerServiceEntity.getComponent().getName());
+            cse = deleteControllerService(controllerServiceEntity);
+            logger.info("deleteAllControllerServices Ends for --> " + controllerServiceEntity.getComponent().getName()
+                    + cse.toString());
+        }
+    }
+
 
 }

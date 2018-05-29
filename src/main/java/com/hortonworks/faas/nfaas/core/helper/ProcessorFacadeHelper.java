@@ -10,12 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ProcessorFacadeHelper {
+public class ProcessorFacadeHelper extends BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorFacadeHelper.class);
 
-    @Autowired
-    TemplateFacadeHelper templateFacadeHelper;
 
     /**
      * This is the method to get all the Processor entity from the pgfe

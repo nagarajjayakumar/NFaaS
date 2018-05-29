@@ -15,24 +15,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class RemoteProcessGroupFacadeHelper {
+public class RemoteProcessGroupFacadeHelper extends BaseFacadeHelper{
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteProcessGroupFacadeHelper.class);
 
-
-    @Autowired
-    TemplateFacadeHelper templateFacadeHelper;
-
-    @Autowired
-    RemoteProcessGroup remoteProcessGroup;
-
-    @Autowired
-    ProcessGroupFlow processGroupFlow;
-
-    @Autowired
-    ProcessGroup processGroup;
-
-    private int WAIT_IN_SEC = 10;
 
     /**
      * This is the method which is used to get all the remote process group from
@@ -146,6 +132,93 @@ public class RemoteProcessGroupFacadeHelper {
             count++;
         }
 
+        return rpge;
+
+    }
+
+    /**
+     * This is the method to disable stop the process group.
+     *
+     * @param pgId
+     */
+    private void enableRemoteProcessGroup(String pgId) {
+
+        if (!remoteProcessGroup.isEnableRPG()) {
+            logger.error("DEMO :: enable remote process group skipping ");
+            return;
+        }
+
+        ProcessGroupFlowEntity pgfe = processGroupFlow.getLatestProcessGroupFlowEntity(pgId);
+        Set<ProcessGroupEntity> processGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
+
+        for (ProcessGroupEntity processGroupEntity : processGroups) {
+            if (processGroupEntity.getInactiveRemotePortCount() > 0) {
+                enableRemoteProcessGroup(processGroupEntity.getId());
+            }
+        }
+
+        ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
+        RemoteProcessGroupsEntity remoteProcessGroupsEntity = remoteProcessGroup.getLatestRemoteProcessGroupsEntity(pgId);
+
+        Set<RemoteProcessGroupEntity> remoteProcessGroups = remoteProcessGroupsEntity.getRemoteProcessGroups();
+
+        if (remoteProcessGroups.isEmpty()) {
+            logger.debug("No remote process group found for the PG " + pge.getComponent().getName());
+            logger.debug("enableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
+            return;
+        }
+
+        for (RemoteProcessGroupEntity rpge : remoteProcessGroups) {
+            logger.info("enableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
+            enableRemoteProcessGroupComponents(rpge);
+            logger.info("enableRemoteProcessGroup Ends for --> " + pge.getComponent().getName());
+        }
+        pge = processGroup.getLatestProcessGroupEntity(pgId);
+
+
+    }
+
+
+
+    /**
+     * This is the method which is used to delete all the remote process group
+     * for the PG
+     *
+     * @param pgId
+     */
+    @SuppressWarnings("unused")
+    private void deleteAllRemoteProcessGroup(String pgId) {
+        logger.info("deleteAllRemoteProcessGroup Starts for --> " + pgId);
+        ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
+        RemoteProcessGroupsEntity remoteProcessGroupsEntity = remoteProcessGroup.getLatestRemoteProcessGroupsEntity(pgId);
+
+        Set<RemoteProcessGroupEntity> remoteProcessGroups = remoteProcessGroupsEntity.getRemoteProcessGroups();
+
+        if (remoteProcessGroups.isEmpty()) {
+            logger.warn("No remote process group found for the PG " + pge.getComponent().getName());
+            return;
+        }
+
+        for (RemoteProcessGroupEntity rpge : remoteProcessGroups) {
+            remoteProcessGroup.deleteRemoteProcessGroupComponents(rpge);
+        }
+        pge = processGroup.getLatestProcessGroupEntity(pgId);
+        logger.info("deleteAllRemoteProcessGroup Ends for --> " + pge.toString());
+
+    }
+
+    /**
+     * Call the NIFI rest api to enable the process group
+     *
+     * @param remoteProcessGroupEntity
+     *
+     */
+    private RemoteProcessGroupEntity enableRemoteProcessGroupComponents(
+            RemoteProcessGroupEntity remoteProcessGroupEntity) {
+        enableRemoteProcessGroupComponents(remoteProcessGroupEntity, EntityState.TRANSMIT_TRUE.getState());
+
+        checkRemoteProcessGroupComponentsStatus(remoteProcessGroupEntity, EntityState.TRANSMIT_TRUE.getState());
+        RemoteProcessGroupEntity rpge = remoteProcessGroup.getLatestRemoteProcessGroupEntity(remoteProcessGroupEntity.getId());
         return rpge;
 
     }
