@@ -47,7 +47,7 @@ public class InputPortFacadeHelper extends BaseFacadeHelper {
      * @param portEntity
      * @return
      */
-    private PortEntity startInputPortEntity(PortEntity portEntity) {
+    public PortEntity startInputPortEntity(PortEntity portEntity) {
         PortEntity pe = inputPort.getLatestInputPortEntity(portEntity);
         pe = inputPort.startOrStopInputPortEntity(pe, EntityState.RUNNING.getState());
         pe = this.checkInputPortStatus(pe, EntityState.RUNNING.getState());
@@ -60,7 +60,7 @@ public class InputPortFacadeHelper extends BaseFacadeHelper {
      * @param portEntity
      * @return
      */
-    private PortEntity stopInputPortEntity(PortEntity portEntity) {
+    public PortEntity stopInputPortEntity(PortEntity portEntity) {
         PortEntity pe = inputPort.getLatestInputPortEntity(portEntity);
         pe = inputPort.startOrStopInputPortEntity(pe, EntityState.STOPPED.getState());
         pe = checkInputPortStatus(pe, EntityState.STOPPED.getState());
@@ -73,7 +73,7 @@ public class InputPortFacadeHelper extends BaseFacadeHelper {
      * @param portEntity
      * @return
      */
-    private void deleteInputPortEntity(PortEntity portEntity) {
+    public void deleteInputPortEntity(PortEntity portEntity) {
         PortEntity pe = inputPort.getLatestInputPortEntity(portEntity);
         pe = inputPort.deleteInputPortEntity(pe, EntityState.DELETE.getState());
         logger.info(pe.toString());
@@ -86,7 +86,7 @@ public class InputPortFacadeHelper extends BaseFacadeHelper {
      * @param portEntity
      * @param state
      */
-    private PortEntity checkInputPortStatus(PortEntity portEntity, String state) {
+    public PortEntity checkInputPortStatus(PortEntity portEntity, String state) {
         int count = 0;
 
         PortEntity pe = null;

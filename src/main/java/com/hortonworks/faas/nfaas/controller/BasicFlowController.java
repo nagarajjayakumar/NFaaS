@@ -1,10 +1,7 @@
 package com.hortonworks.faas.nfaas.controller;
 
 import com.hortonworks.faas.nfaas.core.*;
-import com.hortonworks.faas.nfaas.core.helper.FlowFileQueueFacadeHelper;
-import com.hortonworks.faas.nfaas.core.helper.ProcessGroupFacadeHelper;
-import com.hortonworks.faas.nfaas.core.helper.ProcessorGroupFlowFacadeHelper;
-import com.hortonworks.faas.nfaas.core.helper.TemplateFacadeHelper;
+import com.hortonworks.faas.nfaas.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +29,20 @@ public class BasicFlowController {
     @Autowired
     FlowFileQueueFacadeHelper flowFileQueueFacadeHelper;
 
+    @Autowired
+    InputPortFacadeHelper inputPortFacadeHelper;
+
+    @Autowired
+    OutputPortFacadeHelper outputPortFacadeHelper;
+
+    @Autowired
+    ProcessorFacadeHelper processorFacadeHelper;
+
+    @Autowired
+    ControllerServiceFacadeHelper controllerServiceFacadeHelper;
+
+    @Autowired
+    RemoteProcessGroupFacadeHelper remoteProcessGroupFacadeHelper;
 
     @Autowired
     CommonService commonService;
@@ -44,6 +55,26 @@ public class BasicFlowController {
 
     @Autowired
     ProcessGroup processGroup;
+
+    @Autowired
+    FlowFileQueue flowFileQueue;
+
+    @Autowired
+    InputPort inputPort;
+
+    @Autowired
+    OutputPort outputPort;
+
+    @Autowired
+    Processor processor;
+
+    @Autowired
+    ControllerService controllerService;
+
+    @Autowired
+    RemoteProcessGroup remoteProcessGroup;
+
+
 
 
 }

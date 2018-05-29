@@ -159,10 +159,10 @@ public class HdfmFlowController extends BasicFlowController{
         // template.getSnippet().getRemoteProcessGroups();
 
         logger.info("About to stop all the entity Specified in the File Begin ...");
-        Set<ProcessGroupEntity> processGroups = getProcessGroupEntityForUndeploy(pgfe, processGroupsFromTemplate);
-        Set<PortEntity> inputPorts = getInputPortsEntityForUndeploy(pgfe, inputPortsFromTemplate);
-        Set<PortEntity> outputPorts = getOutputPortsEntityForUndeploy(pgfe, outputPortsFromTemplate);
-        Set<ProcessorEntity> processors = getProcessorEntityForUndeploy(pgfe, processorsFromTemplate);
+        Set<ProcessGroupEntity> processGroups = processGroup.getProcessGroupEntityForUndeploy(pgfe, processGroupsFromTemplate);
+        Set<PortEntity> inputPorts = inputPortFacadeHelper.getInputPortsEntityForUndeploy(pgfe, inputPortsFromTemplate);
+        Set<PortEntity> outputPorts = outputPortFacadeHelper.getOutputPortsEntityForUndeploy(pgfe, outputPortsFromTemplate);
+        Set<ProcessorEntity> processors = processorFacadeHelper.getProcessorEntityForUndeploy(pgfe, processorsFromTemplate);
         // Set<RemoteProcessGroupEntity> remoteProcessGroups =
         // getRemoteProcessGroupEntityForUndeploy(pgfe,
         // remoteProcessGroupsFromTemplate);
@@ -175,20 +175,20 @@ public class HdfmFlowController extends BasicFlowController{
         for (ProcessGroupEntity processorGroup : processGroups) {
             logger.info("Step 1 :: stopAllEntitySpecifiedInTemplate PG starts --> "
                     + processorGroup.getComponent().getName());
-            cse = getAllControllerServicesByProcessGroup(processorGroup.getId());
+            cse = processGroup.getAllControllerServicesByProcessGroup(processorGroup.getId());
 
             logger.info("Step 1.1 :: disable the Controller Services For the Process Group Started "
                     + processorGroup.getId());
-            disableAllControllerServices(cse);
+            controllerServiceFacadeHelper.disableAllControllerServices(cse);
             logger.info("Step 1.1 :: disable the Controller Services For the Process Group Ended " + cse.toString());
 
             logger.info("Step 1.2 :: Stop all the processor For the Process Group Started " + processorGroup.getId());
-            stopAllProcessors(processorGroup.getId());
+            processorFacadeHelper.stopAllProcessors(processorGroup.getId());
             logger.info("Step 1.2 :: Stop all the processor For the Process Group Started " + processorGroup.getId());
 
             logger.info(
                     "Step 1.3 :: disable all the Remote PROCESSOR Group For the Process Group Started " + processorGroup.getId());
-            disableRemoteProcessGroup(processorGroup.getId());
+            remoteProcessGroupFacadeHelper.disableRemoteProcessGroup(processorGroup.getId());
             logger.info(
                     "Step 1.3 :: disable all the Remote PROCESSOR Group For the Process Group Started " + processorGroup.getId());
 
@@ -204,7 +204,7 @@ public class HdfmFlowController extends BasicFlowController{
         for (PortEntity ipPortEntity : inputPorts) {
             logger.info("Step 2 :: stopAllEntitySpecifiedInTemplate inputports starts --> "
                     + ipPortEntity.getComponent().getName());
-            ippe = stopInputPortEntity(ipPortEntity);
+            ippe = inputPortFacadeHelper.stopInputPortEntity(ipPortEntity);
             logger.info("Step 2 :: stopAllEntitySpecifiedInTemplate inputports ends   --> "
                     + ipPortEntity.getComponent().getName() + ippe.toString());
         }
@@ -217,7 +217,7 @@ public class HdfmFlowController extends BasicFlowController{
         for (PortEntity opPortEntity : outputPorts) {
             logger.info("Step 3 :: stopAllEntitySpecifiedInTemplate outputPorts starts --> "
                     + opPortEntity.getComponent().getName());
-            oppe = stopOutputPortEntity(opPortEntity);
+            oppe = outputPortFacadeHelper.stopOutputPortEntity(opPortEntity);
             logger.info("Step 3 :: stopAllEntitySpecifiedInTemplate outputPorts ends   --> "
                     + opPortEntity.getComponent().getName() + oppe.toString());
         }
@@ -230,7 +230,7 @@ public class HdfmFlowController extends BasicFlowController{
         for (ProcessorEntity processor : processors) {
             logger.info("Step 4 :: stopAllEntitySpecifiedInTemplate processor starts --> "
                     + processor.getComponent().getName());
-            procent = stopProcessorEntity(processor);
+            procent = processorFacadeHelper.stopProcessorEntity(processor);
             logger.info("Step 4 :: stopAllEntitySpecifiedInTemplate processor ends   --> "
                     + processor.getComponent().getName() + procent.toString());
         }

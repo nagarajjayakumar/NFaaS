@@ -49,7 +49,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
      * @param processorGroup
      * @return
      */
-    private ProcessGroupFlowEntity startAllProcessors(ProcessGroupEntity processorGroup) {
+    public ProcessGroupFlowEntity startAllProcessors(ProcessGroupEntity processorGroup) {
 
         logger.info("Process Group Starting Starts --> " + processorGroup.getComponent().getName());
         ProcessGroupFlowEntity processGroupFlowEntity = processGroupFlow.getLatestProcessGroupFlowEntity(processorGroup.getId());
@@ -72,7 +72,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
      * @param processorEntity
      * @return
      */
-    private ProcessorEntity startProcessorEntity(ProcessorEntity processorEntity) {
+    public ProcessorEntity startProcessorEntity(ProcessorEntity processorEntity) {
         ProcessorEntity pe = processor.getLatestProcessorEntity(processorEntity);
         if (EntityState.INVALID.getState().equalsIgnoreCase(pe.getStatus().getAggregateSnapshot().getRunStatus())) {
             logger.error("Procesor is in invalid state .. unable to start  " + pe.getComponent().getName());
@@ -89,7 +89,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
      * @param processorEntity
      * @return
      */
-    private ProcessorEntity stopProcessorEntity(ProcessorEntity processorEntity) {
+    public ProcessorEntity stopProcessorEntity(ProcessorEntity processorEntity) {
         ProcessorEntity pe = processor.getLatestProcessorEntity(processorEntity);
         if (EntityState.INVALID.getState().equalsIgnoreCase(pe.getStatus().getAggregateSnapshot().getRunStatus())) {
             logger.error("Procesor is in invalid state unable to stop " + pe.getComponent().getName());
@@ -106,7 +106,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
      * @param processorEntity
      * @return
      */
-    private void deleteProcessorEntity(ProcessorEntity processorEntity) {
+    public void deleteProcessorEntity(ProcessorEntity processorEntity) {
         ProcessorEntity pe = processor.getLatestProcessorEntity(processorEntity);
         pe = processor.deleteProcessorEntity(pe, EntityState.DELETE.getState());
         logger.info(pe.toString());
@@ -118,7 +118,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
      * @param pgId
      * @return
      */
-    private ProcessGroupFlowEntity stopAllProcessors(String pgId) {
+    public ProcessGroupFlowEntity stopAllProcessors(String pgId) {
         ProcessGroupFlowEntity pgfe = processGroupFlow.getLatestProcessGroupFlowEntity(pgId);
         processGroupFacadeHelper.stopProcessGroup(pgfe, pgId);
         return pgfe;
@@ -130,7 +130,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
      * @param pgId
      * @return
      */
-    private ProcessGroupFlowEntity deleteAllProcessors(String pgId) {
+    public ProcessGroupFlowEntity deleteAllProcessors(String pgId) {
         ProcessGroupFlowEntity pgfe = processGroupFlow.getLatestProcessGroupFlowEntity(pgId);
         processGroupFacadeHelper.deleteProcessGroup(pgfe, pgId);
         return pgfe;
@@ -143,7 +143,7 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
      * @param processorEntity
      * @param state
      */
-    private ProcessorEntity checkProcessorEntityStatus(ProcessorEntity processorEntity, String state) {
+    public ProcessorEntity checkProcessorEntityStatus(ProcessorEntity processorEntity, String state) {
         int count = 0;
 
         ProcessorEntity pe = null;
