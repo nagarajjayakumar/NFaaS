@@ -83,7 +83,7 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
     /**
      * Method is used to enable the controller services
      *
-     * @param cse
+     * @param controllerServicesEntity
      * @return
      */
     private void enableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
@@ -105,7 +105,7 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
     /**
      * Method is used to enable the controller services
      *
-     * @param cse
+     * @param controllerServicesEntity
      * @return
      */
     private void disableAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
@@ -124,7 +124,7 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
     /**
      * Method is used to enable the controller services
      *
-     * @param cse
+     * @param controllerServicesEntity
      * @return
      */
     private void deleteAllControllerServices(ControllerServicesEntity controllerServicesEntity) {
@@ -150,10 +150,10 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
 
         logger.info("Stopping Controller Refrence Component Starts --> "
                 + controllerServiceEntity.getComponent().getName());
-        stopReferencingComponents(controllerServiceEntity, EntityState.STOPPED.getState());
+        controllerService.stopReferencingComponents(controllerServiceEntity, EntityState.STOPPED.getState());
 
         checkReferenceComponentStatus(controllerServiceEntity, EntityState.STOPPED.getState());
-        ControllerServiceEntity cse = getLatestControllerServiceEntity(controllerServiceEntity);
+        ControllerServiceEntity cse = controllerService.getLatestControllerServiceEntity(controllerServiceEntity);
         logger.info(
                 "Stopping Controller Refrence Component Ends --> " + controllerServiceEntity.getComponent().getName());
         return cse;
@@ -168,17 +168,17 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
     private ControllerServiceEntity disableControllerService(ControllerServiceEntity cse) {
 
         logger.info("Disable Controller Service Starts --> " + cse.getComponent().getName());
-        disableControllerServiceUsingRef(cse, EntityState.DISABLED.getState());
+        controllerService.disableControllerServiceUsingRef(cse, EntityState.DISABLED.getState());
 
         // No need to check the status now ..
         //checkControllerServiceStatus(cse, EntityState.DISABLED.getState());
-        cse = getLatestControllerServiceEntity(cse);
+        cse = controllerService.getLatestControllerServiceEntity(cse);
 
         disableControllerService(cse, EntityState.DISABLED.getState());
 
         checkControllerServiceStatus(cse, EntityState.DISABLED.getState());
         logger.info("Disable Controller Service Ends --> " + cse.getComponent().getName());
-        return getLatestControllerServiceEntity(cse);
+        return controllerService.getLatestControllerServiceEntity(cse);
     }
 
     /**
@@ -190,12 +190,12 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
     private ControllerServiceEntity enableControllerService(ControllerServiceEntity cse) {
 
         logger.info("Enable Controller Service Starts --> " + cse.getComponent().getName());
-        cse = getLatestControllerServiceEntity(cse);
+        cse = controllerService.getLatestControllerServiceEntity(cse);
         enableControllerService(cse, EntityState.ENABLED.getState());
 
         checkControllerServiceStatus(cse, EntityState.ENABLED.getState());
         logger.info("Enable Controller Service Ends --> " + cse.getComponent().getName());
-        return getLatestControllerServiceEntity(cse);
+        return controllerService.getLatestControllerServiceEntity(cse);
     }
 
     /**
@@ -205,10 +205,8 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
      * @return
      */
     private ControllerServiceEntity deleteControllerService(ControllerServiceEntity controllerServiceEntity) {
-
-        return deleteControllerService(controllerServiceEntity, EntityState.DELETE.getState());
+        return controllerService.deleteControllerService(controllerServiceEntity, EntityState.DELETE.getState());
     }
-
 
 
     /**
@@ -219,7 +217,7 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
      */
 
     private void disableControllerService(ControllerServiceEntity controllerServiceEntity, String state) {
-        changeControllServiceState(controllerServiceEntity, state);
+        controllerService.changeControllServiceState(controllerServiceEntity, state);
 
     }
 
@@ -231,8 +229,39 @@ public class ControllerServiceFacadeHelper extends BaseFacadeHelper {
      */
 
     private void enableControllerService(ControllerServiceEntity controllerServiceEntity, String state) {
-        changeControllServiceState(controllerServiceEntity, state);
+        controllerService.changeControllServiceState(controllerServiceEntity, state);
 
     }
+
+
+    /**
+     * Check the controller service entity status
+     *
+     * @param controllerServiceEntity
+     * @param state
+     */
+    private void checkControllerServiceStatus(ControllerServiceEntity controllerServiceEntity, String state) {
+        int count = 0;
+
+        ControllerServiceEntity cse = null;
+
+        while (true && count < WAIT_IN_SEC) {
+            cse = controllerService.getLatestControllerServiceEntity(controllerServiceEntity);
+
+            if (state.equalsIgnoreCase(cse.getComponent().getState())) {
+                break;
+            }
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+
+            }
+
+            count++;
+        }
+
+    }
+
 
 }

@@ -97,7 +97,7 @@ public class ControllerService {
      * @param controllerServiceEntity
      * @param state
      */
-    private void disableControllerServiceUsingRef(ControllerServiceEntity controllerServiceEntity, String state) {
+    public void disableControllerServiceUsingRef(ControllerServiceEntity controllerServiceEntity, String state) {
 
         UpdateControllerServiceReferenceRequestEntity updateContServRefReq = new UpdateControllerServiceReferenceRequestEntity();
 
@@ -133,7 +133,7 @@ public class ControllerService {
      * @param controllerServiceEntity
      * @param state
      */
-    private void stopReferencingComponents(ControllerServiceEntity controllerServiceEntity, String state) {
+    public void stopReferencingComponents(ControllerServiceEntity controllerServiceEntity, String state) {
 
         String contServid = controllerServiceEntity.getId();
         Set<ControllerServiceReferencingComponentEntity> referencingComponents = controllerServiceEntity.getComponent()
@@ -175,7 +175,7 @@ public class ControllerService {
      * @param controllerServiceEntity
      * @param state
      */
-    private ControllerServiceEntity deleteControllerService(ControllerServiceEntity controllerServiceEntity,
+    public ControllerServiceEntity deleteControllerService(ControllerServiceEntity controllerServiceEntity,
                                                             String state) {
 
         logger.info("Delete Controller Service Entity Starts --> " + controllerServiceEntity.getComponent().getName());
