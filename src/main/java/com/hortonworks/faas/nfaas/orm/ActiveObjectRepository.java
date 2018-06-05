@@ -2,6 +2,7 @@ package com.hortonworks.faas.nfaas.orm;
 
 
 import com.hortonworks.faas.nfaas.dto.ActiveObject;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.repository.CrudRepository;
 
 import javax.transaction.Transactional;
@@ -15,8 +16,9 @@ import javax.transaction.Transactional;
  *
  * @author njayakumar
  */
+@Configuration
 @Transactional
-public interface ActiveObjectRepo extends CrudRepository<ActiveObject, Long> {
+public interface ActiveObjectRepository extends CrudRepository<ActiveObject, Long> {
 
     public ActiveObject findById(Long id);
 

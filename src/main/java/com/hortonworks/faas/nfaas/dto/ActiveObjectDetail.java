@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.dto;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import java.util.Date;
 
 
 @Entity
@@ -24,9 +25,12 @@ public class ActiveObjectDetail {
     String sourceDataType;
     String inferDataType;
     Boolean isRequiredForFlow;
-    DateTime createdAt;
-    DateTime updatedAt;
-    ActiveObject activeObject;
+    java.util.Date createdAt;
+    java.util.Date updatedAt;
+
+//    @ManyToOne
+//    @JoinColumn(name = "haoid")
+//    ActiveObject activeObject;
 
     public ActiveObjectDetail() {
     }
@@ -136,29 +140,28 @@ public class ActiveObjectDetail {
         isRequiredForFlow = requiredForFlow;
     }
 
-    public DateTime getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(DateTime createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public DateTime getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(DateTime updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "haoid")
-    public ActiveObject getActiveObject() {
-        return activeObject;
-    }
-
-    public void setActiveObject(ActiveObject activeObject) {
-        this.activeObject = activeObject;
-    }
+    //
+//    public ActiveObject getActiveObject() {
+//        return activeObject;
+//    }
+//
+//    public void setActiveObject(ActiveObject activeObject) {
+//        this.activeObject = activeObject;
+//    }
 }

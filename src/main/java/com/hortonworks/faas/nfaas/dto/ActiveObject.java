@@ -2,10 +2,8 @@ package com.hortonworks.faas.nfaas.dto;
 
 import org.joda.time.DateTime;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 
@@ -13,6 +11,8 @@ import java.util.Set;
 @Table(name = "hanadb_active_object")
 public class ActiveObject {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
     String namespace;
     String packageId;
@@ -20,12 +20,14 @@ public class ActiveObject {
     String dbObjectType;
     String dbObjectTypeSuffix;
     Integer version;
-    DateTime activatedAt;
+    java.util.Date activatedAt;
     String activatedBy;
     Boolean isActive;
-    Set<ActiveObjectDetail> activeObjectDetail;
-    DateTime createdAt;
-    DateTime updatedAt;
+    java.util.Date createdAt;
+    java.util.Date updatedAt;
+
+//    @OneToMany(mappedBy = "activeObject", cascade = CascadeType.ALL)
+//    Set<ActiveObjectDetail> activeobjectdetails;
 
     public ActiveObject() {
     }
@@ -86,13 +88,7 @@ public class ActiveObject {
         this.version = version;
     }
 
-    public DateTime getActivatedAt() {
-        return activatedAt;
-    }
 
-    public void setActivatedAt(DateTime activatedAt) {
-        this.activatedAt = activatedAt;
-    }
 
     public String getActivatedBy() {
         return activatedBy;
@@ -110,28 +106,37 @@ public class ActiveObject {
         isActive = active;
     }
 
-    @OneToMany(mappedBy = "activeObject", cascade = CascadeType.ALL)
-    public Set<ActiveObjectDetail> getActiveObjectDetail() {
-        return activeObjectDetail;
+
+//    public Set<ActiveObjectDetail> getActiveobjectdetails() {
+//        return activeobjectdetails;
+//    }
+//
+//    public void setActiveobjectdetails(Set<ActiveObjectDetail> activeobjectdetails) {
+//        this.activeobjectdetails = activeobjectdetails;
+//    }
+
+
+    public Date getActivatedAt() {
+        return activatedAt;
     }
 
-    public void setActiveObjectDetail(Set<ActiveObjectDetail> activeObjectDetail) {
-        this.activeObjectDetail = activeObjectDetail;
+    public void setActivatedAt(Date activatedAt) {
+        this.activatedAt = activatedAt;
     }
 
-    public DateTime getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(DateTime createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public DateTime getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(DateTime updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

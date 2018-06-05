@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -43,7 +45,9 @@ import java.util.Arrays;
 //@EnableAuthorizationServer
 @SpringBootApplication
 @EnableZuulProxy
-@ComponentScan({"com.hortonworks.faas.nfaas", "org.apache.nifi.web.api.dto", "com.hortonworks.faas.nfaas.core"})
+@EnableJpaRepositories("com.hortonworks.faas.nfaas.*")
+@EntityScan("com.hortonworks.faas.nfaas.*")
+@ComponentScan({"com.hortonworks.faas.nfaas", "org.apache.nifi.web.api.dto", "com.hortonworks.faas.nfaas.core", "com.hortonworks.faas.nfaas.orm"})
 @PropertySource(ignoreResourceNotFound = false, value = "classpath:application.properties")
 @PropertySource(ignoreResourceNotFound = true, value = "file:/etc/hdfm/hdfm.properties")
 public class NFaaSApp {
