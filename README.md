@@ -40,8 +40,9 @@ Dev tools
 ============
 mdbdetails
 
+```
 http://localhost:8084/mdb/getaod?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS
-
+```
 
 
 SIGN: Naga Jay @nagajay_

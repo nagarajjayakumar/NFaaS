@@ -34,7 +34,7 @@ public class ActiveObjectController {
         List<ActiveObjectDetail> activeObjectDetail;
         try {
             activeObject = activeObjectRepository.findByNamespaceAndPackageIdAndDbObjectName(namespace,package_id,db_object_name);
-            activeObjectDetail = activeObjectDetailRepository.findByHaoid(activeObject.getId());
+            activeObjectDetail = activeObjectDetailRepository.findAllByHaoid(activeObject.getId());
 
         }
         catch (Exception ex) {

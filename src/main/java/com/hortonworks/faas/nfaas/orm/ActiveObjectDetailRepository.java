@@ -23,6 +23,6 @@ public interface ActiveObjectDetailRepository extends CrudRepository<ActiveObjec
 
     public ActiveObjectDetail findById(Long id);
 
-    public List<ActiveObjectDetail> findByHaoid(Long haoid);
+    public List<ActiveObjectDetail> findAllByHaoid(Long haoid);
 
 }
