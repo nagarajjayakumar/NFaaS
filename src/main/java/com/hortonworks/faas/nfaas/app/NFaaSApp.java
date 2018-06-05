@@ -7,11 +7,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +34,8 @@ import org.springframework.security.oauth2.provider.error.DefaultWebResponseExce
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+
 
 //@EnableGlobalMethodSecurity
 
@@ -37,18 +43,36 @@ import org.springframework.web.client.RestTemplate;
 //@EnableAuthorizationServer
 @SpringBootApplication
 @EnableZuulProxy
-@ComponentScan({"com.hortonworks.faas.nfaas", "org.apache.nifi.web.api.dto","com.hortonworks.faas.nfaas.core"})
+@ComponentScan({"com.hortonworks.faas.nfaas", "org.apache.nifi.web.api.dto", "com.hortonworks.faas.nfaas.core"})
 @PropertySource(ignoreResourceNotFound = false, value = "classpath:application.properties")
 @PropertySource(ignoreResourceNotFound = true, value = "file:/etc/hdfm/hdfm.properties")
 public class NFaaSApp {
 
+    private static final Logger logger = LoggerFactory.getLogger(NFaaSApp.class);
+
     public static void main(String[] args) {
+
         SpringApplication.run(NFaaSApp.class, args);
     }
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) throws Exception {
         return builder.build();
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+        return args -> {
+
+            System.out.println("Let's inspect the beans provided by Spring Boot:");
+
+            String[] beanNames = ctx.getBeanDefinitionNames();
+            Arrays.sort(beanNames);
+            for (String beanName : beanNames) {
+                logger.warn(String.format("beanName %s", beanName));
+            }
+
+        };
     }
 
     @Bean
