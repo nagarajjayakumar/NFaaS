@@ -36,6 +36,14 @@ Configuration is externalized
 
 Runs on embedded tomcat server – Generated artifact war file
 
+Dev tools
+============
+mdbdetails
+
+http://localhost:8084/mdb/getaod?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS
+
+
+
 SIGN: Naga Jay @nagajay_
 
 CICD: Yogeshprabhu @yogesh_
