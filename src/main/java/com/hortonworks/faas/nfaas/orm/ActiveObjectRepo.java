@@ -20,4 +20,6 @@ public interface ActiveObjectRepo extends CrudRepository<ActiveObject, Long> {
 
     public ActiveObject findById(Long id);
 
+    public ActiveObject findByNamespaceAndPackageIdAndDbObjectName(String namespace, String packageId, String dbObjectName);
+
 }
