@@ -4,6 +4,8 @@ import com.hortonworks.faas.nfaas.dto.ActiveObject;
 import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectDetailRepository;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -21,9 +23,10 @@ import java.util.List;
 @Controller
 public class MetaDbController {
 
+    private static final Logger logger = LoggerFactory.getLogger(MetaDbController.class);
+
     /**
      * /getaod  --> Return the Active Object detail
-     *
      */
     @CrossOrigin
     @PreAuthorize("#oauth2.hasScope('read')")
@@ -33,12 +36,11 @@ public class MetaDbController {
         ActiveObject activeObject;
         List<ActiveObjectDetail> activeObjectDetail;
         try {
-            activeObject = activeObjectRepository.findByNamespaceAndPackageIdAndDbObjectName(namespace,package_id,db_object_name);
+            activeObject = activeObjectRepository.findByNamespaceAndPackageIdAndDbObjectName(namespace, package_id, db_object_name);
             activeObjectDetail = activeObjectDetailRepository.findAllByHaoid(activeObject.getId());
 
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
             return null;
         }
         return activeObjectDetail;
