@@ -1,15 +1,16 @@
 package com.hortonworks.faas.nfaas.flow_builder;
 
-import com.beust.jcommander.JCommander;
+import com.hortonworks.faas.nfaas.flow_builder.task.HiveDdlGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class FlowBuilder {
 
-    public static void main(String[] args) {
+    @Autowired
+    private HiveDdlGenerator hiveDdlGenerator;
 
-        FlowBuilderOptions fbo = new FlowBuilderOptions();
-        JCommander.newBuilder()
-                .addObject(fbo)
-                .build()
-                .parse(args);
+    public void doWork(FlowBuilderOptions fbo) {
+        hiveDdlGenerator.doWork(fbo);
     }
 }

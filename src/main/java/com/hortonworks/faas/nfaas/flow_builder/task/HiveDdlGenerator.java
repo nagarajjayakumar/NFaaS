@@ -1,19 +1,20 @@
 package com.hortonworks.faas.nfaas.flow_builder.task;
 
-import com.hortonworks.faas.nfaas.controller.MetaDbController;
 import com.hortonworks.faas.nfaas.dto.ActiveObject;
 import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
+import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveExternalTableDdl;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectDetailRepository;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class HiveDdlGenerator implements  Task{
+@Configuration
+public class HiveDdlGenerator implements Task {
 
     private static final Logger logger = LoggerFactory.getLogger(HiveDdlGenerator.class);
     public String task = "hive_ddl_generator";
@@ -26,13 +27,18 @@ public class HiveDdlGenerator implements  Task{
     @Autowired
     private ActiveObjectDetailRepository activeObjectDetailRepository;
 
+    @Autowired
+    private HiveExternalTableDdl hiveExternalTableDdl;
+
     @Override
     public void doWork(FlowBuilderOptions fbo) {
-        logger.info(String.format("started %s !! ",task));
+        logger.info(String.format("started %s !! ", task));
         this._fbo = fbo;
         ActiveObject activeObject = this.getActiveObject();
         List<ActiveObjectDetail> aod = this.getActiveObjectDetail();
-        logger.info(String.format("ended %s !! ",task));
+
+        String sql = hiveExternalTableDdl.generateExternalTableDdl(fbo, activeObject, aod);
+        logger.info(String.format("ended %s !! ", task));
     }
 
     private List<ActiveObjectDetail> getActiveObjectDetail() {
@@ -63,8 +69,6 @@ public class HiveDdlGenerator implements  Task{
         return activeObject;
 
     }
-
-
 
 
 }
