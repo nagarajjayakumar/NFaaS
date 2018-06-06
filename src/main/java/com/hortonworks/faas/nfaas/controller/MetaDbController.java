@@ -19,7 +19,7 @@ import java.util.List;
  * @author njayakumar
  */
 @Controller
-public class ActiveObjectController {
+public class MetaDbController {
 
     /**
      * /getaod  --> Return the Active Object detail
