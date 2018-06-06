@@ -34,10 +34,9 @@ public class HiveDdlGenerator implements Task {
     public void doWork(FlowBuilderOptions fbo) {
         logger.info(String.format("started %s !! ", task));
         this._fbo = fbo;
-        ActiveObject activeObject = this.getActiveObject();
         List<ActiveObjectDetail> aod = this.getActiveObjectDetail();
 
-        String sql = hiveExternalTableDdl.generateExternalTableDdl(fbo, activeObject, aod);
+        String sql = hiveExternalTableDdl.generateExternalTableDdl(fbo, aod);
         logger.info(String.format("ended %s !! ", task));
     }
 
