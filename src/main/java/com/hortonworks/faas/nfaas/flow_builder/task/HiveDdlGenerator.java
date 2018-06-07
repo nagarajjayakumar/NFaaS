@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.flow_builder.task;
 import com.hortonworks.faas.nfaas.dto.ActiveObject;
 import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
+import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveDeltaTableDdl;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveExternalTableDdl;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectDetailRepository;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectRepository;
@@ -30,13 +31,19 @@ public class HiveDdlGenerator implements Task {
     @Autowired
     private HiveExternalTableDdl hiveExternalTableDdl;
 
+    @Autowired
+    private HiveDeltaTableDdl hiveDeltaTableDdl;
+
+
     @Override
     public void doWork(FlowBuilderOptions fbo) {
         logger.info(String.format("started %s !! ", task));
         this._fbo = fbo;
         List<ActiveObjectDetail> aod = this.getActiveObjectDetail();
 
-        String sql = hiveExternalTableDdl.generateExternalTableDdl(fbo, aod);
+        String externalSql = hiveExternalTableDdl.generateExternalTableDdl(fbo, aod);
+        String deltaSql = hiveDeltaTableDdl.generateDeltaTableDdl(fbo, aod);
+
         logger.info(String.format("ended %s !! ", task));
     }
 

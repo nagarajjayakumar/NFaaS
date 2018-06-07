@@ -43,7 +43,12 @@ mdbdetails
 ```
 http://localhost:8084/mdb/getaod?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS
 ```
-
+```
+http://localhost:8084/faas/createhiveddl?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS
+```
+```
+http://localhost:8084/faas/createhiveddl?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS&buckets=32&clustered_by=documentnumber
+```
 
 SIGN: Naga Jay @nagajay_
 

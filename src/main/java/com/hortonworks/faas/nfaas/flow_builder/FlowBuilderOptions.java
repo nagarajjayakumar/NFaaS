@@ -19,8 +19,11 @@ public class FlowBuilderOptions {
     @Parameter(names = "-db_object_name", description = "database object name")
     public String db_object_name;
 
-    @Parameter(names = "-buckets", description = "table bucket name")
+    @Parameter(names = "-buckets", description = "table bucket number")
     public String buckets;
+
+    @Parameter(names = "-clustered_by", description = "clustered by bucket number ")
+    public String clustered_by;
 
 
 }

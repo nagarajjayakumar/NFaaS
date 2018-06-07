@@ -35,7 +35,11 @@ public class FlowBuilderController {
     @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(value = "/faas/createhiveddl", produces = "application/json")
     public @ResponseBody
-    String generateHiveDdl(String namespace, String package_id, String db_object_name) {
+    String generateHiveDdl(String namespace,
+                           String package_id,
+                           String db_object_name,
+                           String buckets,
+                           String clustered_by) {
 
         FlowBuilderOptions fbo = new FlowBuilderOptions();
 
@@ -44,8 +48,12 @@ public class FlowBuilderController {
         args.add(namespace);
         args.add("-package_id");
         args.add(package_id);
-        args.add("-db_object_name ");
+        args.add("-db_object_name");
         args.add(db_object_name);
+        args.add("-buckets");
+        args.add(buckets);
+        args.add("-clustered_by");
+        args.add(clustered_by);
 
         JCommander.newBuilder()
                 .addObject(fbo)
