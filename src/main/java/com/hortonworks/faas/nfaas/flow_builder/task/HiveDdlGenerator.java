@@ -55,7 +55,7 @@ public class HiveDdlGenerator implements Task {
         List<ActiveObjectDetail> activeObjectDetail;
 
         try {
-            activeObject = activeObjectRepository.findByNamespaceAndPackageIdAndDbObjectName(_fbo.namespace, _fbo.package_id, _fbo.db_object_name);
+            activeObject = this.getActiveObject();
             activeObjectDetail = activeObjectDetailRepository.findAllByHaoid(activeObject.getId());
 
         } catch (Exception ex) {
