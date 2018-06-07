@@ -1,9 +1,7 @@
 package com.hortonworks.faas.nfaas.core;
 
-import org.apache.nifi.web.api.entity.ControllerServicesEntity;
-import org.apache.nifi.web.api.entity.ProcessGroupEntity;
-import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
-import org.apache.nifi.web.api.entity.VariableRegistryEntity;
+import org.apache.nifi.web.api.dto.ProcessGroupDTO;
+import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +96,51 @@ public class ProcessGroup {
 
         logger.debug(resp.toString());
         return resp;
+
+    }
+
+    /**
+     * create the process group ...
+     *
+     * @param pge
+     * @param pgName
+     * @return
+     */
+    public ProcessGroupEntity createProcessGroup(ProcessGroupEntity pge, String pgName) {
+
+        String pgId = pge.getId();
+
+        // https://"+nifiServerHostnameAndPort+"/nifi-api/process-groups/a57d7d2a-86bd-4b43-357a-34abb1bd85d6?version=0&clientId=deaebc77-015b-1000-31ea-162516e98255
+        String version = String.valueOf(commonService.getClientIdAndVersion(pge).getVersion());
+        String clientId = String.valueOf(commonService.getClientIdAndVersion(pge).getClientId());
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId + "/process-groups?version="
+                + version + "&clientId=" + clientId;
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        /*
+            Create the process group entity object with the name ..
+            to create the process group entity with the provided pgname
+         */
+        ProcessGroupEntity reqPge =  new ProcessGroupEntity();
+        ProcessGroupDTO component = new ProcessGroupDTO();
+        component.setName(pgName);
+        reqPge.setComponent(component);
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(reqPge,requestHeaders);
+
+        ProcessGroupEntity resp = null;
+
+        ResponseEntity<ProcessGroupEntity> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity,
+                ProcessGroupEntity.class,params);
+
+        ProcessGroupEntity resp_pge = response.getBody();
+
+        resp = response.getBody();
+        logger.debug(resp.toString());
+        return resp_pge;
 
     }
 

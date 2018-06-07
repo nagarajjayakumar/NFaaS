@@ -205,7 +205,6 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
         VariableRegistryEntity vre  = processGroup.getVariableRegistry(pge);
         Set<VariableEntity> variables = vre.getVariableRegistry().getVariables();
 
-        int index = 0;
         String value = "";
         VariableDTO varDto = null;
 
@@ -219,6 +218,50 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
             varDto.setValue(value);
         }
 
+        return  processGroup.updateVariableRegistry(pge.getId(), vre);
+    }
+
+    public VariableRegistryEntity createOrUpdadeVariableRegistry(ProcessGroupEntity pge, Map<String,String> paramMap) {
+        VariableRegistryEntity vre  = processGroup.getVariableRegistry(pge);
+        Set<VariableEntity> variables = vre.getVariableRegistry().getVariables();
+
+        VariableDTO varDto = null;
+        String value = "";
+
+        boolean found = false;
+
+        for(String key : paramMap.keySet()){
+            found = false;
+            for(VariableEntity variable : variables){
+                varDto = variable.getVariable();
+                if(key.equalsIgnoreCase(varDto.getName())){
+                    found = true;
+                    varDto = variable.getVariable();
+                    value = paramMap.get(varDto.getName());
+
+                    if(value != null) {
+                        varDto.setValue(value);
+                    }
+
+                    break;
+                }
+            }
+
+            if(!found){
+                VariableEntity entity = new VariableEntity();
+                VariableDTO variable = new VariableDTO();
+
+                variable.setName(key);
+                variable.setValue(paramMap.get(key));
+                variable.setProcessGroupId(pge.getId());
+
+                entity.setVariable(variable);
+                variables.add(entity);
+            }
+
+        }
+
+        vre.getVariableRegistry().setVariables(variables);
         return  processGroup.updateVariableRegistry(pge.getId(), vre);
     }
 }

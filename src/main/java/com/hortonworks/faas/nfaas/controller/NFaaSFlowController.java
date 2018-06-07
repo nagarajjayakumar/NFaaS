@@ -39,6 +39,7 @@ public class NFaaSFlowController extends BasicFlowController {
     private boolean nifiSecuredCluster = false;
     private boolean enableRPG = false;
 
+    private final String statementDelim = ";";
     // "Authorization",
     // "Bearer
     // eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJIMjI4MzQ4IiwiaXNzIjoiTGRhcFByb3ZpZGVyIiwiYXVkIjoiTGRhcFByb3ZpZGVyIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiSDIyODM0OCIsImtpZCI6MSwiZXhwIjoxNDk0NDAzODM1LCJpYXQiOjE0OTQzNjA2MzV9.ztHHOr4uAnxa8Yx2qv5QV2b8grBxjHDx6vkUfYw00zQ"
@@ -168,6 +169,7 @@ public class NFaaSFlowController extends BasicFlowController {
         sqlMap.put("external_table_sql", externalTableSql);
         sqlMap.put("delta_table_sql", deltaTableSql);
         sqlMap.put("txn_table_sql", txnTableSql);
+        sqlMap.put("sql", externalTableSql.concat(statementDelim).concat(deltaTableSql).concat(statementDelim).concat(txnTableSql).concat(statementDelim));
 
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);
         logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
@@ -176,7 +178,7 @@ public class NFaaSFlowController extends BasicFlowController {
         ProcessGroupEntity pge = processGroupFacadeHelper.getProcessGroupEntityByName(pgfe,hiveDdlGenerator.task);
         processorFacadeHelper.stopAllProcessors(pge.getId());
 
-        processGroupFacadeHelper.updadeVariableRegistry(pge,sqlMap);
+        processGroupFacadeHelper.createOrUpdadeVariableRegistry(pge,sqlMap);
 
         processorFacadeHelper.startAllProcessors(pge);
 
