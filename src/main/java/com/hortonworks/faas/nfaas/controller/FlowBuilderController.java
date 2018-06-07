@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.controller;
 import com.beust.jcommander.JCommander;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilder;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
+import com.hortonworks.faas.nfaas.flow_builder.task.HiveDdlGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class FlowBuilderController {
 
     @Autowired
     FlowBuilder flowBuilder;
+
+    @Autowired
+    HiveDdlGenerator hiveDdlGenerator;
 
     /**
      * /getaod  --> Return the Active Object detail
@@ -60,7 +64,7 @@ public class FlowBuilderController {
                 .build()
                 .parse(args.toArray(new String[0]));
 
-        flowBuilder.doWork(fbo);
+        hiveDdlGenerator.doWork(fbo);
         return "createhiveddl done";
     }
 
