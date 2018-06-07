@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.core;
 import org.apache.nifi.web.api.entity.ControllerServicesEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
+import org.apache.nifi.web.api.entity.VariableRegistryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -100,6 +102,58 @@ public class ProcessGroup {
     }
 
     /**
+     *
+     * this is the method to get the variable registry for the process group entity
+     * http://localhost:8080/nifi-api/process-groups/da2ad18e-b984-35ec-828b-30de2fbf0a4f/variable-registry
+     * @param pge
+     * @return
+     */
+
+    public VariableRegistryEntity getVariableRegistry(ProcessGroupEntity pge){
+        String pgId = pge.getId();
+
+        // http://localhost:8080/nifi-api/process-groups/da2ad18e-b984-35ec-828b-30de2fbf0a4f/variable-registry
+        String version = String.valueOf(commonService.getClientIdAndVersion(pge).getVersion());
+        String clientId = String.valueOf(commonService.getClientIdAndVersion(pge).getClientId());
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId + "/variable-registry?version="
+                + version + "&clientId=" + clientId;
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        VariableRegistryEntity resp = null;
+        HttpEntity<VariableRegistryEntity> response = restTemplate.exchange(uri, HttpMethod.GET, requestEntity,
+                VariableRegistryEntity.class, params);
+
+        resp = response.getBody();
+
+        logger.debug(resp.toString());
+        return resp;
+    }
+
+
+    public VariableRegistryEntity updateVariableRegistry(String pgId, VariableRegistryEntity vre){
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId + "/variable-registry";
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders headers = security.getAuthorizationHeader();
+        HttpEntity<VariableRegistryEntity> requestEntity = new HttpEntity<>(vre, headers);
+
+        HttpEntity<VariableRegistryEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
+                VariableRegistryEntity.class, params);
+
+        VariableRegistryEntity resp = response.getBody();
+
+        logger.debug(resp.toString());
+
+        return resp;
+    }
+
+    /**
      * get All Controller Services By Process Group
      *
      * @param pgId
@@ -155,6 +209,7 @@ public class ProcessGroup {
         }
         return null;
     }
+
 
 
 

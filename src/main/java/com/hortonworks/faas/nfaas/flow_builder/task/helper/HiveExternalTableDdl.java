@@ -21,7 +21,7 @@ public class HiveExternalTableDdl {
         String sql_head = "CREATE EXTERNAL TABLE ie_awinternal.%s ( ";
         String sql_body = HelperUtil.getSqlBody(aod);
         String sql_tail = " ) STORED AS ORC LOCATION ".concat(
-                " 'hdfs://AWHDP-PRDHA/tmp/aw_hive_stg/stg_%s'");
+                " 'hdfs://AWHDP-PRDHA/tmp/aw_hive_stg/stg_%s' ");
 
         sql_head = String.format(sql_head, fbo.db_object_name.toLowerCase());
         sql_tail = String.format(sql_tail, fbo.db_object_name.toLowerCase());

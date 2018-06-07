@@ -2,15 +2,15 @@ package com.hortonworks.faas.nfaas.core.helper;
 
 import com.hortonworks.faas.nfaas.config.EntityState;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
-import org.apache.nifi.web.api.entity.ProcessGroupEntity;
-import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
-import org.apache.nifi.web.api.entity.TemplateEntity;
+import org.apache.nifi.web.api.dto.VariableDTO;
+import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -183,4 +183,42 @@ public class ProcessGroupFacadeHelper extends BaseFacadeHelper {
         return processGroupNameFromTemplate;
     }
 
+    public ProcessGroupEntity getProcessGroupEntityByName(ProcessGroupFlowEntity pgfe,
+                                                          String pgName) {
+
+        ProcessGroupEntity resultPge = null;
+        Set<ProcessGroupEntity> allProcessGroups = pgfe.getProcessGroupFlow().getFlow().getProcessGroups();
+
+        for (ProcessGroupEntity pge : allProcessGroups) {
+            if (pgName.equalsIgnoreCase(pge.getComponent().getName())) {
+                resultPge = pge;
+                break;
+            }
+
+        }
+
+        return resultPge;
+
+    }
+
+    public VariableRegistryEntity updadeVariableRegistry(ProcessGroupEntity pge, Map<String,String> sqlMap) {
+        VariableRegistryEntity vre  = processGroup.getVariableRegistry(pge);
+        Set<VariableEntity> variables = vre.getVariableRegistry().getVariables();
+
+        int index = 0;
+        String value = "";
+        VariableDTO varDto = null;
+
+        for(VariableEntity variable : variables){
+            varDto = variable.getVariable();
+            value = sqlMap.get(varDto.getName());
+
+            if(value == null || value.trim() == "")
+                continue;
+
+            varDto.setValue(value);
+        }
+
+        return  processGroup.updateVariableRegistry(pge.getId(), vre);
+    }
 }

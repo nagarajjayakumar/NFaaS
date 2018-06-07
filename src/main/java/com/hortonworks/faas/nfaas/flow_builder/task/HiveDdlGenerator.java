@@ -50,6 +50,33 @@ public class HiveDdlGenerator implements Task {
         logger.info(String.format("ended %s !! ", task));
     }
 
+    public String getExternalTableDdl(FlowBuilderOptions fbo){
+        logger.info(String.format("started %s !! ", task));
+        this._fbo = fbo;
+        List<ActiveObjectDetail> aod = this.getActiveObjectDetail();
+        String externalSql = hiveExternalTableDdl.generateExternalTableDdl(fbo, aod);
+        logger.info(String.format("ended %s !! ", task));
+        return externalSql;
+    }
+
+    public String getDeltaTableDdl(FlowBuilderOptions fbo){
+        logger.info(String.format("started %s !! ", task));
+        this._fbo = fbo;
+        List<ActiveObjectDetail> aod = this.getActiveObjectDetail();
+        String deltaSql = hiveDeltaTableDdl.generateDeltaTableDdl(fbo, aod);
+        logger.info(String.format("ended %s !! ", task));
+        return deltaSql;
+    }
+
+    public String getTxnTableDdl(FlowBuilderOptions fbo){
+        logger.info(String.format("started %s !! ", task));
+        this._fbo = fbo;
+        List<ActiveObjectDetail> aod = this.getActiveObjectDetail();
+        String txnSql = hiveTxnTableDdl.generateTxnTableDdl(fbo, aod);
+        logger.info(String.format("ended %s !! ", task));
+        return txnSql;
+    }
+
     private List<ActiveObjectDetail> getActiveObjectDetail() {
         ActiveObject activeObject;
         List<ActiveObjectDetail> activeObjectDetail;

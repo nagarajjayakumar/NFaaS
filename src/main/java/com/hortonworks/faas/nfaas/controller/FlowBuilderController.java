@@ -22,7 +22,7 @@ import java.util.List;
  * @author njayakumar
  */
 @Controller
-public class FlowBuilderController {
+public class FlowBuilderController extends BasicFlowController{
 
     private static final Logger logger = LoggerFactory.getLogger(MetaDbController.class);
 
@@ -67,6 +67,5 @@ public class FlowBuilderController {
         hiveDdlGenerator.doWork(fbo);
         return "createhiveddl done";
     }
-
 
 }

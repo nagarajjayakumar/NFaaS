@@ -1,5 +1,8 @@
 package com.hortonworks.faas.nfaas.controller;
 
+import com.beust.jcommander.JCommander;
+import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
+import com.hortonworks.faas.nfaas.flow_builder.task.HiveDdlGenerator;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
@@ -14,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class NFaaSFlowController extends BasicFlowController {
@@ -62,6 +65,9 @@ public class NFaaSFlowController extends BasicFlowController {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    HiveDdlGenerator hiveDdlGenerator;
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -118,6 +124,65 @@ public class NFaaSFlowController extends BasicFlowController {
         deployAndStartProcessGroup(pge);
         logger.info(pge.toString());
         return pge;
+    }
+
+
+    /**
+     * create hive table .. call the processor group and create the hive tables
+     */
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/faas/createhivetable", produces = "application/json")
+    public @ResponseBody
+    String createHiveTable(String namespace,
+                           String package_id,
+                           String db_object_name,
+                           String buckets,
+                           String clustered_by) {
+
+        FlowBuilderOptions fbo = new FlowBuilderOptions();
+
+        List<String> args = new ArrayList<>();
+        args.add("-namespace");
+        args.add(namespace);
+        args.add("-package_id");
+        args.add(package_id);
+        args.add("-db_object_name");
+        args.add(db_object_name);
+        args.add("-buckets");
+        args.add(buckets);
+        args.add("-clustered_by");
+        args.add(clustered_by);
+
+        JCommander.newBuilder()
+                .addObject(fbo)
+                .build()
+                .parse(args.toArray(new String[0]));
+
+        String externalTableSql = hiveDdlGenerator.getExternalTableDdl(fbo);
+        String deltaTableSql    = hiveDdlGenerator.getDeltaTableDdl(fbo);
+        String txnTableSql      = hiveDdlGenerator.getTxnTableDdl(fbo);
+
+        Map<String,String> sqlMap = new HashMap<>();
+        sqlMap.put("external_table_sql", externalTableSql);
+        sqlMap.put("delta_table_sql", deltaTableSql);
+        sqlMap.put("txn_table_sql", txnTableSql);
+
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
+        logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
+        ProcessGroupFlowEntity pgfe = processGroupFlow.getRootProcessGroupFlowEntity();
+
+        ProcessGroupEntity pge = processGroupFacadeHelper.getProcessGroupEntityByName(pgfe,hiveDdlGenerator.task);
+        processorFacadeHelper.stopAllProcessors(pge.getId());
+
+        processGroupFacadeHelper.updadeVariableRegistry(pge,sqlMap);
+
+        processorFacadeHelper.startAllProcessors(pge);
+
+
+
+        return "createhiveddl done";
     }
 
     /**
