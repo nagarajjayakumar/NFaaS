@@ -18,7 +18,7 @@ public class HiveExternalTableDdl {
     public String generateExternalTableDdl(FlowBuilderOptions fbo,
                                            List<ActiveObjectDetail> aod) {
 
-        String sql_head = "CREATE EXTERNAL TABLE awinternal.%s ( ";
+        String sql_head = "CREATE EXTERNAL TABLE ie_awinternal.%s ( ";
         String sql_body = HelperUtil.getSqlBody(aod);
         String sql_tail = " ) STORED AS ORC LOCATION ".concat(
                 " 'hdfs://AWHDP-PRDHA/tmp/aw_hive_stg/stg_%s'");

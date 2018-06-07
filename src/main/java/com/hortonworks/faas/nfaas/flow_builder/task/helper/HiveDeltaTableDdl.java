@@ -18,7 +18,7 @@ public class HiveDeltaTableDdl {
     public String generateDeltaTableDdl(FlowBuilderOptions fbo,
                                            List<ActiveObjectDetail> aod) {
 
-        String sql_head = "CREATE TABLE awinternal.%s_delta ( ";
+        String sql_head = "CREATE TABLE ie_awinternal.%s_delta ( ";
         String sql_body = HelperUtil.getSqlBody(aod);
         String sql_tail = " ) CLUSTERED BY ( " +
                 "   %1$s )   INTO %2$s BUCKETS " +
