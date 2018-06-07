@@ -5,6 +5,7 @@ import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveDeltaTableDdl;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveExternalTableDdl;
+import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveTxnTableDdl;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectDetailRepository;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectRepository;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ public class HiveDdlGenerator implements Task {
     @Autowired
     private HiveDeltaTableDdl hiveDeltaTableDdl;
 
+    @Autowired
+    private HiveTxnTableDdl hiveTxnTableDdl;
 
     @Override
     public void doWork(FlowBuilderOptions fbo) {
@@ -43,7 +46,7 @@ public class HiveDdlGenerator implements Task {
 
         String externalSql = hiveExternalTableDdl.generateExternalTableDdl(fbo, aod);
         String deltaSql = hiveDeltaTableDdl.generateDeltaTableDdl(fbo, aod);
-
+        String txnSql = hiveTxnTableDdl.generateTxnTableDdl(fbo,aod);
         logger.info(String.format("ended %s !! ", task));
     }
 
