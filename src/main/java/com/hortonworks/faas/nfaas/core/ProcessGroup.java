@@ -121,6 +121,10 @@ public class ProcessGroup {
         component.setName(pgName);
         reqPge.setComponent(component);
 
+        /*
+          Very critical to set the client Id and the inital version
+          Otherwise the Httprequest will turn to a bad request.
+         */
         RevisionDTO revision = new RevisionDTO();
         revision.setClientId(clientId);
         revision.setVersion(0l);
