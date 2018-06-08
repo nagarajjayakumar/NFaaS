@@ -1,7 +1,6 @@
 package com.hortonworks.faas.nfaas.core;
 
-import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
-import org.apache.nifi.web.api.entity.ScheduleComponentsEntity;
+import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +109,94 @@ public class ProcessGroupFlow {
                 String.class, params);
         return response.getBody();
     }
+
+
+    /**
+     *
+     * GET /flow/registries
+     * Gets the listing of available registries
+     * Entity
+     *
+     * @return
+     */
+    public RegistryClientsEntity getAvailableRegistry() {
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/registries";
+
+        HttpEntity<RegistryClientsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                RegistryClientsEntity.class, params);
+        return response.getBody();
+    }
+
+
+    /**
+     * GET /flow/registries/{id}/buckets
+     * Gets the buckets from the specified registry for the current use
+     * Entity
+     *
+     * @return
+     */
+    public BucketsEntity getBucket(String registryId) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/registries/"+registryId+"/buckets";
+
+        HttpEntity<BucketsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                BucketsEntity.class, params);
+        return response.getBody();
+    }
+
+    /**
+     *
+     * GET  /flow/registries/{registry-id}/buckets/{bucket-id}/flows
+     * Gets the flows from the specified registry and bucket for the current use
+     * Entity
+     *
+     * @return
+     */
+    public VersionedFlowsEntity getFlowFromRegistryAndBucket(String registryId, String bucketId) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/registries/"+registryId+"/buckets/"+bucketId+"/flows";
+
+        HttpEntity<VersionedFlowsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                VersionedFlowsEntity.class, params);
+        return response.getBody();
+    }
+
+
+    /**
+     *
+     * /flow/registries/{registry-id}/buckets/{bucket-id}/flows/{flow-id}/versions
+     * Gets the flow versions from the specified registry and bucket for the specified flow for the current user
+     * Request
+     * Entity
+     *
+     * @return
+     */
+    public VersionedFlowSnapshotMetadataSetEntity getFlowVersionFromRegistryAndBucketAndFlow(String registryId, String bucketId, String flowId) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/registries/"+registryId+"/buckets/"+bucketId+"/flows/"+flowId+"/versions";
+
+        HttpEntity<VersionedFlowSnapshotMetadataSetEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                VersionedFlowSnapshotMetadataSetEntity.class, params);
+        return response.getBody();
+    }
+
     /**
      * Call the NIFI rest api to start/stop the process group
      *
