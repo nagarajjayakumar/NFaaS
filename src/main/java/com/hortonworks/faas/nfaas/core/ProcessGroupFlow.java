@@ -96,6 +96,21 @@ public class ProcessGroupFlow {
     }
 
     /**
+     * /flow/client-id
+     * Method to get the client id from the flow api
+     */
+
+    public String getClientId() {
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/client-id";
+        HttpEntity<String> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                String.class, params);
+        return response.getBody();
+    }
+    /**
      * Call the NIFI rest api to start/stop the process group
      *
      * @param processGroupFlowEntity

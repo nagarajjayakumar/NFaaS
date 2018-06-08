@@ -59,7 +59,7 @@ public class CommonService {
     public RevisionDTO getClientIdAndVersion(ComponentEntity entity) {
         RevisionDTO revision = new RevisionDTO();
 
-        if (null != entity) {
+        if (null != entity && null != entity.getRevision()) {
             return entity.getRevision();
         }
 
