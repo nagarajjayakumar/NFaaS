@@ -173,6 +173,7 @@ public class NFaaSFlowController extends BasicFlowController {
 
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);
         logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
+
         ProcessGroupFlowEntity pgfe = processGroupFlow.getRootProcessGroupFlowEntity();
 
         String clientId = processGroupFlow.getClientId();
@@ -181,6 +182,7 @@ public class NFaaSFlowController extends BasicFlowController {
         if(null == pge){
              // if the process group not found create the process group
              pge = processGroup.createProcessGroup(pgfe.getProcessGroupFlow().getId(),clientId, hiveDdlGenerator.task);
+             // Get the version 1 from the prod_registry
              processorGroupFlowFacadeHelper.importProcessGroupFromRegistry(pgfe, pge, hiveDdlGenerator.task,1,"prod_registry");
         }
         processorFacadeHelper.stopAllProcessors(pge.getId());

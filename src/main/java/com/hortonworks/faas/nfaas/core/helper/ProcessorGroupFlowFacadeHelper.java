@@ -148,7 +148,9 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
         String prod_registry_id = getRegistryId(registryName);
         BucketEntity  prod_bucket = getBucket(prod_registry_id);
         VersionedFlowEntity prod_flow = getFlowFromRegistry(prod_registry_id,prod_bucket,flowName);
-        VersionedFlowSnapshotMetadataEntity prod_flow_version = getFlowSnapShotFromRegistryAndBucketAndFlow(prod_registry_id,prod_bucket,prod_flow, version_num);
+
+        // I face some weird issue .. need to check on that
+        //VersionedFlowSnapshotMetadataEntity prod_flow_version = getFlowSnapShotFromRegistryAndBucketAndFlow(prod_registry_id,prod_bucket,prod_flow, version_num);
 
         ProcessGroupEntity ret_pge = processGroup.createProcessGroup(pge.getId(),
                                         clientId,
@@ -156,7 +158,7 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
                                         prod_registry_id,
                                         prod_bucket.getId(),
                                         prod_flow.getVersionedFlow().getFlowId(),
-                                        prod_flow_version.getVersionedFlowSnapshotMetadata().getVersion());
+                                        version_num);
 
         return ret_pge;
 
@@ -217,7 +219,7 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
     // this is the method to get the registry
     private String getRegistryId(String registryName) {
 
-        return null;
+        return processGroupFlow.getAvailableRegistry(registryName);
 
 //        RegistryClientsEntity registries = (RegistryClientsEntity) processGroupFlow.getAvailableRegistry();
 //        RegistryClientEntity registry = registries.getRegistries().iterator().next();

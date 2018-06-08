@@ -147,6 +147,7 @@ public class ProcessGroupFlow {
             if(registryName.equalsIgnoreCase(((String)registry.get("name")).toLowerCase()))
             {
                 id = (String) registry.get("id");
+                break;
             }
         }
 
