@@ -9,9 +9,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Configuration
@@ -119,17 +122,59 @@ public class ProcessGroupFlow {
      *
      * @return
      */
+    public String getAvailableRegistry(String registryName) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
+
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/registries";
+
+        HttpEntity<LinkedHashMap> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                LinkedHashMap.class, params);
+
+        LinkedHashMap map =  response.getBody();
+        ArrayList registries = (ArrayList) map.get("registries");
+
+        LinkedHashMap indRegistryMap = null;
+        LinkedHashMap registry = null;
+
+        String id = "";
+
+        for(Object registryMap : registries){
+            indRegistryMap = (LinkedHashMap)registryMap;
+            registry = (LinkedHashMap) indRegistryMap.get("registry");
+            if(registryName.equalsIgnoreCase(((String)registry.get("name")).toLowerCase()))
+            {
+                id = (String) registry.get("id");
+            }
+        }
+
+
+        return id;
+    }
+
+    /**
+     *
+     * GET /flow/registries
+     * Gets the listing of available registries
+     * Entity
+     *
+     * @return
+     */
     public RegistryClientsEntity getAvailableRegistry() {
 
         Map<String, String> params = new HashMap<String, String>();
         HttpHeaders requestHeaders = security.getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
 
         String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/registries";
 
         HttpEntity<RegistryClientsEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
                 RegistryClientsEntity.class, params);
+
         return response.getBody();
+
     }
 
 
@@ -144,7 +189,7 @@ public class ProcessGroupFlow {
 
         Map<String, String> params = new HashMap<String, String>();
         HttpHeaders requestHeaders = security.getAuthorizationHeader();
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
 
         String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/flow/registries/"+registryId+"/buckets";
 
@@ -161,7 +206,7 @@ public class ProcessGroupFlow {
      *
      * @return
      */
-    public VersionedFlowsEntity getFlowFromRegistryAndBucket(String registryId, String bucketId) {
+    public VersionedFlowsEntity getAllFlowsFromRegistryAndBucket(String registryId, String bucketId) {
 
         Map<String, String> params = new HashMap<String, String>();
         HttpHeaders requestHeaders = security.getAuthorizationHeader();
@@ -184,7 +229,7 @@ public class ProcessGroupFlow {
      *
      * @return
      */
-    public VersionedFlowSnapshotMetadataSetEntity getFlowVersionFromRegistryAndBucketAndFlow(String registryId, String bucketId, String flowId) {
+    public VersionedFlowSnapshotMetadataSetEntity getFlowSnapShotFromRegistryAndBucketAndFlow(String registryId, String bucketId, String flowId) {
 
         Map<String, String> params = new HashMap<String, String>();
         HttpHeaders requestHeaders = security.getAuthorizationHeader();

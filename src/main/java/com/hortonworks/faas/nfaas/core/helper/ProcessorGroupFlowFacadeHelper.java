@@ -1,8 +1,7 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
 import com.hortonworks.faas.nfaas.config.EntityState;
-import org.apache.nifi.web.api.entity.ProcessGroupEntity;
-import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
+import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,4 +137,98 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
     }
 
 
+
+    public ProcessGroupEntity importProcessGroupFromRegistry(ProcessGroupFlowEntity pgfe,
+                                                             ProcessGroupEntity pge,
+                                                             String flowName,
+                                                             int version_num,
+                                                             String registryName) {
+        String clientId = processGroupFlow.getClientId();
+
+        String prod_registry_id = getRegistryId(registryName);
+        BucketEntity  prod_bucket = getBucket(prod_registry_id);
+        VersionedFlowEntity prod_flow = getFlowFromRegistry(prod_registry_id,prod_bucket,flowName);
+        VersionedFlowSnapshotMetadataEntity prod_flow_version = getFlowSnapShotFromRegistryAndBucketAndFlow(prod_registry_id,prod_bucket,prod_flow, version_num);
+
+        ProcessGroupEntity ret_pge = processGroup.createProcessGroup(pge.getId(),
+                                        clientId,
+                                        flowName,
+                                        prod_registry_id,
+                                        prod_bucket.getId(),
+                                        prod_flow.getVersionedFlow().getFlowId(),
+                                        prod_flow_version.getVersionedFlowSnapshotMetadata().getVersion());
+
+        return ret_pge;
+
+    }
+
+    // this is the method to get the flow version
+    private VersionedFlowSnapshotMetadataEntity getFlowSnapShotFromRegistryAndBucketAndFlow(String prod_registry_id,
+                                                                                            BucketEntity prod_bucket,
+                                                                                            VersionedFlowEntity prod_flow,
+                                                                                            int version_num) {
+
+        VersionedFlowSnapshotMetadataSetEntity versionedFlows =
+                processGroupFlow.getFlowSnapShotFromRegistryAndBucketAndFlow(prod_registry_id,
+                                                                             prod_bucket.getId(),
+                                                                             prod_flow.getVersionedFlow().getFlowId());
+
+        VersionedFlowSnapshotMetadataEntity versionedFlow = versionedFlows.getVersionedFlowSnapshotMetadataSet().iterator().next();
+
+        for(VersionedFlowSnapshotMetadataEntity vsme : versionedFlows.getVersionedFlowSnapshotMetadataSet()){
+            if(version_num == vsme.getVersionedFlowSnapshotMetadata().getVersion()){
+                versionedFlow = vsme;
+                break;
+            }
+        }
+
+        return versionedFlow;
+    }
+
+    // this is the method to get the flow
+    private VersionedFlowEntity getFlowFromRegistry(String prod_registry_id, BucketEntity prod_bucket, String flowName) {
+        VersionedFlowsEntity versionedFlows = processGroupFlow.getAllFlowsFromRegistryAndBucket(prod_registry_id,prod_bucket.getId());
+        VersionedFlowEntity versionedFlow = versionedFlows.getVersionedFlows().iterator().next();
+
+        for(VersionedFlowEntity vfe : versionedFlows.getVersionedFlows()){
+            if(flowName.equalsIgnoreCase(vfe.getVersionedFlow().getFlowName().toLowerCase())){
+                versionedFlow = vfe;
+                break;
+            }
+        }
+        return versionedFlow;
+    }
+
+    // this is the method to get the bucket from the prod_registry
+    private BucketEntity getBucket(String prod_registry_id) {
+        BucketsEntity buckets = processGroupFlow.getBucket(prod_registry_id);
+        BucketEntity bucket = buckets.getBuckets().iterator().next();
+
+        for(BucketEntity be : buckets.getBuckets()){
+            if("prod".equalsIgnoreCase(be.getBucket().getName().toLowerCase())){
+                bucket = be;
+                break;
+            }
+        }
+
+        return bucket;
+    }
+
+    // this is the method to get the registry
+    private String getRegistryId(String registryName) {
+
+        return null;
+
+//        RegistryClientsEntity registries = (RegistryClientsEntity) processGroupFlow.getAvailableRegistry();
+//        RegistryClientEntity registry = registries.getRegistries().iterator().next();
+//
+//        for (RegistryClientEntity rce : registries.getRegistries()){
+//            if ("prod_registry".equalsIgnoreCase(rce.getComponent().getName().toLowerCase())){
+//                registry = rce;
+//                break;
+//            }
+//        }
+//        return registry;
+
+    }
 }

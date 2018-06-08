@@ -2,6 +2,7 @@ package com.hortonworks.faas.nfaas.core;
 
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.RevisionDTO;
+import org.apache.nifi.web.api.dto.VersionControlInformationDTO;
 import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,6 +122,66 @@ public class ProcessGroup {
         component.setName(pgName);
         reqPge.setComponent(component);
 
+        /*
+          Very critical to set the client Id and the inital version
+          Otherwise the Httprequest will turn to a bad request.
+         */
+        RevisionDTO revision = new RevisionDTO();
+        revision.setClientId(clientId);
+        revision.setVersion(0l);
+        reqPge.setRevision(revision);
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<ProcessGroupEntity> requestEntity = new HttpEntity<>(reqPge,requestHeaders);
+
+        ProcessGroupEntity resp = null;
+
+        ResponseEntity<ProcessGroupEntity> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity,
+                ProcessGroupEntity.class, params);
+
+        ProcessGroupEntity resp_pge = response.getBody();
+
+        resp = response.getBody();
+        logger.debug(resp.toString());
+        return resp_pge;
+
+    }
+
+
+    /**
+     * create the process group ...
+     *
+     * @param pgId
+     * @param pgName
+     * @return
+     */
+    public ProcessGroupEntity createProcessGroup(String pgId,
+                                                 String clientId,
+                                                 String pgName,
+                                                 String registryId,
+                                                 String bucketId,
+                                                 String flowId,
+                                                 int version_num) {
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/" + pgId + "/process-groups";
+        Map<String, String> params = new HashMap<String, String>();
+
+        /*
+            Create the process group entity object with the name ..
+            to create the process group entity with the provided pgname
+         */
+        ProcessGroupEntity reqPge =  new ProcessGroupEntity();
+
+        ProcessGroupDTO component = new ProcessGroupDTO();
+        component.setName(pgName);
+        reqPge.setComponent(component);
+
+        VersionControlInformationDTO versionControlInformation = new VersionControlInformationDTO();
+        versionControlInformation.setRegistryId(registryId);
+        versionControlInformation.setBucketId(bucketId);
+        versionControlInformation.setFlowId(flowId);
+        versionControlInformation.setVersion(version_num);
+        component.setVersionControlInformation(versionControlInformation);
         /*
           Very critical to set the client Id and the inital version
           Otherwise the Httprequest will turn to a bad request.
