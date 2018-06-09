@@ -31,4 +31,35 @@ public class HelperUtil {
 
         return sql_body.toString();
     }
+
+    public static String getStagingSelectSqlBody(List<ActiveObjectDetail> aod, String dboName) {
+        StringBuilder sql_body = new StringBuilder();
+
+        for (ActiveObjectDetail aodetail : aod) {
+            sql_body.append("stg_").append(dboName).append(".").append(aodetail.getColumnName().toLowerCase()).append(delimter).append(" ");
+        }
+
+        String md5HashClause = getMd5HashClause(aod);
+
+        sql_body.append(" ").append(md5HashClause).append(" ");
+        sql_body.append(" CURRENT_TIMESTAMP ");
+        return sql_body.toString();
+    }
+
+    private static String getMd5HashClause(List<ActiveObjectDetail> aod) {
+        StringBuilder md5HashClause = new StringBuilder();
+        md5HashClause.append("md5(CONCAT(");
+
+        int index = 1;
+        for (ActiveObjectDetail aodetail : aod) {
+            md5HashClause.append(" (nvl(").append(aodetail.getColumnName().toLowerCase()).append(" ,\"\")) ");
+            if (index < aod.size()) {
+                index++;
+                md5HashClause.append(delimter);
+            }
+        }
+
+        md5HashClause.append(")),");
+        return md5HashClause.toString();
+    }
 }
