@@ -36,7 +36,7 @@ public class HelperUtil {
         StringBuilder sql_body = new StringBuilder();
 
         for (ActiveObjectDetail aodetail : aod) {
-            sql_body.append(aodetail.getColumnName().toLowerCase()).append(" ").append(aodetail.getInferDataType().toLowerCase());
+            sql_body.append(aodetail.getColumnName().toLowerCase()).append(" ").append(aodetail.getInferDataType().toLowerCase()).append(", ");
         }
         sql_body.append(" checksum string, ").append(" watermark timestamp ");
         return sql_body.toString();
