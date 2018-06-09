@@ -22,7 +22,7 @@ public class HiveDeltaTableInsertDml {
     public String generateDeltaTableInsertDml(FlowBuilderOptions fbo,
                                               List<ActiveObjectDetail> aod) {
 
-        String sql_head = "insert into table  ie_awinternal.%s_delta ( ";
+        String sql_head = "insert into table  ie_awinternal.%s_delta  ";
         String sql_body = hiveStagingTableSelectDml.generateStagingTableSelectDml(fbo, aod);
         String sql_tail = " ";
 

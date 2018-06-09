@@ -21,7 +21,7 @@ public class HiveStagingTableSelectDml {
 
         String sql_head = " select distinct  ";
         String sql_body = HelperUtil.getStagingSelectSqlBody(aod, fbo.db_object_name.toLowerCase());
-        String sql_tail = " from ie_awinternal.%s ";
+        String sql_tail = " from ie_awinternal.stg_%s ";
 
         sql_head = String.format(sql_head);
         sql_tail = String.format(sql_tail, fbo.db_object_name.toLowerCase());

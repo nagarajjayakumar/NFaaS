@@ -9,9 +9,11 @@ import com.hortonworks.faas.nfaas.orm.ActiveObjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+@Configuration
 public class HiveDmlGenerator implements Task {
 
     private static final Logger logger = LoggerFactory.getLogger(HiveDmlGenerator.class);
