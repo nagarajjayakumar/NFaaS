@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.controller;
 import com.beust.jcommander.JCommander;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import com.hortonworks.faas.nfaas.flow_builder.task.HiveDdlGenerator;
+import com.hortonworks.faas.nfaas.flow_builder.task.HiveDmlGenerator;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
@@ -69,6 +70,9 @@ public class NFaaSFlowController extends BasicFlowController {
 
     @Autowired
     HiveDdlGenerator hiveDdlGenerator;
+
+    @Autowired
+    HiveDmlGenerator hiveDmlGenerator;
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -164,11 +168,13 @@ public class NFaaSFlowController extends BasicFlowController {
         String externalTableSql = hiveDdlGenerator.getExternalTableDdl(fbo);
         String deltaTableSql    = hiveDdlGenerator.getDeltaTableDdl(fbo);
         String txnTableSql      = hiveDdlGenerator.getTxnTableDdl(fbo);
+        String deltaTableInsertSql = hiveDmlGenerator.generateDeltaTableInsertDml(fbo);
 
         Map<String,String> sqlMap = new HashMap<>();
         sqlMap.put("external_table_sql", externalTableSql);
         sqlMap.put("delta_table_sql", deltaTableSql);
         sqlMap.put("txn_table_sql", txnTableSql);
+        sqlMap.put("delta_insert_sql", deltaTableInsertSql);
         sqlMap.put("sql", externalTableSql.concat(statementDelim).concat(deltaTableSql).concat(statementDelim).concat(txnTableSql).concat(statementDelim));
 
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);
