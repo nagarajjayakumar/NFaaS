@@ -2,6 +2,7 @@ package com.hortonworks.faas.nfaas.controller;
 
 import com.beust.jcommander.JCommander;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
+import com.hortonworks.faas.nfaas.flow_builder.task.HanaDmlGenerator;
 import com.hortonworks.faas.nfaas.flow_builder.task.HiveDdlGenerator;
 import com.hortonworks.faas.nfaas.flow_builder.task.HiveDmlGenerator;
 import org.apache.nifi.web.api.dto.PortDTO;
@@ -48,6 +49,8 @@ public class NFaaSFlowController extends BasicFlowController {
     private final String authorizationHeaderValue = "Bearer ";
 
     private final String hive_extenal_table_location= "hdfs://AWHDP-QAHA/tmp/aw_hive_stg/";
+    private final String  period= ".";
+    private final String  fwd_slash = "/";
 
     @Autowired
     NFaaSFlowController(Environment env) {
@@ -75,6 +78,9 @@ public class NFaaSFlowController extends BasicFlowController {
 
     @Autowired
     HiveDmlGenerator hiveDmlGenerator;
+
+    @Autowired
+    HanaDmlGenerator hanaDmlGenerator;
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -252,6 +258,10 @@ public class NFaaSFlowController extends BasicFlowController {
         String deltaTruncateSql = hiveDmlGenerator.generateDeltaTableTruncateDml(fbo);
         String txnMinorCompactionSql = hiveDmlGenerator.generateTxnTableMinorCompactionDml(fbo);
 
+        String strMaxValueColumns = hanaDmlGenerator.getMaxValueColumns(fbo);
+        String strOrderByClause =  hanaDmlGenerator.getOrderByClause(fbo);
+
+        String hanaTableName = this.getHanaTableName(fbo);
         Map<String,String> sqlMap = new HashMap<>();
 
         sqlMap.put("flow_name", fbo.db_object_name.toLowerCase());
@@ -262,6 +272,10 @@ public class NFaaSFlowController extends BasicFlowController {
         sqlMap.put("flow_sig_counter_name", "sig_ctr_"+fbo.db_object_name.toLowerCase());
         sqlMap.put("delta_truncate_sql", deltaTruncateSql);
         sqlMap.put("txn_minor_compaction_sql", txnMinorCompactionSql);
+        sqlMap.put("hana_table_name", hanaTableName);
+        sqlMap.put("hana_max_val_cols", strMaxValueColumns);
+        sqlMap.put("hana_order_by_clause", strOrderByClause);
+
 
 
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);
@@ -284,6 +298,23 @@ public class NFaaSFlowController extends BasicFlowController {
 
         return new StringBuilder(hanaIngestionPipeline).append(" done !!!").toString();
     }
+
+    /**
+     * "_SYS_BIC"."DataLake.Deltaviews.TransactionViews/MaintenanceNotificationActTS"
+     * @param fbo
+     * @return
+     */
+    private String getHanaTableName(FlowBuilderOptions fbo) {
+        StringBuilder hanaTableName = new StringBuilder();
+
+        hanaTableName = hanaTableName.append("\"").append(fbo.namespace).append("\"").append(period);
+        hanaTableName = hanaTableName.append("\"").append(fbo.package_id).append(fwd_slash);
+        hanaTableName = hanaTableName.append(fbo.db_object_name).append("\"");
+
+        return hanaTableName.toString();
+
+    }
+
     /**
      * This is the method which is used to undeploy the FLOW
      *

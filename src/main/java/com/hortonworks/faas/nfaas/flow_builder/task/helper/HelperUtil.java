@@ -106,51 +106,6 @@ public class HelperUtil {
 
     }
 
-    private static List<ActiveObjectDetail> getOnlyKeyActiveObjectDetail(List<ActiveObjectDetail> aod) {
-        List<ActiveObjectDetail> result = new ArrayList<>();
-
-        for (ActiveObjectDetail aodetail : aod) {
-            if(aodetail.getKey()) {
-                result.add(aodetail);
-            }
-        }
-        return result;
-    }
-
-    private static String getLeftOperand(ActiveObjectDetail aodetail, String dbo_name) {
-        StringBuilder leftOperand = new StringBuilder();
-
-        leftOperand.append(String.format("nvl(%1$s.%2$s, ", dbo_name, aodetail.getColumnName().toLowerCase()));
-        String inferDataType  = aodetail.getInferDataType();
-
-        if("int".equalsIgnoreCase(inferDataType.toLowerCase()) ||
-                    "bigint".equalsIgnoreCase(inferDataType.toLowerCase())){
-            leftOperand.append("0");
-        }else{
-            leftOperand.append("\"\"");
-        }
-        leftOperand.append(" ) ");
-        return leftOperand.toString();
-    }
-
-    private static String getRightOperand(ActiveObjectDetail aodetail, String dbo_name) {
-        StringBuilder rightOperand = new StringBuilder();
-
-
-        rightOperand.append(String.format("nvl(%1$s_delta.%2$s, ", dbo_name, aodetail.getColumnName().toLowerCase()));
-        String inferDataType  = aodetail.getInferDataType();
-
-        if("int".equalsIgnoreCase(inferDataType.toLowerCase()) ||
-                "bigint".equalsIgnoreCase(inferDataType.toLowerCase())){
-            rightOperand.append("0");
-        }else{
-            rightOperand.append("\"\"");
-        }
-        rightOperand.append(" ) ");
-
-        return rightOperand.toString();
-    }
-
     /**
      * Method is used to get the merge match clause .. usaully update statement
      * @param aod
@@ -195,4 +150,107 @@ public class HelperUtil {
 
         return mergeNotMatchedClause.toString();
     }
+
+    /**
+     * This is the method to get the order by clause
+     * @param aod
+     */
+    public static String getOrderByClause(List<ActiveObjectDetail> aod) {
+
+        StringBuilder maxValCols = new StringBuilder();
+        List<ActiveObjectDetail> keys = getOnlyKeyActiveObjectDetail(aod);
+
+        int index = 1;
+        for(ActiveObjectDetail key :keys){
+            maxValCols.append("\"").append(key.getColumnName()).append("\"");
+
+            if (index < keys.size()) {
+                index++;
+                maxValCols.append(delimter);
+            }
+        }
+
+        return maxValCols.toString();
+    }
+
+    /**
+     * This is the methof to get the max value cols from metadata
+     * @param aod
+     * @return
+     */
+    public static String getMaxValueColumns(List<ActiveObjectDetail> aod) {
+
+        StringBuilder maxValCols = new StringBuilder();
+        List<ActiveObjectDetail> tsAod = getOnlyTsFromActiveObjectDetail(aod);
+
+        int index = 1;
+        for(ActiveObjectDetail ts :tsAod){
+            maxValCols.append("\"").append(ts.getColumnName()).append("\"");
+
+            if (index < tsAod.size()) {
+                index++;
+                maxValCols.append(delimter);
+            }
+        }
+
+        return maxValCols.toString();
+    }
+
+    private static List<ActiveObjectDetail> getOnlyKeyActiveObjectDetail(List<ActiveObjectDetail> aod) {
+        List<ActiveObjectDetail> result = new ArrayList<>();
+
+        for (ActiveObjectDetail aodetail : aod) {
+            if(aodetail.getKey()) {
+                result.add(aodetail);
+            }
+        }
+        return result;
+    }
+
+    private static List<ActiveObjectDetail> getOnlyTsFromActiveObjectDetail(List<ActiveObjectDetail> aod) {
+        List<ActiveObjectDetail> result = new ArrayList<>();
+
+        for (ActiveObjectDetail aodetail : aod) {
+            if(aodetail.getColumnName().toLowerCase().contains("ts")) {
+                result.add(aodetail);
+            }
+        }
+        return result;
+    }
+
+    private static String getLeftOperand(ActiveObjectDetail aodetail, String dbo_name) {
+        StringBuilder leftOperand = new StringBuilder();
+
+        leftOperand.append(String.format("nvl(%1$s.%2$s, ", dbo_name, aodetail.getColumnName().toLowerCase()));
+        String inferDataType  = aodetail.getInferDataType();
+
+        if("int".equalsIgnoreCase(inferDataType.toLowerCase()) ||
+                    "bigint".equalsIgnoreCase(inferDataType.toLowerCase())){
+            leftOperand.append("0");
+        }else{
+            leftOperand.append("\"\"");
+        }
+        leftOperand.append(" ) ");
+        return leftOperand.toString();
+    }
+
+    private static String getRightOperand(ActiveObjectDetail aodetail, String dbo_name) {
+        StringBuilder rightOperand = new StringBuilder();
+
+
+        rightOperand.append(String.format("nvl(%1$s_delta.%2$s, ", dbo_name, aodetail.getColumnName().toLowerCase()));
+        String inferDataType  = aodetail.getInferDataType();
+
+        if("int".equalsIgnoreCase(inferDataType.toLowerCase()) ||
+                "bigint".equalsIgnoreCase(inferDataType.toLowerCase())){
+            rightOperand.append("0");
+        }else{
+            rightOperand.append("\"\"");
+        }
+        rightOperand.append(" ) ");
+
+        return rightOperand.toString();
+    }
+
+
 }
