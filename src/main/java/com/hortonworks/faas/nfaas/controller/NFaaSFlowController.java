@@ -146,6 +146,8 @@ public class NFaaSFlowController extends BasicFlowController {
                            String buckets,
                            String clustered_by) {
 
+        String createHiveTable = "create hive table done !";
+
         FlowBuilderOptions fbo = new FlowBuilderOptions();
 
         List<String> args = new ArrayList<>();
@@ -202,9 +204,49 @@ public class NFaaSFlowController extends BasicFlowController {
 
 
 
-        return "createhiveddl done";
+        return createHiveTable;
     }
 
+
+    /**
+     * create hive table .. call the processor group and create the hive tables
+     */
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/faas/createhanaflow", produces = "application/json")
+    public @ResponseBody
+    String createHanaFlow(String namespace,
+                           String package_id,
+                           String db_object_name,
+                           String buckets,
+                           String clustered_by) {
+
+        String createHanaFlow = "create_hana_flow_done";
+
+        FlowBuilderOptions fbo = new FlowBuilderOptions();
+
+        List<String> args = new ArrayList<>();
+        args.add("-namespace");
+        args.add(namespace);
+        args.add("-package_id");
+        args.add(package_id);
+        args.add("-db_object_name");
+        args.add(db_object_name);
+        args.add("-buckets");
+        args.add(buckets);
+        args.add("-clustered_by");
+        args.add(clustered_by);
+
+        JCommander.newBuilder()
+                .addObject(fbo)
+                .build()
+                .parse(args.toArray(new String[0]));
+
+
+
+        return createHanaFlow;
+    }
     /**
      * This is the method which is used to undeploy the FLOW
      *
