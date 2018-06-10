@@ -169,12 +169,15 @@ public class NFaaSFlowController extends BasicFlowController {
         String deltaTableSql    = hiveDdlGenerator.getDeltaTableDdl(fbo);
         String txnTableSql      = hiveDdlGenerator.getTxnTableDdl(fbo);
         String deltaTableInsertSql = hiveDmlGenerator.generateDeltaTableInsertDml(fbo);
+        String txnTableMergeSql = hiveDmlGenerator.generateTxnTableMergeDml(fbo);
 
         Map<String,String> sqlMap = new HashMap<>();
         sqlMap.put("external_table_sql", externalTableSql);
         sqlMap.put("delta_table_sql", deltaTableSql);
         sqlMap.put("txn_table_sql", txnTableSql);
         sqlMap.put("delta_insert_sql", deltaTableInsertSql);
+        sqlMap.put("txn_merge_sql", txnTableMergeSql);
+
         sqlMap.put("sql", externalTableSql.concat(statementDelim).concat(deltaTableSql).concat(statementDelim).concat(txnTableSql).concat(statementDelim));
 
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);

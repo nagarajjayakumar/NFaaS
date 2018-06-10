@@ -4,6 +4,7 @@ import com.hortonworks.faas.nfaas.dto.ActiveObject;
 import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveDeltaTableInsertDml;
+import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveTxnTableMergeDml;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectDetailRepository;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectRepository;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ public class HiveDmlGenerator implements Task {
     @Autowired
     HiveDeltaTableInsertDml hiveDeltaTableInsertDml;
 
+    @Autowired
+    HiveTxnTableMergeDml hiveTxnTableMergeDml;
 
     public void doWork(FlowBuilderOptions fbo){
         logger.info("Inside the task " +task);
@@ -44,6 +47,17 @@ public class HiveDmlGenerator implements Task {
         String insertSql = hiveDeltaTableInsertDml.generateDeltaTableInsertDml(fbo, aod);
         logger.info(String.format("ended %s !! ", task));
         return insertSql;
+
+    }
+
+    public String generateTxnTableMergeDml(FlowBuilderOptions fbo)
+    {
+        logger.info(String.format("started %s !! ", task));
+        this._fbo = fbo;
+        List<ActiveObjectDetail> aod = this.getActiveObjectDetail();
+        String mergeSql = hiveTxnTableMergeDml.generateTxnTableMergeDml(fbo, aod);
+        logger.info(String.format("ended %s !! ", task));
+        return mergeSql;
 
     }
 
