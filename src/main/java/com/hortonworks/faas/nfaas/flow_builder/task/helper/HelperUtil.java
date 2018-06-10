@@ -157,18 +157,25 @@ public class HelperUtil {
      * @param dbo_name
      * @return
      */
-    public static String getMergeWhenMatchedClause(List<ActiveObjectDetail> aod, String dbo_name) {
+    public static String getMergeWhenMatchedClause(List<ActiveObjectDetail> aod, String dbo_name, String clustered_by) {
 
         StringBuilder mergeMatchedClause = new StringBuilder(" update set ");
 
 
         for (ActiveObjectDetail aodetail : aod) {
-            mergeMatchedClause.append(aodetail.getColumnName().toLowerCase()).append(equal).
-                               append(dbo_name).append("_delta.").
-                               append(aodetail.getColumnName().toLowerCase()).append(delimter).append(" ");
+
+            // Bucket or clustered by column should not be there in the update statement .. hive restriction
+            // Need to revisit after HDP 3.0 release
+            // HDP 3.0 Bucket restriction is relaxed
+
+            if(! clustered_by.equalsIgnoreCase(aodetail.getColumnName().toLowerCase())) {
+                mergeMatchedClause.append(aodetail.getColumnName().toLowerCase()).append(equal).
+                        append(dbo_name).append("_delta.").
+                        append(aodetail.getColumnName().toLowerCase()).append(delimter).append(" ");
+            }
         }
 
-        mergeMatchedClause.append("checksum = %1$s_delta.checksum ,").append(" watermark=CURRENT_TIMESTAMP ");
+        mergeMatchedClause.append(" checksum = %1$s_delta.checksum ,").append(" watermark=CURRENT_TIMESTAMP ");
 
         return mergeMatchedClause.toString();
     }

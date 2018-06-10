@@ -16,6 +16,8 @@ public class HiveDeltaTableInsertDml {
     @Autowired
     private HiveStagingTableSelectDml hiveStagingTableSelectDml;
 
+    private static final String statement_delim = " ; ";
+
     private static final Logger logger = LoggerFactory.getLogger(HiveDeltaTableInsertDml.class);
 
 
@@ -24,7 +26,7 @@ public class HiveDeltaTableInsertDml {
 
         String sql_head = "insert into table  ie_awinternal.%s_delta  ";
         String sql_body = hiveStagingTableSelectDml.generateStagingTableSelectDml(fbo, aod);
-        String sql_tail = " ";
+        String sql_tail = statement_delim;
 
         sql_head = String.format(sql_head, fbo.db_object_name.toLowerCase());
         sql_tail = String.format(sql_tail, fbo.clustered_by, fbo.buckets);
