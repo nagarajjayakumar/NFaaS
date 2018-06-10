@@ -300,10 +300,14 @@ public class NFaaSFlowController extends BasicFlowController {
         processGroupFacadeHelper.createOrUpdadeVariableRegistry(pge,sqlMap);
 
 
+        // always get the latest process group before start versioning the process group
+        pge = processGroup.getLatestProcessGroupEntity(pge.getId());
+
         // version control the just created processor - this is critical
         processorGroupFlowFacadeHelper.saveProcessGroupWithId(pgfe, pge, rootIngestionPipeLineName,
                                                               pge.getRevision().getVersion(),
-                                                  "prod_registry");
+                                                  "prod_registry",
+                                                     "nFaaS :: Sys Generated Flow :: Inital commit ");
 
         return new StringBuilder(hanaIngestionPipeline).append(" done !!!").toString();
     }

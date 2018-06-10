@@ -177,13 +177,10 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
                                                      ProcessGroupEntity pge,
                                                      String flowName,
                                                      long version_num,
-
-                                                     String registryName) {
+                                                     String registryName,
+                                                     String comment) {
 
         String clientId = processGroupFlow.getClientId();
-
-        // always get the latest process group before start versioning the process group
-        pge = processGroup.getLatestProcessGroupEntity(pge.getId());
 
         String prod_registry_id = getRegistryId(registryName);
         BucketEntity  prod_bucket = getBucket(prod_registry_id);
@@ -192,7 +189,7 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
                                     version.saveProcessGroupById(pge.getId(),
                                                                  clientId,
                                                                  flowName,
-                                                                 prod_registry_id,  prod_bucket.getId(), version_num );
+                                                                 prod_registry_id,  prod_bucket.getId(), version_num, comment );
 
 
 

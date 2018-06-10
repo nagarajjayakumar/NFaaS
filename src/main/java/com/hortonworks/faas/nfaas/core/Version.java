@@ -63,7 +63,7 @@ public class Version {
                                                                 String flowName,
                                                                 String registryId,
                                                                 String bucketId,
-                                                                long version_num){
+                                                                long version_num, String comment){
 
         final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/versions/process-groups/" + pgId ;
         Map<String, String> params = new HashMap<String, String>();
@@ -79,6 +79,7 @@ public class Version {
         versionedFlow.setRegistryId(registryId);
         versionedFlow.setBucketId(bucketId);
         versionedFlow.setFlowName(flowName);
+        versionedFlow.setComments(comment);
 
         startVersionControlRequestEntity.setVersionedFlow(versionedFlow);
         /*
