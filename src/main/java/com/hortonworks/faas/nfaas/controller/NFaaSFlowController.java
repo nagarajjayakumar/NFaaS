@@ -285,16 +285,25 @@ public class NFaaSFlowController extends BasicFlowController {
 
         String clientId = processGroupFlow.getClientId();
 
-        ProcessGroupEntity pge = processGroupFacadeHelper.getProcessGroupEntityByName(pgfe,hanaIngestionPipeline);
+        String rootIngestionPipeLineName = hanaIngestionPipeline+"_"+fbo.db_object_name.toLowerCase();
+
+        ProcessGroupEntity pge = processGroupFacadeHelper.getProcessGroupEntityByName(pgfe,rootIngestionPipeLineName);
         if(null == pge){
             // if the process group not found create the process group
-            pge = processGroup.createProcessGroup(pgfe.getProcessGroupFlow().getId(),clientId, hanaIngestionPipeline);
+            pge = processGroup.createProcessGroup(pgfe.getProcessGroupFlow().getId(),clientId, rootIngestionPipeLineName);
             // Get the version 1 from the prod_registry
             processorGroupFlowFacadeHelper.importProcessGroupFromRegistry(pgfe, pge, hanaIngestionPipeline,1,"prod_registry");
         }
+
         processorFacadeHelper.stopAllProcessors(pge.getId());
 
         processGroupFacadeHelper.createOrUpdadeVariableRegistry(pge,sqlMap);
+
+
+        // version control the just created processor - this is critical
+        processorGroupFlowFacadeHelper.saveProcessGroupWithId(pgfe, pge, rootIngestionPipeLineName,
+                                                              pge.getRevision().getVersion(),
+                                                  "prod_registry");
 
         return new StringBuilder(hanaIngestionPipeline).append(" done !!!").toString();
     }

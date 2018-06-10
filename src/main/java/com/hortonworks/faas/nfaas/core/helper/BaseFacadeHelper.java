@@ -47,6 +47,9 @@ public class BaseFacadeHelper {
     Processor processor;
 
     @Autowired
+    Version version;
+
+    @Autowired
     TemplateFacadeHelper templateFacadeHelper;
 
     @Autowired

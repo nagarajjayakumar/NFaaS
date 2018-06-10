@@ -164,6 +164,41 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
 
     }
 
+    /**
+     * This is the method to save the process group in the flow registry
+     * @param pgfe
+     * @param pge
+     * @param flowName
+     * @param version_num
+     * @param registryName
+     * @return
+     */
+    public VersionControlInformationEntity saveProcessGroupWithId(ProcessGroupFlowEntity pgfe,
+                                                     ProcessGroupEntity pge,
+                                                     String flowName,
+                                                     long version_num,
+
+                                                     String registryName) {
+
+        String clientId = processGroupFlow.getClientId();
+
+        // always get the latest process group before start versioning the process group
+        pge = processGroup.getLatestProcessGroupEntity(pge.getId());
+
+        String prod_registry_id = getRegistryId(registryName);
+        BucketEntity  prod_bucket = getBucket(prod_registry_id);
+
+        VersionControlInformationEntity versionCtrlInfoEntity =
+                                    version.saveProcessGroupById(pge.getId(),
+                                                                 clientId,
+                                                                 flowName,
+                                                                 prod_registry_id,  prod_bucket.getId(), version_num );
+
+
+
+        return versionCtrlInfoEntity;
+    }
+
     // this is the method to get the flow version
     private VersionedFlowSnapshotMetadataEntity getFlowSnapShotFromRegistryAndBucketAndFlow(String prod_registry_id,
                                                                                             BucketEntity prod_bucket,
