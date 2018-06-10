@@ -47,6 +47,8 @@ public class NFaaSFlowController extends BasicFlowController {
     private final String authorizationHeaderKey = "Authorization";
     private final String authorizationHeaderValue = "Bearer ";
 
+    private final String hive_extenal_table_location= "hdfs://AWHDP-QAHA/tmp/aw_hive_stg/";
+
     @Autowired
     NFaaSFlowController(Environment env) {
         this.env = env;
@@ -214,7 +216,7 @@ public class NFaaSFlowController extends BasicFlowController {
 
     @CrossOrigin
     @PreAuthorize("#oauth2.hasScope('read')")
-    @RequestMapping(value = "/faas/createhanaflow", produces = "application/json")
+    @RequestMapping(value = "/faas/hanaingestionpipeline", produces = "application/json")
     public @ResponseBody
     String createHanaFlow(String namespace,
                            String package_id,
@@ -222,7 +224,7 @@ public class NFaaSFlowController extends BasicFlowController {
                            String buckets,
                            String clustered_by) {
 
-        String createHanaFlow = "create_hana_flow_done";
+        String hanaIngestionPipeline = "hana_ingestion_pipeline";
 
         FlowBuilderOptions fbo = new FlowBuilderOptions();
 
@@ -244,8 +246,40 @@ public class NFaaSFlowController extends BasicFlowController {
                 .parse(args.toArray(new String[0]));
 
 
+        String deltaTableInsertSql = hiveDmlGenerator.generateDeltaTableInsertDml(fbo);
+        String txnTableMergeSql = hiveDmlGenerator.generateTxnTableMergeDml(fbo);
+        String externalTableLocation = String.format(hive_extenal_table_location+"stg_%s", db_object_name.toLowerCase());
+        String deltaTruncateSql = hiveDmlGenerator.generateDeltaTableTruncateDml(fbo);
 
-        return createHanaFlow;
+        Map<String,String> sqlMap = new HashMap<>();
+
+        sqlMap.put("flow_name", fbo.db_object_name.toLowerCase());
+        sqlMap.put("delta_insert_sql", deltaTableInsertSql);
+        sqlMap.put("txn_merge_sql", txnTableMergeSql);
+        sqlMap.put("path.delete.flow_name", externalTableLocation);
+        sqlMap.put("path.put.flow_name", externalTableLocation);
+        sqlMap.put("flow_sig_counter_name", "sig_ctr_"+fbo.db_object_name.toLowerCase());
+        sqlMap.put("delta_truncate_sql", deltaTruncateSql);
+
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
+        logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
+
+        ProcessGroupFlowEntity pgfe = processGroupFlow.getRootProcessGroupFlowEntity();
+
+        String clientId = processGroupFlow.getClientId();
+
+        ProcessGroupEntity pge = processGroupFacadeHelper.getProcessGroupEntityByName(pgfe,hanaIngestionPipeline);
+        if(null == pge){
+            // if the process group not found create the process group
+            pge = processGroup.createProcessGroup(pgfe.getProcessGroupFlow().getId(),clientId, hanaIngestionPipeline);
+            // Get the version 1 from the prod_registry
+            processorGroupFlowFacadeHelper.importProcessGroupFromRegistry(pgfe, pge, hanaIngestionPipeline,1,"prod_registry");
+        }
+        processorFacadeHelper.stopAllProcessors(pge.getId());
+
+        processGroupFacadeHelper.createOrUpdadeVariableRegistry(pge,sqlMap);
+
+        return new StringBuilder(hanaIngestionPipeline).append(" done !!!").toString();
     }
     /**
      * This is the method which is used to undeploy the FLOW

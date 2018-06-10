@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.flow_builder.task;
 import com.hortonworks.faas.nfaas.dto.ActiveObject;
 import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
+import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveDeltaTableTruncateDml;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveDeltaTableInsertDml;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveTxnTableMergeDml;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectDetailRepository;
@@ -34,6 +35,9 @@ public class HiveDmlGenerator implements Task {
     @Autowired
     HiveTxnTableMergeDml hiveTxnTableMergeDml;
 
+    @Autowired
+    HiveDeltaTableTruncateDml hiveDeltaTableTruncateDml;
+
     public void doWork(FlowBuilderOptions fbo){
         logger.info("Inside the task " +task);
     }
@@ -58,6 +62,16 @@ public class HiveDmlGenerator implements Task {
         String mergeSql = hiveTxnTableMergeDml.generateTxnTableMergeDml(fbo, aod);
         logger.info(String.format("ended %s !! ", task));
         return mergeSql;
+
+    }
+
+    public String generateDeltaTableTruncateDml(FlowBuilderOptions fbo)
+    {
+        logger.info(String.format("started %s !! ", task));
+        this._fbo = fbo;
+        String truncateSql = hiveDeltaTableTruncateDml.generateDeltaTableTruncateDml(fbo);
+        logger.info(String.format("ended %s !! ", task));
+        return truncateSql;
 
     }
 

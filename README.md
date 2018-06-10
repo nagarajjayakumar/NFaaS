@@ -49,7 +49,12 @@ http://localhost:8084/faas/createhiveddl?namespace=DataLake.Deltaviews.Transacti
 ```
 http://localhost:8084/faas/createhiveddl?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS&buckets=32&clustered_by=documentnumber
 ```
-
+```
+http://localhost:8084/faas/createhivetable?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS&buckets=32&clustered_by=installation
+```
+```
+http://localhost:8084/faas/hanaingestionpipeline?namespace=DataLake.Deltaviews.TransactionViews&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS&buckets=32&clustered_by=installation
+```
 SIGN: Naga Jay @nagajay_
 
 CICD: Yogeshprabhu @yogesh_
