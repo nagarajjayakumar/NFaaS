@@ -6,6 +6,7 @@ import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveDeltaTableTruncateDml;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveDeltaTableInsertDml;
 import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveTxnTableMergeDml;
+import com.hortonworks.faas.nfaas.flow_builder.task.helper.HiveTxnTableMinorCompactionDml;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectDetailRepository;
 import com.hortonworks.faas.nfaas.orm.ActiveObjectRepository;
 import org.slf4j.Logger;
@@ -37,6 +38,9 @@ public class HiveDmlGenerator implements Task {
 
     @Autowired
     HiveDeltaTableTruncateDml hiveDeltaTableTruncateDml;
+
+    @Autowired
+    HiveTxnTableMinorCompactionDml hiveTxnTableMinorCompactionDml;
 
     public void doWork(FlowBuilderOptions fbo){
         logger.info("Inside the task " +task);
@@ -72,6 +76,16 @@ public class HiveDmlGenerator implements Task {
         String truncateSql = hiveDeltaTableTruncateDml.generateDeltaTableTruncateDml(fbo);
         logger.info(String.format("ended %s !! ", task));
         return truncateSql;
+
+    }
+
+    public String generateTxnTableMinorCompactionDml(FlowBuilderOptions fbo)
+    {
+        logger.info(String.format("started %s !! ", task));
+        this._fbo = fbo;
+        String minorCompactionSql = hiveTxnTableMinorCompactionDml.generateTxnTableMinorCompactionDml(fbo);
+        logger.info(String.format("ended %s !! ", task));
+        return minorCompactionSql;
 
     }
 

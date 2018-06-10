@@ -250,6 +250,7 @@ public class NFaaSFlowController extends BasicFlowController {
         String txnTableMergeSql = hiveDmlGenerator.generateTxnTableMergeDml(fbo);
         String externalTableLocation = String.format(hive_extenal_table_location+"stg_%s", db_object_name.toLowerCase());
         String deltaTruncateSql = hiveDmlGenerator.generateDeltaTableTruncateDml(fbo);
+        String txnMinorCompactionSql = hiveDmlGenerator.generateTxnTableMinorCompactionDml(fbo);
 
         Map<String,String> sqlMap = new HashMap<>();
 
@@ -260,6 +261,8 @@ public class NFaaSFlowController extends BasicFlowController {
         sqlMap.put("path.put.flow_name", externalTableLocation);
         sqlMap.put("flow_sig_counter_name", "sig_ctr_"+fbo.db_object_name.toLowerCase());
         sqlMap.put("delta_truncate_sql", deltaTruncateSql);
+        sqlMap.put("txn_minor_compaction_sql", txnMinorCompactionSql);
+
 
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);
         logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
