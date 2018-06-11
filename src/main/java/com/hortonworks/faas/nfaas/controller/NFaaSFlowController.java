@@ -152,7 +152,7 @@ public class NFaaSFlowController extends BasicFlowController {
                            String buckets,
                            String clustered_by) {
 
-        String createHiveTable = "create hive table done !";
+        String createHiveTable = "{\"task\":\"create hive table done !\"}";
 
         FlowBuilderOptions fbo = new FlowBuilderOptions();
 
@@ -309,7 +309,8 @@ public class NFaaSFlowController extends BasicFlowController {
                                                   "prod_registry",
                                                      "nFaaS :: Sys Generated Flow :: Inital commit ");
 
-        return new StringBuilder(hanaIngestionPipeline).append(" done !!!").toString();
+        String jsonHanaIngestionPipeline_task = "{\"task\":\"create hive ingestion pipeline done !\"}";
+        return jsonHanaIngestionPipeline_task;
     }
 
 
