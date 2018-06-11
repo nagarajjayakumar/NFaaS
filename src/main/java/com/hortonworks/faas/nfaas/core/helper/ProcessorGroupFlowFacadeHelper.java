@@ -196,6 +196,12 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
         return versionCtrlInfoEntity;
     }
 
+    public VersionControlInformationEntity stopVersionControlForPge(ProcessGroupEntity pge){
+        VersionControlInformationEntity versionCtrlInfoEntity = version.stopVersionControlForPge(pge);
+
+        return versionCtrlInfoEntity;
+    }
+
     // this is the method to get the flow version
     private VersionedFlowSnapshotMetadataEntity getFlowSnapShotFromRegistryAndBucketAndFlow(String prod_registry_id,
                                                                                             BucketEntity prod_bucket,

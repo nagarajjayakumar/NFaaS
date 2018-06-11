@@ -289,6 +289,8 @@ public class NFaaSFlowController extends BasicFlowController {
             pge = processGroup.createProcessGroup(pgfe.getProcessGroupFlow().getId(),clientId, rootIngestionPipeLineName);
             // Get the version 1 from the prod_registry
             ProcessGroupEntity  importPge = processorGroupFlowFacadeHelper.importProcessGroupFromRegistry(pgfe, pge, hanaIngestionPipeline,1,"prod_registry");
+            // Stop the version Control
+            processorGroupFlowFacadeHelper.stopVersionControlForPge(importPge);
             // always get the latest process group before start versioning the process group
             ProcessGroupFlowEntity importPgfe = processGroupFlow.getLatestProcessGroupFlowEntity(importPge.getId());
 
