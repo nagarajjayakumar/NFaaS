@@ -62,8 +62,8 @@ Hana Ingestion Pipe Line Sample Rest URL
 http://localhost:8084/faas/hanaingestionpipeline?namespace=_SYS_BIC&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS&buckets=32&clustered_by=installation
 ```
 
-SIGN: Naga Jay @nagajay_
+SIGN : Naga Jay @nagajay_
 
 Contributor : Adaam Michalsky @Michalsky_
 
-CICD: Yogeshprabhu @yogesh_
+CICD : Yogeshprabhu @yogesh_
