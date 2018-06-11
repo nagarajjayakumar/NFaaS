@@ -1,14 +1,12 @@
 package com.hortonworks.faas.nfaas.controller;
 
 import com.beust.jcommander.JCommander;
+import com.hortonworks.faas.nfaas.core.ProcessGroupFlow;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import com.hortonworks.faas.nfaas.flow_builder.task.HanaDmlGenerator;
 import com.hortonworks.faas.nfaas.flow_builder.task.HiveDdlGenerator;
 import com.hortonworks.faas.nfaas.flow_builder.task.HiveDmlGenerator;
-import org.apache.nifi.web.api.dto.PortDTO;
-import org.apache.nifi.web.api.dto.ProcessGroupDTO;
-import org.apache.nifi.web.api.dto.ProcessorDTO;
-import org.apache.nifi.web.api.dto.TemplateDTO;
+import org.apache.nifi.web.api.dto.*;
 import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -276,8 +274,6 @@ public class NFaaSFlowController extends BasicFlowController {
         sqlMap.put("hana_max_val_cols", strMaxValueColumns);
         sqlMap.put("hana_order_by_clause", strOrderByClause);
 
-
-
         restTemplate = security.ignoreCertAndHostVerification(restTemplate);
         logger.info("bootrest.customproperty " + env.getProperty("bootrest.customproperty"));
 
@@ -292,17 +288,19 @@ public class NFaaSFlowController extends BasicFlowController {
             // if the process group not found create the process group
             pge = processGroup.createProcessGroup(pgfe.getProcessGroupFlow().getId(),clientId, rootIngestionPipeLineName);
             // Get the version 1 from the prod_registry
-            processorGroupFlowFacadeHelper.importProcessGroupFromRegistry(pgfe, pge, hanaIngestionPipeline,1,"prod_registry");
+            ProcessGroupEntity  importPge = processorGroupFlowFacadeHelper.importProcessGroupFromRegistry(pgfe, pge, hanaIngestionPipeline,1,"prod_registry");
+            // always get the latest process group before start versioning the process group
+            ProcessGroupFlowEntity importPgfe = processGroupFlow.getLatestProcessGroupFlowEntity(importPge.getId());
+
+            pipeLinePostHook(importPgfe, importPge, clientId, db_object_name.toLowerCase());
         }
 
         processorFacadeHelper.stopAllProcessors(pge.getId());
 
         processGroupFacadeHelper.createOrUpdadeVariableRegistry(pge,sqlMap);
 
-
         // always get the latest process group before start versioning the process group
         pge = processGroup.getLatestProcessGroupEntity(pge.getId());
-
         // version control the just created processor - this is critical
         processorGroupFlowFacadeHelper.saveProcessGroupWithId(pgfe, pge, rootIngestionPipeLineName,
                                                               pge.getRevision().getVersion(),
@@ -311,6 +309,81 @@ public class NFaaSFlowController extends BasicFlowController {
 
         return new StringBuilder(hanaIngestionPipeline).append(" done !!!").toString();
     }
+
+
+    /**
+     * This is the post hook for the pipe line .. do any thing after the import ... critical
+     * like - attribute update .. get the running processor id
+     * @param pgfe
+     * @param pge
+     * @param clientId
+     * @param dbo_name
+     * @return
+     */
+    private ProcessGroupEntity pipeLinePostHook(ProcessGroupFlowEntity pgfe,
+                                                ProcessGroupEntity pge,
+                                                String clientId,
+                                                String dbo_name) {
+
+
+        ProcessorEntity head_stg_table_delete_hdfs_pe = getProcessorByName(pgfe, "head_stg_table_delete_hdfs");
+        ProcessorEntity tail_stg_table_put_hdfs_pe = getProcessorByName(pgfe, "tail_stg_table_put_hdfs");
+        ProcessorEntity tail_stg_table_delete_hdfs_pe = getProcessorByName(pgfe, "tail_stg_table_delete_hdfs");
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("head_stg_table_delete_hdfs_pid",head_stg_table_delete_hdfs_pe.getId());
+        properties.put("tail_stg_table_put_hdfs_pid",tail_stg_table_put_hdfs_pe.getId());
+        properties.put("tail_stg_table_delete_hdfs_pid",tail_stg_table_delete_hdfs_pe.getId());
+        properties.put("nostatechange."+dbo_name,"true");
+
+        updateAttribute(pgfe, "head_update_attribute", properties);
+
+        properties = new HashMap<>();
+        properties.put("head_stg_table_delete_hdfs_pid",head_stg_table_delete_hdfs_pe.getId());
+        properties.put("tail_stg_table_put_hdfs_pid",tail_stg_table_put_hdfs_pe.getId());
+        properties.put("tail_stg_table_delete_hdfs_pid",tail_stg_table_delete_hdfs_pe.getId());
+        properties.put("nostatechange."+dbo_name,"false");
+        updateAttribute(pgfe, "body_update_attribute", properties);
+
+        properties = new HashMap<>();
+        properties.put("head_stg_table_delete_hdfs_pid",head_stg_table_delete_hdfs_pe.getId());
+        properties.put("tail_stg_table_put_hdfs_pid",tail_stg_table_put_hdfs_pe.getId());
+        properties.put("tail_stg_table_delete_hdfs_pid",tail_stg_table_delete_hdfs_pe.getId());
+        updateAttribute(pgfe, "execute_sql_update_attribute", properties);
+
+
+        pge = processGroup.getLatestProcessGroupEntity(pge.getId());
+        return pge;
+    }
+
+    private void updateAttribute(ProcessGroupFlowEntity pgfe, String processorName,
+                                 Map<String,String> properties) {
+
+        ProcessorEntity pe = getProcessorByName(pgfe, processorName);
+        ProcessorDTO processorDTO = pe.getComponent();
+        ProcessorConfigDTO processorConfig = processorDTO.getConfig();
+
+        Map<String, String> srcProperties = processorConfig.getProperties();
+        srcProperties.putAll(properties);
+
+        processor.updateProcessorEntity(pe);
+
+
+
+    }
+
+    /**
+     * Call the facade helper to get the processor entity
+     * @param pgfe
+     * @param processorName
+     * @return
+     */
+    private ProcessorEntity getProcessorByName(ProcessGroupFlowEntity pgfe, String processorName) {
+
+        return processorFacadeHelper.getProcessorByName(pgfe,processorName);
+
+    }
+
 
     /**
      * "_SYS_BIC"."DataLake.Deltaviews.TransactionViews/MaintenanceNotificationActTS"

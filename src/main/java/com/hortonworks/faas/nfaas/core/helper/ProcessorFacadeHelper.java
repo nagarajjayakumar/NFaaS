@@ -167,5 +167,25 @@ public class ProcessorFacadeHelper extends BaseFacadeHelper{
 
     }
 
+    /**
+     * This is the method to get the processor by Name
+     *
+     * @param pgfe
+     * @param processorName
+     * @return
+     */
+    public ProcessorEntity getProcessorByName(ProcessGroupFlowEntity pgfe, String processorName) {
+        Set<ProcessorEntity> allProcessors =  pgfe.getProcessGroupFlow().getFlow().getProcessors();
+        ProcessorEntity resultProcessor = null;
+        for(ProcessorEntity processor : allProcessors){
+            if(processorName.toLowerCase().equalsIgnoreCase(processor.getComponent().getName().toLowerCase())){
+                resultProcessor = processor;
+                break;
+            }
+        }
+
+        ProcessorEntity pe =  processor.getLatestProcessorEntityById(resultProcessor.getId());
+        return pe;
+    }
 }
 
