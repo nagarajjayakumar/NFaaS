@@ -1,0 +1,490 @@
+<?xml version="1.0" ?>
+<template>
+  <description>An Ad Hoc web service that "enriches" a request to port 8011 with a NiFi greeting utilizing HandleHttpRequest, HandleHttpResponse and the StandardHttpContextMap controller service</description>
+  <groupId>48e5e4b3-015b-1000-cd5b-ae5d2fdf9b54</groupId>
+  <name>Hello NiFi Web Service</name>
+  <snippet>
+    <controllerServices>
+      <id>b369d993-48ae-4c0e-925b-ffd48846b1a5</id>
+      <comments></comments>
+      <descriptors>
+        <entry>
+          <key>Request Expiration</key>
+          <value>
+            <name>Request Expiration</name>
+          </value>
+        </entry>
+        <entry>
+          <key>Maximum Outstanding Requests</key>
+          <value>
+            <name>Maximum Outstanding Requests</name>
+          </value>
+        </entry>
+      </descriptors>
+      <name>StandardHttpContextMap</name>
+      <properties>
+        <entry>
+          <key>Request Expiration</key>
+          <value>1 min</value>
+        </entry>
+        <entry>
+          <key>Maximum Outstanding Requests</key>
+          <value>5000</value>
+        </entry>
+      </properties>
+      <referencingComponents>
+        <id>59c6db74-7fa8-4348-8e75-7b337056571a</id>
+      </referencingComponents>
+      <referencingComponents>
+        <id>f3311380-d1aa-4c00-921c-79be8ca48e4e</id>
+      </referencingComponents>
+      <state>ENABLED</state>
+      <type>org.apache.nifi.http.StandardHttpContextMap</type>
+    </controllerServices>
+    <processGroups>
+      <id>a57d7d2a-86bd-4b43-b611-558b2346303e</id>
+      <parentGroupId>02db0a1e-d9f2-4026-b808-9729d7a234a1</parentGroupId>
+      <position>
+        <x>2882.653703607906</x>
+        <y>-666.7517834017946</y>
+      </position>
+      <comments>An Ad Hoc web service that "enriches" a request to port 8011 with a NiFi greeting utilizing HandleHttpRequest, HandleHttpResponse and the StandardHttpContextMap controller service</comments>
+      <contents>
+        <connections>
+          <id>8982edda-aecc-4368-8630-0c1dc8ce1c30</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <backPressureDataSizeThreshold>0 MB</backPressureDataSizeThreshold>
+          <backPressureObjectThreshold>0</backPressureObjectThreshold>
+          <destination>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>772077b0-d2a7-4b1f-9ac3-e255772aba31</id>
+            <type>PROCESSOR</type>
+          </destination>
+          <flowFileExpiration>0 sec</flowFileExpiration>
+          <labelIndex>1</labelIndex>
+          <name></name>
+          <selectedRelationships>success</selectedRelationships>
+          <source>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>59c6db74-7fa8-4348-8e75-7b337056571a</id>
+            <type>PROCESSOR</type>
+          </source>
+          <zIndex>0</zIndex>
+        </connections>
+        <connections>
+          <id>c61aa60a-e0f9-4575-b8b5-1a7162438184</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <backPressureDataSizeThreshold>0 MB</backPressureDataSizeThreshold>
+          <backPressureObjectThreshold>0</backPressureObjectThreshold>
+          <bends>
+            <x>807.000059370961</x>
+            <y>525.2178051356348</y>
+          </bends>
+          <bends>
+            <x>807.000059370961</x>
+            <y>575.2178051356348</y>
+          </bends>
+          <destination>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>f3311380-d1aa-4c00-921c-79be8ca48e4e</id>
+            <type>PROCESSOR</type>
+          </destination>
+          <flowFileExpiration>0 sec</flowFileExpiration>
+          <labelIndex>1</labelIndex>
+          <name></name>
+          <selectedRelationships>failure</selectedRelationships>
+          <source>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>f3311380-d1aa-4c00-921c-79be8ca48e4e</id>
+            <type>PROCESSOR</type>
+          </source>
+          <zIndex>0</zIndex>
+        </connections>
+        <connections>
+          <id>d74a69d1-7434-454f-8ad0-4109ed7c1e13</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <backPressureDataSizeThreshold>0 MB</backPressureDataSizeThreshold>
+          <backPressureObjectThreshold>0</backPressureObjectThreshold>
+          <destination>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>f3311380-d1aa-4c00-921c-79be8ca48e4e</id>
+            <type>PROCESSOR</type>
+          </destination>
+          <flowFileExpiration>0 sec</flowFileExpiration>
+          <labelIndex>1</labelIndex>
+          <name></name>
+          <selectedRelationships>success</selectedRelationships>
+          <source>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>772077b0-d2a7-4b1f-9ac3-e255772aba31</id>
+            <type>PROCESSOR</type>
+          </source>
+          <zIndex>0</zIndex>
+        </connections>
+        <connections>
+          <id>6fdbca07-2aa5-43df-9ed8-45da67c04190</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <backPressureDataSizeThreshold>0 MB</backPressureDataSizeThreshold>
+          <backPressureObjectThreshold>0</backPressureObjectThreshold>
+          <bends>
+            <x>808.4437849568985</x>
+            <y>321.116547811416</y>
+          </bends>
+          <bends>
+            <x>808.4437849568985</x>
+            <y>371.116547811416</y>
+          </bends>
+          <destination>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>772077b0-d2a7-4b1f-9ac3-e255772aba31</id>
+            <type>PROCESSOR</type>
+          </destination>
+          <flowFileExpiration>0 sec</flowFileExpiration>
+          <labelIndex>1</labelIndex>
+          <name></name>
+          <selectedRelationships>failure</selectedRelationships>
+          <source>
+            <groupId>a57d7d2a-86bd-4b43-b611-558b2346303e</groupId>
+            <id>772077b0-d2a7-4b1f-9ac3-e255772aba31</id>
+            <type>PROCESSOR</type>
+          </source>
+          <zIndex>0</zIndex>
+        </connections>
+        <labels>
+          <id>a7c62dc4-bfb2-4d44-b0aa-146fd0e4d8a0</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <position>
+            <x>372.000059370961</x>
+            <y>269.00000118055664</y>
+          </position>
+          <height>130.0</height>
+          <label>This processor could be replaced with an entire flow of logic.</label>
+          <style>
+            <entry>
+              <key>font-size</key>
+              <value>12px</value>
+            </entry>
+          </style>
+          <width>391.0</width>
+        </labels>
+        <processors>
+          <id>f3311380-d1aa-4c00-921c-79be8ca48e4e</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <position>
+            <x>398.000059370961</x>
+            <y>500.21780513563476</y>
+          </position>
+          <config>
+            <bulletinLevel>WARN</bulletinLevel>
+            <comments></comments>
+            <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+            <descriptors>
+              <entry>
+                <key>HTTP Context Map</key>
+                <value>
+                  <identifiesControllerService>org.apache.nifi.http.HttpContextMap</identifiesControllerService>
+                  <name>HTTP Context Map</name>
+                </value>
+              </entry>
+              <entry>
+                <key>HTTP Status Code</key>
+                <value>
+                  <name>HTTP Status Code</name>
+                </value>
+              </entry>
+            </descriptors>
+            <lossTolerant>false</lossTolerant>
+            <penaltyDuration>30 sec</penaltyDuration>
+            <properties>
+              <entry>
+                <key>HTTP Context Map</key>
+                <value>b369d993-48ae-4c0e-925b-ffd48846b1a5</value>
+              </entry>
+              <entry>
+                <key>HTTP Status Code</key>
+                <value>200</value>
+              </entry>
+            </properties>
+            <runDurationMillis>0</runDurationMillis>
+            <schedulingPeriod>0 sec</schedulingPeriod>
+            <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+            <yieldDuration>1 sec</yieldDuration>
+          </config>
+          <name>Respond with enriched data</name>
+          <relationships>
+            <autoTerminate>false</autoTerminate>
+            <name>failure</name>
+          </relationships>
+          <relationships>
+            <autoTerminate>true</autoTerminate>
+            <name>success</name>
+          </relationships>
+          <style></style>
+          <type>org.apache.nifi.processors.standard.HandleHttpResponse</type>
+        </processors>
+        <processors>
+          <id>59c6db74-7fa8-4348-8e75-7b337056571a</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <position>
+            <x>399.004209761586</x>
+            <y>55.00000118055664</y>
+          </position>
+          <config>
+            <bulletinLevel>WARN</bulletinLevel>
+            <comments></comments>
+            <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+            <descriptors>
+              <entry>
+                <key>Allow POST</key>
+                <value>
+                  <name>Allow POST</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Hostname</key>
+                <value>
+                  <name>Hostname</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Default URL Character Set</key>
+                <value>
+                  <name>Default URL Character Set</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Allow DELETE</key>
+                <value>
+                  <name>Allow DELETE</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Additional HTTP Methods</key>
+                <value>
+                  <name>Additional HTTP Methods</name>
+                </value>
+              </entry>
+              <entry>
+                <key>HTTP Context Map</key>
+                <value>
+                  <identifiesControllerService>org.apache.nifi.http.HttpContextMap</identifiesControllerService>
+                  <name>HTTP Context Map</name>
+                </value>
+              </entry>
+              <entry>
+                <key>SSL Context Service</key>
+                <value>
+                  <identifiesControllerService>org.apache.nifi.ssl.SSLContextService</identifiesControllerService>
+                  <name>SSL Context Service</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Allow OPTIONS</key>
+                <value>
+                  <name>Allow OPTIONS</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Allowed Paths</key>
+                <value>
+                  <name>Allowed Paths</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Allow GET</key>
+                <value>
+                  <name>Allow GET</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Allow HEAD</key>
+                <value>
+                  <name>Allow HEAD</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Listening Port</key>
+                <value>
+                  <name>Listening Port</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Client Authentication</key>
+                <value>
+                  <name>Client Authentication</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Allow PUT</key>
+                <value>
+                  <name>Allow PUT</name>
+                </value>
+              </entry>
+            </descriptors>
+            <lossTolerant>false</lossTolerant>
+            <penaltyDuration>30 sec</penaltyDuration>
+            <properties>
+              <entry>
+                <key>Allow POST</key>
+                <value>true</value>
+              </entry>
+              <entry>
+                <key>Hostname</key>
+              </entry>
+              <entry>
+                <key>Default URL Character Set</key>
+                <value>UTF-8</value>
+              </entry>
+              <entry>
+                <key>Allow DELETE</key>
+                <value>true</value>
+              </entry>
+              <entry>
+                <key>Additional HTTP Methods</key>
+              </entry>
+              <entry>
+                <key>container-queue-size</key>
+                <value>50</value>
+              </entry>
+              <entry>
+                <key>HTTP Context Map</key>
+                <value>b369d993-48ae-4c0e-925b-ffd48846b1a5</value>
+              </entry>
+              <entry>
+                <key>SSL Context Service</key>
+              </entry>
+              <entry>
+                <key>Allow OPTIONS</key>
+                <value>false</value>
+              </entry>
+              <entry>
+                <key>Allowed Paths</key>
+              </entry>
+              <entry>
+                <key>Allow GET</key>
+                <value>true</value>
+              </entry>
+              <entry>
+                <key>Allow HEAD</key>
+                <value>false</value>
+              </entry>
+              <entry>
+                <key>Listening Port</key>
+                <value>8011</value>
+              </entry>
+              <entry>
+                <key>Client Authentication</key>
+                <value>No Authentication</value>
+              </entry>
+              <entry>
+                <key>Allow PUT</key>
+                <value>true</value>
+              </entry>
+            </properties>
+            <runDurationMillis>0</runDurationMillis>
+            <schedulingPeriod>0 sec</schedulingPeriod>
+            <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+            <yieldDuration>1 sec</yieldDuration>
+          </config>
+          <name>Receive request and data</name>
+          <relationships>
+            <autoTerminate>false</autoTerminate>
+            <name>success</name>
+          </relationships>
+          <style></style>
+          <type>org.apache.nifi.processors.standard.HandleHttpRequest</type>
+        </processors>
+        <processors>
+          <id>772077b0-d2a7-4b1f-9ac3-e255772aba31</id>
+          <parentGroupId>a57d7d2a-86bd-4b43-b611-558b2346303e</parentGroupId>
+          <position>
+            <x>399.4437849568985</x>
+            <y>296.116547811416</y>
+          </position>
+          <config>
+            <bulletinLevel>WARN</bulletinLevel>
+            <comments></comments>
+            <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+            <descriptors>
+              <entry>
+                <key>Regular Expression</key>
+                <value>
+                  <name>Regular Expression</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Replacement Value</key>
+                <value>
+                  <name>Replacement Value</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Evaluation Mode</key>
+                <value>
+                  <name>Evaluation Mode</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Character Set</key>
+                <value>
+                  <name>Character Set</name>
+                </value>
+              </entry>
+              <entry>
+                <key>Maximum Buffer Size</key>
+                <value>
+                  <name>Maximum Buffer Size</name>
+                </value>
+              </entry>
+            </descriptors>
+            <lossTolerant>false</lossTolerant>
+            <penaltyDuration>30 sec</penaltyDuration>
+            <properties>
+              <entry>
+                <key>Regular Expression</key>
+                <value>(?s)(^.*$)</value>
+              </entry>
+              <entry>
+                <key>Replacement Value</key>
+                <value>Hello, NiFi!</value>
+              </entry>
+              <entry>
+                <key>Evaluation Mode</key>
+                <value>Entire text</value>
+              </entry>
+              <entry>
+                <key>Character Set</key>
+                <value>UTF-8</value>
+              </entry>
+              <entry>
+                <key>Maximum Buffer Size</key>
+                <value>1 MB</value>
+              </entry>
+              <entry>
+                <key>Replacement Strategy</key>
+                <value>Regex Replace</value>
+              </entry>
+            </properties>
+            <runDurationMillis>0</runDurationMillis>
+            <schedulingPeriod>0 sec</schedulingPeriod>
+            <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+            <yieldDuration>1 sec</yieldDuration>
+          </config>
+          <name>Update Request Body with a greeting!</name>
+          <relationships>
+            <autoTerminate>false</autoTerminate>
+            <name>failure</name>
+          </relationships>
+          <relationships>
+            <autoTerminate>false</autoTerminate>
+            <name>success</name>
+          </relationships>
+          <style></style>
+          <type>org.apache.nifi.processors.standard.ReplaceText</type>
+        </processors>
+      </contents>
+      <name>Hello NiFi Web Service</name>
+    </processGroups>
+  </snippet>
+  <timestamp>04/07/2017 11:29:21 EDT</timestamp>
+</template>
