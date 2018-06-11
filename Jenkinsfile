@@ -1,4 +1,4 @@
-def CONTAINER_NAME="naarai"
+def CONTAINER_NAME="myhana"
 def CONTAINER_TAG="latest"
 def DOCKER_HUB_USER="yogeshprabhu"
 def HTTP_PORT="8090"
