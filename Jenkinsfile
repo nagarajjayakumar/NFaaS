@@ -1,7 +1,7 @@
 def CONTAINER_NAME="myhana"
 def CONTAINER_TAG="latest"
 def DOCKER_HUB_USER="yogeshprabhu"
-def HTTP_PORT="8090"
+
 
 node {
 
@@ -45,9 +45,6 @@ node {
         notifySuccessful()
     }
 
-    stage('Run App'){
-        runApp(CONTAINER_NAME, CONTAINER_TAG, DOCKER_HUB_USER, HTTP_PORT)
-    }
 
 
 }
