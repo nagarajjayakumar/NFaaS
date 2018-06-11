@@ -139,4 +139,44 @@ public class Processor {
                 ProcessorEntity.class, params);
         return response.getBody();
     }
+
+    /**
+     * This is the method to get the latest Processor Entity
+     *
+     * @param processorId https://localhost:8080/nifi-api/processors/
+     * @return
+     */
+    public ProcessorEntity getLatestProcessorEntityById(String processorId) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/processors/" + processorId;
+
+        HttpEntity<ProcessorEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                ProcessorEntity.class, params);
+        return response.getBody();
+    }
+
+    /**
+     * this is the method the to update Processor Entity
+     * @param processor
+     * @return
+     */
+    public ProcessorEntity updateProcessorEntity(ProcessorEntity processor) {
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/processors/" + processor.getId() + "/";
+
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders headers = security.getAuthorizationHeader();
+        HttpEntity<ProcessorEntity> requestEntity = new HttpEntity<>(processor, headers);
+
+        HttpEntity<ProcessorEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
+                ProcessorEntity.class, params);
+
+        ProcessorEntity resp = response.getBody();
+
+        logger.debug(resp.toString());
+
+        return resp;
+    }
 }

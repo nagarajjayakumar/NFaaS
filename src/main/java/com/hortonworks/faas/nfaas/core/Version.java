@@ -5,6 +5,7 @@ import org.apache.nifi.web.api.dto.RevisionDTO;
 import org.apache.nifi.web.api.dto.VersionControlInformationDTO;
 import org.apache.nifi.web.api.dto.VersionedFlowDTO;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
+import org.apache.nifi.web.api.entity.ProcessorEntity;
 import org.apache.nifi.web.api.entity.StartVersionControlRequestEntity;
 import org.apache.nifi.web.api.entity.VersionControlInformationEntity;
 import org.slf4j.Logger;
@@ -37,6 +38,9 @@ public class Version {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    CommonService commonService;
 
     @Autowired
     Version(Environment env) {
@@ -101,6 +105,59 @@ public class Version {
                 VersionControlInformationEntity.class, params);
 
         resp = response.getBody();
+        logger.debug(resp.toString());
+        return resp;
+
+    }
+
+    /**
+     *
+     GET
+     /versions/process-groups/{id}
+     Gets the Version Control information for a process group
+     */
+
+    public VersionControlInformationEntity getVersionControlInfoForPgId(String pgId){
+        final String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/versions/process-groups/" + pgId ;
+        Map<String, String> params = new HashMap<String, String>();
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
+
+        HttpEntity<VersionControlInformationEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity,
+                VersionControlInformationEntity.class, params);
+        return response.getBody();
+
+    }
+
+    /**
+     * This is the method to stop the version control for the Process group ID
+     * @param pge
+     * @return
+     */
+
+    public VersionControlInformationEntity stopVersionControlForPge(ProcessGroupEntity pge){
+
+        String pgId = pge.getId();
+
+        // https://"+nifiServerHostnameAndPort+"/nifi-api/versions/process-groups/a57d7d2a-86bd-4b43-357a-34abb1bd85d6?version=0&clientId=deaebc77-015b-1000-31ea-162516e98255
+        String version = String.valueOf(commonService.getClientIdAndVersion(pge).getVersion());
+        String clientId = String.valueOf(commonService.getClientIdAndVersion(pge).getClientId());
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/versions/process-groups/" + pgId + "?version="
+                + version + "&clientId=" + clientId;
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
+
+        VersionControlInformationEntity resp = null;
+        HttpEntity<VersionControlInformationEntity> response = restTemplate.exchange(uri, HttpMethod.DELETE, requestEntity,
+                VersionControlInformationEntity.class, params);
+
+        resp = response.getBody();
+
         logger.debug(resp.toString());
         return resp;
 
