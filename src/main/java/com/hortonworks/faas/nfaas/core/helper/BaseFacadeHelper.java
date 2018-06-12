@@ -58,5 +58,8 @@ public class BaseFacadeHelper {
     @Autowired
     ProcessGroupFacadeHelper processGroupFacadeHelper;
 
+    @Autowired
+    Connection connection;
+
 
 }

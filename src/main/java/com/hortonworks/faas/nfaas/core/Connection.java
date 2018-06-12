@@ -158,6 +158,22 @@ public class Connection {
     }
 
     /**
+     * This is the method to get the latest Connection Entity
+     *
+     * @param connectionEntity
+     * @return
+     */
+    public ConnectionEntity getLatestConnectionEntity(ConnectionEntity connectionEntity) {
+        Map<String, String> params = new HashMap<String, String>();
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/connections/" + connectionEntity.getId() + "/";
+        HttpEntity<ConnectionEntity> response = restTemplate.exchange(theUrl, HttpMethod.GET, requestEntity, ConnectionEntity.class,
+                params);
+        return response.getBody();
+    }
+
+    /**
      * Helper function that will return the id of the given entity
      * @param entity entity that will be interrogated for parent Id
      * @return id of the entity
