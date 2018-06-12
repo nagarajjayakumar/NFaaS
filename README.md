@@ -64,6 +64,6 @@ http://localhost:8084/faas/hanaingestionpipeline?namespace=_SYS_BIC&package_id=D
 
 SIGN : Naga Jay @nagajay_
 
-Contributor : Adaam Michalsky @Michalsky_
+Contributor : Adam Michalsky @Michalsky_
 
 CICD : Yogeshprabhu @yogesh_
