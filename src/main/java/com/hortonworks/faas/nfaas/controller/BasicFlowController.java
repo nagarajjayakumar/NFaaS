@@ -45,6 +45,12 @@ public class BasicFlowController {
     RemoteProcessGroupFacadeHelper remoteProcessGroupFacadeHelper;
 
     @Autowired
+    ConnectionFacadeHelper connectionFacadeHelper;
+
+    @Autowired
+    Connection connection;
+
+    @Autowired
     CommonService commonService;
 
     @Autowired
