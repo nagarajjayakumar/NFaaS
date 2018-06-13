@@ -13,6 +13,9 @@ Integrated with NiFi Secured cluster – via NiFi bearer token services
 In built NiFi template validator
 
 
+![alt text](https://github.com/nagarajjayakumar/NFaaS/blob/master/nFaaS_Architecture.png)
+
+
 nFaaS – Config
 =================
 
