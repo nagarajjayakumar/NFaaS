@@ -3,6 +3,7 @@ package com.hortonworks.faas.nfaas.core.helper;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
+import org.apache.nifi.web.api.dto.ConnectionDTO;
 import org.apache.nifi.web.api.dto.TemplateDTO;
 import org.apache.nifi.web.api.entity.FlowEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
@@ -69,6 +70,21 @@ public class TemplateFacadeHelper extends  BaseFacadeHelper{
         }
 
         return remoteProcessorGroupNameFromTemplate;
+    }
+
+    /**
+     * @param connectionsFromTemplate
+     * @return
+     */
+    public Set<String> getAllConnectionsFromTemplate(
+            Set<ConnectionDTO> connectionsFromTemplate) {
+        Set<String> connectionsNameFromTemplate = new LinkedHashSet<>();
+
+        for (ConnectionDTO connectionDTO : connectionsFromTemplate) {
+            connectionsNameFromTemplate.add(connectionDTO.getName());
+        }
+
+        return connectionsNameFromTemplate;
     }
 
 
