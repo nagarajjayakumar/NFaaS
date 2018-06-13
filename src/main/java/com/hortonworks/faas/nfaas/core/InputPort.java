@@ -26,7 +26,7 @@ public class InputPort {
 
     private String trasnsportMode = "http";
     private boolean nifiSecuredCluster = false;
-    private String nifiServerHostnameAndPort = "localhost:9090";
+    private String nifiServerHostnameAndPort = "localhost:8080";
 
     @Autowired
     Security security;
@@ -136,4 +136,46 @@ public class InputPort {
                 params);
         return response.getBody();
     }
+
+    /**
+     * This method is used to create an Input Port Entity
+     *
+     * @param pgId process group id where the input port is being created
+     * @param clientId clientId from the process group flow
+     * @param portName name of the input port
+     *
+     */
+    public PortEntity createInputPortEntity(String pgId, String clientId, String portName)
+    {
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        /*
+         * Create the port entity object with name and assign the component.
+          */
+        PortEntity reqPe = new PortEntity();
+        PortDTO component = new PortDTO();
+        component.setName(portName);
+        reqPe.setComponent(component);
+
+        /*
+          Very critical to set the client Id and the inital version
+          Otherwise the Httprequest will turn to a bad request.
+         */
+        RevisionDTO revision = new RevisionDTO();
+        revision.setClientId(clientId);
+        revision.setVersion(0l);
+        reqPe.setRevision(revision);
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<PortEntity> requestEntity = new HttpEntity<PortEntity>(reqPe,requestHeaders);
+
+
+
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/"+ pgId + "/input-ports/";
+        HttpEntity<PortEntity> response = restTemplate.exchange(theUrl, HttpMethod.POST, requestEntity, PortEntity.class,
+                params);
+        return response.getBody();
+    }
+
 }

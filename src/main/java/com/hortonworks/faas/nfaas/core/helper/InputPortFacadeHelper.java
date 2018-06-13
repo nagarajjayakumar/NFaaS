@@ -109,4 +109,31 @@ public class InputPortFacadeHelper extends BaseFacadeHelper {
         return pe;
 
     }
+
+    /**
+     * Searches for an input port in a process group flow entity
+     *
+     * @param pgfe ProcessGroupFlowEntity to be searched
+     * @param portName Name of port
+     * @return PortEntity found with the provided name - null if no port is found.
+     */
+    public PortEntity getPortEntityByName(ProcessGroupFlowEntity pgfe,
+                                                          String portName) {
+
+        PortEntity resultPe = null;
+        Set<PortEntity> allInputPorts = pgfe.getProcessGroupFlow().getFlow().getInputPorts();
+
+        for (PortEntity pe : allInputPorts) {
+            if (portName.equalsIgnoreCase(pe.getComponent().getName())) {
+                resultPe = pe;
+                break;
+            }
+
+        }
+
+        return resultPe;
+
+    }
+
+
 }
