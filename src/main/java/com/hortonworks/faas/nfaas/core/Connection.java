@@ -8,6 +8,7 @@ package com.hortonworks.faas.nfaas.core;
 
 import org.apache.nifi.web.api.dto.ConnectableDTO;
 import org.apache.nifi.web.api.dto.ConnectionDTO;
+import org.apache.nifi.web.api.dto.FlowFileDTO;
 import org.apache.nifi.web.api.dto.RevisionDTO;
 import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class Connection {
     private String trasnsportMode = "http";
     private boolean nifiSecuredCluster = false;
     private String nifiServerHostnameAndPort = "localhost:8080";
+    private String BACKPRESSURE_DATA_SIZE_THRESHOLD_DEFAULT = "1 GB";
+    private long BACKPRESSURE_OBJECT_THRESHOLD_DEFAULT = 10000;
+    private String FLOW_FILE_EXPIRATION_DEFAULT = "0 sec";
 
     @Autowired
     Security security;
@@ -43,13 +47,7 @@ public class Connection {
     ProcessGroupFlow processGroupFlow;
 
     @Autowired
-    PortEntity portEntity;
-
-    @Autowired
-    ConnectionEntity connectionEntity;
-
-    @Autowired
-    ProcessorEntity processorEntity;
+    FlowFileQueue flowFileQueue;
 
     @Autowired
     RestTemplate restTemplate;
@@ -73,34 +71,25 @@ public class Connection {
      * @param clientId clientId to be used while creating the connection entity
      * @return the connection entity created.
      */
-    public ConnectionEntity createConnectionEntity(Entity src, Entity dest, String clientId)
+    public ConnectionEntity createConnectionEntityPorts(PortEntity src, PortEntity dest, String clientId, String connectionName)
     {
         Map<String, String> params = new HashMap<String, String>();
-        String src_pgId = this.getEntityParentGroupId(src);
-        String dest_pgId = this.getEntityParentGroupId(dest);
-        String srcId = this.getEntityId(src);
-        String destId = this.getEntityId(dest);
+        Map<String, String> connectionConfig = new HashMap<String, String>();
 
-        /*
-        Create connection entity and connectable DTOs for source and destinations
-         */
+
+        connectionConfig.put("src_pgId", src.getComponent().getParentGroupId());
+        connectionConfig.put("dest_pgId", dest.getComponent().getParentGroupId());
+        connectionConfig.put("srcId", src.getComponent().getId());
+        connectionConfig.put("destId", dest.getComponent().getId());
+        connectionConfig.put("srcType", src.getComponent().getType());
+        connectionConfig.put("destType", dest.getComponent().getType());
+        connectionConfig.put("name", connectionName);
+
+
+        ConnectionDTO component = initializeComponent(connectionConfig);
         ConnectionEntity connection_entity = new ConnectionEntity();
-        ConnectableDTO source = new ConnectableDTO();
-        ConnectableDTO destination = new ConnectableDTO();
-        ConnectionDTO component = new ConnectionDTO();
 
-
-        /*
-        Assign the source and destination parent Ids and entity Ids to the connectable DTOs
-         */
-        source.setId(srcId);
-        source.setGroupId(src_pgId);
-        destination.setId(destId);
-        destination.setGroupId(dest_pgId);
-
-        component.setDestination(destination);
-        component.setSource(source);
-
+        component.setName(connectionName);
         connection_entity.setComponent(component);
 
         /*
@@ -118,12 +107,10 @@ public class Connection {
 
 
 
-        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/"+ src_pgId + "/connections/";
+        String theUrl = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/process-groups/"+ connectionConfig.get("src_pgId") + "/connections/";
         HttpEntity<ConnectionEntity> response = restTemplate.exchange(theUrl, HttpMethod.POST, requestEntity, ConnectionEntity.class,
                 params);
         return response.getBody();
-
-
     }
 
     /**
@@ -133,11 +120,14 @@ public class Connection {
      */
     public ConnectionEntity deleteConnectionEntity(ConnectionEntity connection)
     {
-        String connId = connectionEntity.getId();
+        String connId = connection.getId();
 
         // https://"+nifiServerHostnameAndPort+"/nifi-api/process-groups/a57d7d2a-86bd-4b43-357a-34abb1bd85d6?version=0&clientId=deaebc77-015b-1000-31ea-162516e98255
-        String version = String.valueOf(commonService.getClientIdAndVersion(connectionEntity).getVersion());
-        String clientId = String.valueOf(commonService.getClientIdAndVersion(connectionEntity).getClientId());
+        String version = String.valueOf(commonService.getClientIdAndVersion(connection).getVersion());
+        String clientId = String.valueOf(commonService.getClientIdAndVersion(connection).getClientId());
+
+        DropRequestEntity dre = flowFileQueue.placeRequestForDeletion(connection);
+        flowFileQueue.deleteTheQueueContent(dre);
 
         final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/connections/" + connId + "?version="
                 + version + "&clientId=" + clientId;
@@ -173,11 +163,12 @@ public class Connection {
         return response.getBody();
     }
 
+    /*
     /**
      * Helper function that will return the id of the given entity
      * @param entity entity that will be interrogated for parent Id
      * @return id of the entity
-     */
+
     private String getEntityId(Entity entity)
     {
         String entity_class = entity.getClass().toString();
@@ -202,7 +193,8 @@ public class Connection {
      *  Helper function that will return the id of the parent group for a given entity
      * @param entity entity that will be interrogated for parent Id
      * @return id of Parent Group
-     */
+      */
+    /*
     private String getEntityParentGroupId(Entity entity)
     {
         String entity_class = entity.getClass().toString();
@@ -221,6 +213,38 @@ public class Connection {
         }
 
         return resultId;
+    }
+    */
+
+    private ConnectionDTO initializeComponent(Map<String, String> connectionConfig)
+    {
+             /*
+        Create connection entity and connectable DTOs for source and destinations
+         */
+        ConnectableDTO source = new ConnectableDTO();
+        ConnectableDTO destination = new ConnectableDTO();
+        ConnectionDTO component = new ConnectionDTO();
+
+
+        /*
+        Assign the source and destination parent Ids and entity Ids to the connectable DTOs
+         */
+        source.setId(connectionConfig.get("srcId"));
+        source.setGroupId(connectionConfig.get("src_pgId"));
+        source.setType(connectionConfig.get("srcType"));
+        destination.setId(connectionConfig.get("destId"));
+        destination.setGroupId(connectionConfig.get("dest_pgId"));
+        destination.setType(connectionConfig.get("destType"));
+
+
+        component.setDestination(destination);
+        component.setSource(source);
+        component.setName(connectionConfig.get("name"));
+        component.setBackPressureDataSizeThreshold(BACKPRESSURE_DATA_SIZE_THRESHOLD_DEFAULT);
+        component.setBackPressureObjectThreshold(BACKPRESSURE_OBJECT_THRESHOLD_DEFAULT);
+        component.setFlowFileExpiration(FLOW_FILE_EXPIRATION_DEFAULT);
+
+        return component;
     }
 
 }
