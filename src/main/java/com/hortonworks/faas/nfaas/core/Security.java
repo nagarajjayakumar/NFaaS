@@ -101,10 +101,10 @@ public class Security {
      */
     public HttpHeaders getAuthorizationHeader() {
         HttpHeaders requestHeaders = new HttpHeaders();
-        String token = "anonymous";
+        String token = "";
 
         // For secured Cluster
-        if (this.nifiSecuredCluster) {
+        if (this.nifiSecuredCluster ) {
             token = getAccessToken();
         }
 
