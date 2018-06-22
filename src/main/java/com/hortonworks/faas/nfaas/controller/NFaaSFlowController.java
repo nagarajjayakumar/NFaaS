@@ -309,7 +309,7 @@ public class NFaaSFlowController extends BasicFlowController {
                                                   "prod_registry",
                                                      "nFaaS :: Sys Generated Flow :: Inital commit ");
 
-        String jsonHanaIngestionPipeline_task = "{\"task\":\"create hive ingestion pipeline done !\"}";
+        String jsonHanaIngestionPipeline_task = String.format("{\"task\":\"create Hana ingestion [%1$s] pipeline done !\"}", fbo.db_object_name);
         return jsonHanaIngestionPipeline_task;
     }
 

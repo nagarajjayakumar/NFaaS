@@ -4,7 +4,7 @@
     <div class="navbar-header">
       <a class="navbar-brand" th:href="@{/}">NiFi Flow as a Service</a>
     </div>
-    <p class="navbar-text navbar-right">**{{organization}} {{cookie}}##C &nbsp; &nbsp; &nbsp;</p>
+    <p class="navbar-text navbar-right">**{{organization}} {{cookie}} ##C &nbsp; &nbsp; &nbsp;</p>
     
   </div><!-- /.container-fluid -->
 </nav>
@@ -21,7 +21,7 @@
 /*<![CDATA[*/
 var app = angular.module('myApp', ["ngResource","ngRoute","ngCookies","angular-jwt"]);
 
-app.controller('mainCtrl', function($scope,$resource,$http,$httpParamSerializer,$cookies,jwtHelper) {
+app.controller('mainCtrl', function($scope,$resource,$http,$httpParamSerializer,$cookies,$location, jwtHelper) {
     $scope.foo = {id:1 , name:"sample foo"};
     $scope.foos = $resource("http://localhost:8080/greet/",{fooId:'@id'});
     
@@ -35,8 +35,7 @@ app.controller('mainCtrl', function($scope,$resource,$http,$httpParamSerializer,
     $scope.encoded = btoa("acme:acmesecret");
     
     $scope.cookie = $cookies.get("access_token");
-    
-        
+
     var isLoginPage = window.location.href.indexOf("login") != -1;
     if(isLoginPage){
         if($cookies.get("access_token")){
@@ -65,7 +64,8 @@ app.controller('mainCtrl', function($scope,$resource,$http,$httpParamSerializer,
     $scope.logout = function() {
         logout($scope.loginData);
 	}
-    
+
+
     function obtainAccessToken(params){
         var req = {
             method: 'POST',
@@ -95,7 +95,7 @@ app.controller('mainCtrl', function($scope,$resource,$http,$httpParamSerializer,
 	    window.location.href="login";
        
     }
-    
+
 });
 /*]]>*/
 </script>
