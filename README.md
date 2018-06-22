@@ -14,6 +14,10 @@ In built NiFi template validator
 
 #
 
+nFaaS Architecture
+=====================
+#
+
 ![alt text](https://github.com/nagarajjayakumar/NFaaS/blob/master/nFaaS_Arch.png)
 
 #
