@@ -18,9 +18,6 @@ In built NiFi template validator
 
 #
 
-![alt text](https://github.com/nagarajjayakumar/NFaaS/blob/master/nFaaS_Architecture.png)
-
-
 nFaaS – Config
 =================
 
