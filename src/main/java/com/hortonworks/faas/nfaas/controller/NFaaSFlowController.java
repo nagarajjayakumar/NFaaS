@@ -284,6 +284,9 @@ public class NFaaSFlowController extends BasicFlowController {
         String rootIngestionPipeLineName = hanaIngestionPipeline+"_"+fbo.db_object_name.toLowerCase();
 
         ProcessGroupEntity pge = processGroupFacadeHelper.getProcessGroupEntityByName(pgfe,rootIngestionPipeLineName);
+
+        boolean isFlowNew = false;
+
         if(null == pge){
             // if the process group not found create the process group
             pge = processGroup.createProcessGroup(pgfe.getProcessGroupFlow().getId(),clientId, rootIngestionPipeLineName);
@@ -295,6 +298,8 @@ public class NFaaSFlowController extends BasicFlowController {
             ProcessGroupFlowEntity importPgfe = processGroupFlow.getLatestProcessGroupFlowEntity(importPge.getId());
 
             pipeLinePostHook(importPgfe, importPge, clientId, db_object_name.toLowerCase());
+
+            isFlowNew = true;
         }
 
         processorFacadeHelper.stopAllProcessors(pge.getId());
@@ -304,10 +309,13 @@ public class NFaaSFlowController extends BasicFlowController {
         // always get the latest process group before start versioning the process group
         pge = processGroup.getLatestProcessGroupEntity(pge.getId());
         // version control the just created processor - this is critical
-        processorGroupFlowFacadeHelper.saveProcessGroupWithId(pgfe, pge, rootIngestionPipeLineName,
-                                                              pge.getRevision().getVersion(),
-                                                  "prod_registry",
-                                                     "nFaaS :: Sys Generated Flow :: Inital commit ");
+
+        if(isFlowNew) {
+            processorGroupFlowFacadeHelper.saveProcessGroupWithId(pgfe, pge, rootIngestionPipeLineName,
+                    pge.getRevision().getVersion(),
+                    "prod_registry",
+                    "nFaaS :: Sys Generated Flow :: Inital commit ");
+        }
 
         String jsonHanaIngestionPipeline_task = String.format("{\"task\":\"create Hana ingestion [%1$s] pipeline done !\"}", fbo.db_object_name);
         return jsonHanaIngestionPipeline_task;

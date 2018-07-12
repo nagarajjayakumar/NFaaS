@@ -4,10 +4,7 @@ import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.RevisionDTO;
 import org.apache.nifi.web.api.dto.VersionControlInformationDTO;
 import org.apache.nifi.web.api.dto.VersionedFlowDTO;
-import org.apache.nifi.web.api.entity.ProcessGroupEntity;
-import org.apache.nifi.web.api.entity.ProcessorEntity;
-import org.apache.nifi.web.api.entity.StartVersionControlRequestEntity;
-import org.apache.nifi.web.api.entity.VersionControlInformationEntity;
+import org.apache.nifi.web.api.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +99,61 @@ public class Version {
         VersionControlInformationEntity resp = null;
 
         ResponseEntity<VersionControlInformationEntity> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity,
+                VersionControlInformationEntity.class, params);
+
+        resp = response.getBody();
+        logger.debug(resp.toString());
+        return resp;
+
+    }
+
+    /**
+     * This is the method to save the Process group by ID
+     * @param pge
+     * @param clientId
+     * @param registryId
+     * @param bucketId
+     * @param version_num
+     * @return
+     */
+    public VersionControlInformationEntity updateProcessGroupById(ProcessGroupEntity pge,
+                                                                String clientId,
+                                                                String flowName,
+                                                                String registryId,
+                                                                String bucketId,
+                                                                long version_num, String comment){
+
+        String pgId = pge.getId();
+
+        final String uri = trasnsportMode + "://" + nifiServerHostnameAndPort + "/nifi-api/versions/process-groups/" + pgId ;
+        Map<String, String> params = new HashMap<String, String>();
+
+        /*
+            Create the process group entity object with the name ..
+            to create the process group entity with the provided pgname
+         */
+        VersionedFlowSnapshotEntity versionedFlowSnapshotEntity =  new VersionedFlowSnapshotEntity();
+
+        versionedFlowSnapshotEntity.setVersionedFlow(pge.getVersionedFlowSnapshot());
+        versionedFlowSnapshotEntity.setRegistryId(registryId);
+        versionedFlowSnapshotEntity.setUpdateDescendantVersionedFlows(true);
+
+        /*
+          Very critical to set the client Id and the inital version
+          Otherwise the Httprequest will turn to a bad request.
+         */
+        RevisionDTO revision = new RevisionDTO();
+        revision.setClientId(clientId);
+        revision.setVersion(version_num);
+
+        versionedFlowSnapshotEntity.setProcessGroupRevision(revision);
+
+        HttpHeaders requestHeaders = security.getAuthorizationHeader();
+        HttpEntity<VersionedFlowSnapshotEntity> requestEntity = new HttpEntity<>(versionedFlowSnapshotEntity,requestHeaders);
+
+        VersionControlInformationEntity resp = null;
+
+        ResponseEntity<VersionControlInformationEntity> response = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity,
                 VersionControlInformationEntity.class, params);
 
         resp = response.getBody();

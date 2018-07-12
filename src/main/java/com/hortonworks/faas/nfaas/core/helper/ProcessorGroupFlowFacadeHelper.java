@@ -196,6 +196,29 @@ public class ProcessorGroupFlowFacadeHelper extends  BaseFacadeHelper{
         return versionCtrlInfoEntity;
     }
 
+    public VersionControlInformationEntity updateProcessGroupWithId(ProcessGroupFlowEntity pgfe,
+                                                                  ProcessGroupEntity pge,
+                                                                  String flowName,
+                                                                  long version_num,
+                                                                  String registryName,
+                                                                  String comment) {
+
+        String clientId = processGroupFlow.getClientId();
+
+        String prod_registry_id = getRegistryId(registryName);
+        BucketEntity  prod_bucket = getBucket(prod_registry_id);
+
+        VersionControlInformationEntity versionCtrlInfoEntity =
+                version.updateProcessGroupById(pge,
+                        clientId,
+                        flowName,
+                        prod_registry_id,  prod_bucket.getId(), version_num, comment );
+
+
+
+        return versionCtrlInfoEntity;
+    }
+
     public VersionControlInformationEntity stopVersionControlForPge(ProcessGroupEntity pge){
         VersionControlInformationEntity versionCtrlInfoEntity = version.stopVersionControlForPge(pge);
 
