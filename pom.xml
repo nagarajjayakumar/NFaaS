@@ -38,7 +38,7 @@
 			<commons-io.version>2.4</commons-io.version>
 
             <!-- Spring oAuth2 version -->
-            <spring.oauth2.version>2.3.3.RELEASE</spring.oauth2.version>
+            <spring.oauth2.version>[2.3.5,)</spring.oauth2.version>
 				
 			<!-- Maven plugins -->
 			<cargo-maven2-plugin.version>1.4.19</cargo-maven2-plugin.version>

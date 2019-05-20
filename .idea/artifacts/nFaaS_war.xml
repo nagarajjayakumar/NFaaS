@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="nFaaS:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>nFaaS</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="nFaaS-1.0.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="nFaaS:war exploded" />
+    </root>
+  </artifact>
+</component>
