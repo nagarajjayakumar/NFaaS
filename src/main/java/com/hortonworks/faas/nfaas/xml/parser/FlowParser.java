@@ -2,9 +2,13 @@ package com.hortonworks.faas.nfaas.xml.parser;
 
 import com.hortonworks.faas.nfaas.xml.util.LoggingXmlParserErrorHandler;
 import org.apache.commons.io.IOUtils;
+import org.apache.nifi.controller.serialization.FlowEncodingVersion;
 import org.apache.nifi.controller.serialization.FlowFromDOMFactory;
-
+import org.apache.nifi.encrypt.StringEncryptor;
+import org.apache.nifi.security.util.EncryptionMethod;
 import org.apache.nifi.web.api.dto.PortDTO;
+import org.apache.nifi.web.api.dto.ProcessGroupDTO;
+import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -38,7 +42,13 @@ public class FlowParser {
     private static final Logger logger = LoggerFactory.getLogger(FlowParser.class);
 
     private static final String FLOW_XSD_VERSION = "_1_8";
-    private static final String FLOW_XSD = "/FlowConfiguration"+FLOW_XSD_VERSION+".xsd";
+    private static final String FLOW_XSD = "/FlowConfiguration" + FLOW_XSD_VERSION + ".xsd";
+
+    private final String DEFAULT_SENSITIVE_PROPS_KEY = "nififtw!";
+
+    final StringEncryptor DEFAULT_ENCRYPTOR = new StringEncryptor(EncryptionMethod.MD5_256AES.getAlgorithm(),
+                                                                  EncryptionMethod.MD5_256AES.getProvider(),
+                                                                  DEFAULT_SENSITIVE_PROPS_KEY);
 
     private Schema flowSchema;
     private SchemaFactory schemaFactory;
@@ -51,7 +61,6 @@ public class FlowParser {
     /**
      * Extracts the root group id from the flow configuration file provided in nifi.properties, and extracts
      * the root group input ports and output ports, and their access controls.
-     *
      */
     public FlowInfo parse(final File flowConfigurationFile) {
         if (flowConfigurationFile == null) {
@@ -108,14 +117,24 @@ public class FlowParser {
 
             final String rootGroupId = rootGroupIdElement.getTextContent();
 
+            final FlowEncodingVersion encodingVersion = FlowEncodingVersion.parse(rootGroupElement);
+
             final List<PortDTO> ports = new ArrayList<>();
             ports.addAll(getPorts(rootGroupElement, "inputPort"));
             ports.addAll(getPorts(rootGroupElement, "outputPort"));
 
-            return new FlowInfo(rootGroupId, ports);
+            final List<ProcessGroupDTO> processGroups = new ArrayList<>();
+            processGroups.addAll(getProcessGroups(rootGroupId, rootGroupElement,DEFAULT_ENCRYPTOR,encodingVersion,"processGroup"));
+
+            FlowInfo fi = new FlowInfo();
+            fi.setRootGroupId(rootGroupId);
+            fi.setPorts(ports);
+            fi.setProcessGroups(processGroups);
+
+            return fi;
 
         } catch (final SAXException | ParserConfigurationException | IOException ex) {
-            logger.error("Unable to parse flow {} due to {}", new Object[] { flowPath.toAbsolutePath(), ex });
+            logger.error("Unable to parse flow {} due to {}", new Object[]{flowPath.toAbsolutePath(), ex});
             return null;
         }
     }
@@ -124,7 +143,7 @@ public class FlowParser {
      * Gets the ports that are direct children of the given element.
      *
      * @param element the element containing ports
-     * @param type the type of port to find (inputPort or outputPort)
+     * @param type    the type of port to find (inputPort or outputPort)
      * @return a list of PortDTOs representing the found ports
      */
     private List<PortDTO> getPorts(final Element element, final String type) {
@@ -138,7 +157,51 @@ public class FlowParser {
             ports.add(portDTO);
         }
 
-        return  ports;
+        return ports;
+    }
+
+    /**
+     * Gets the ports that are direct children of the given element.
+     *
+     * @param element the element containing ports
+     * @param type    the type of port to find (inputPort or outputPort)
+     * @return a list of PortDTOs representing the found ports
+     */
+    private List<ProcessorDTO> getProcessors(final Element element, final String type) {
+        final List<ProcessorDTO> processors = new ArrayList<>();
+
+        // add input ports
+        final List<Element> portNodeList = getChildrenByTagName(element, type);
+        for (final Element portElement : portNodeList) {
+            final ProcessorDTO processorDTO = FlowFromDOMFactory.getProcessor(portElement, DEFAULT_ENCRYPTOR);
+            processorDTO.setType(type);
+            processors.add(processorDTO);
+        }
+
+        return processors;
+    }
+
+    /**
+     * Gets the ports that are direct children of the given element.
+     *
+     * @param element the element containing ports
+     * @param type    the type of port to find (inputPort or outputPort)
+     * @return a list of PortDTOs representing the found ports
+     */
+    private List<ProcessGroupDTO> getProcessGroups(String parentId, Element element, StringEncryptor encryptor, FlowEncodingVersion encodingVersion, final String type) {
+        final List<ProcessGroupDTO> processorGroup = new ArrayList<>();
+
+        // add input ports
+        final List<Element> processGroupNodeList = getChildrenByTagName(element, type);
+        for (final Element processGroupElement : processGroupNodeList) {
+            final ProcessGroupDTO processGroupDTO = FlowFromDOMFactory.
+                                                        getProcessGroup(parentId,
+                                                                        processGroupElement,
+                                                                        DEFAULT_ENCRYPTOR,encodingVersion);
+            processorGroup.add(processGroupDTO);
+        }
+
+        return processorGroup;
     }
 
     /**
@@ -167,9 +230,11 @@ public class FlowParser {
     }
 
     public static void main(String[] args) throws Exception {
-        FlowParser fp  = new FlowParser();
+        FlowParser fp = new FlowParser();
         FlowInfo fi = fp.parse(new File("/Users/njayakumar/Downloads/flow.xml.gz"));
         System.out.println(fi.getRootGroupId());
+        System.out.println(fi.getProcessGroups().get(0).getName());
+
     }
 
 }
