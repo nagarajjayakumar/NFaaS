@@ -1,5 +1,6 @@
 package com.hortonworks.faas.nfaas.xml.parser;
 
+import com.hortonworks.faas.nfaas.config.NifiType;
 import com.hortonworks.faas.nfaas.xml.util.LoggingXmlParserErrorHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.nifi.controller.serialization.FlowEncodingVersion;
@@ -47,8 +48,8 @@ public class FlowParser {
     private final String DEFAULT_SENSITIVE_PROPS_KEY = "nififtw!";
 
     final StringEncryptor DEFAULT_ENCRYPTOR = new StringEncryptor(EncryptionMethod.MD5_256AES.getAlgorithm(),
-                                                                  EncryptionMethod.MD5_256AES.getProvider(),
-                                                                  DEFAULT_SENSITIVE_PROPS_KEY);
+            EncryptionMethod.MD5_256AES.getProvider(),
+            DEFAULT_SENSITIVE_PROPS_KEY);
 
     private Schema flowSchema;
     private SchemaFactory schemaFactory;
@@ -124,7 +125,7 @@ public class FlowParser {
             ports.addAll(getPorts(rootGroupElement, "outputPort"));
 
             final List<ProcessGroupDTO> processGroups = new ArrayList<>();
-            processGroups.addAll(getProcessGroups(rootGroupId, rootGroupElement,DEFAULT_ENCRYPTOR,encodingVersion,"processGroup"));
+            processGroups.addAll(getProcessGroups(rootGroupId, rootGroupElement, DEFAULT_ENCRYPTOR, encodingVersion, NifiType.PROCESS_GROUP.type));
 
             FlowInfo fi = new FlowInfo();
             fi.setRootGroupId(rootGroupId);
@@ -181,6 +182,11 @@ public class FlowParser {
         return processors;
     }
 
+    private List<ProcessGroupDTO> getProcessGroups(String parentId,
+                                                   Element element, StringEncryptor encryptor,
+                                                   FlowEncodingVersion encodingVersion, final String type) {
+        return this.getProcessGroups(parentId,element,encryptor,encodingVersion,type,new ArrayList<>());
+    }
     /**
      * Gets the ports that are direct children of the given element.
      *
@@ -188,17 +194,20 @@ public class FlowParser {
      * @param type    the type of port to find (inputPort or outputPort)
      * @return a list of PortDTOs representing the found ports
      */
-    private List<ProcessGroupDTO> getProcessGroups(String parentId, Element element, StringEncryptor encryptor, FlowEncodingVersion encodingVersion, final String type) {
-        final List<ProcessGroupDTO> processorGroup = new ArrayList<>();
-
-        // add input ports
+    private List<ProcessGroupDTO> getProcessGroups(String parentId,
+                                                   Element element, StringEncryptor encryptor,
+                                                   FlowEncodingVersion encodingVersion, final String type, List<ProcessGroupDTO> processorGroup) {
+        // add process group
         final List<Element> processGroupNodeList = getChildrenByTagName(element, type);
         for (final Element processGroupElement : processGroupNodeList) {
             final ProcessGroupDTO processGroupDTO = FlowFromDOMFactory.
-                                                        getProcessGroup(parentId,
-                                                                        processGroupElement,
-                                                                        DEFAULT_ENCRYPTOR,encodingVersion);
+                    getProcessGroup(parentId,
+                            processGroupElement,
+                            DEFAULT_ENCRYPTOR, encodingVersion);
+            getProcessGroups(processGroupDTO.getId(), processGroupElement, DEFAULT_ENCRYPTOR, encodingVersion, NifiType.PROCESS_GROUP.type, processorGroup);
+
             processorGroup.add(processGroupDTO);
+
         }
 
         return processorGroup;
