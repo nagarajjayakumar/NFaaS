@@ -1,8 +1,10 @@
 package com.hortonworks.faas.nfaas.xml.parser;
 
 
+import org.apache.nifi.controller.serialization.FlowEncodingVersion;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
+import org.apache.nifi.web.api.dto.ProcessorDTO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,26 +16,19 @@ public class FlowInfo {
 
     private String rootGroupName;
 
-
     private List<PortDTO> ports;
 
     private List<ProcessGroupDTO> processGroups;
+
+    private List<ProcessorDTO> processors;
+
+    private FlowEncodingVersion flowEncodingVersion;
 
     /*public FlowInfo() {
         this.rootGroupId = rootGroupId;
         this.ports = (ports == null ? Collections.unmodifiableList(Collections.EMPTY_LIST) :
                 Collections.unmodifiableList(new ArrayList<>(ports)));
     }*/
-
-    public void setRootGroupId(String rootGroupId) {
-        this.rootGroupId = rootGroupId;
-    }
-
-
-    public void setPorts(List<PortDTO> ports) {
-        this.ports = (ports == null ? Collections.unmodifiableList(Collections.EMPTY_LIST) :
-                Collections.unmodifiableList(new ArrayList<>(ports)));
-    }
 
     public List<ProcessGroupDTO> getProcessGroups() {
         return processGroups;
@@ -48,8 +43,17 @@ public class FlowInfo {
         return rootGroupId;
     }
 
+    public void setRootGroupId(String rootGroupId) {
+        this.rootGroupId = rootGroupId;
+    }
+
     public List<PortDTO> getPorts() {
         return ports;
+    }
+
+    public void setPorts(List<PortDTO> ports) {
+        this.ports = (ports == null ? Collections.unmodifiableList(Collections.EMPTY_LIST) :
+                Collections.unmodifiableList(new ArrayList<>(ports)));
     }
 
     public String getRootGroupName() {
@@ -58,5 +62,21 @@ public class FlowInfo {
 
     public void setRootGroupName(String rootGroupName) {
         this.rootGroupName = rootGroupName;
+    }
+
+    public List<ProcessorDTO> getProcessors() {
+        return processors;
+    }
+
+    public void setProcessors(List<ProcessorDTO> processors) {
+        this.processors = processors;
+    }
+
+    public FlowEncodingVersion getFlowEncodingVersion() {
+        return flowEncodingVersion;
+    }
+
+    public void setFlowEncodingVersion(FlowEncodingVersion flowEncodingVersion) {
+        this.flowEncodingVersion = flowEncodingVersion;
     }
 }

@@ -127,21 +127,25 @@ public class FlowParser {
 
             final FlowEncodingVersion encodingVersion = FlowEncodingVersion.parse(rootGroupElement);
 
+            FlowInfo fi = new FlowInfo();
+            fi.setRootGroupId(rootGroupId);
+            fi.setRootGroupName(rootGroupName);
+            fi.setFlowEncodingVersion(encodingVersion);
+
             final List<PortDTO> ports = new ArrayList<>();
             ports.addAll(getPorts(rootGroupElement, "inputPort"));
             ports.addAll(getPorts(rootGroupElement, "outputPort"));
 
-            final List<ProcessGroupDTO> processGroups = new ArrayList<>();
-            processGroups.addAll(getProcessGroups(rootGroupId, rootGroupElement, encodingVersion));
+//            final List<ProcessGroupDTO> processGroups = new ArrayList<>();
+//            processGroups.addAll(getProcessGroups(rootGroupElement, fi).getProcessGroups());
+//
+//            final List<ProcessorDTO> processors = new ArrayList<>();
+//            processors.addAll(getProcessors(rootGroupElement));
 
-            final List<ProcessorDTO> processors = new ArrayList<>();
-            processors.addAll(getProcessors(rootGroupElement));
-
-            FlowInfo fi = new FlowInfo();
-            fi.setRootGroupId(rootGroupId);
-            fi.setRootGroupName(rootGroupName);
+            fi = getProcessGroups(rootGroupElement, fi);
             fi.setPorts(ports);
-            fi.setProcessGroups(processGroups);
+            //fi.setProcessGroups(processGroups);
+            //fi.setProcessors(processors);
 
             return fi;
 
@@ -201,10 +205,8 @@ public class FlowParser {
         return processors;
     }
 
-    private List<ProcessGroupDTO> getProcessGroups(String parentId,
-                                                   Element element,
-                                                   FlowEncodingVersion encodingVersion) {
-        return this.getProcessGroups(parentId, element, encodingVersion, new ArrayList<>());
+    private FlowInfo getProcessGroups(Element element, FlowInfo fi) {
+        return this.getProcessGroups(fi.getRootGroupId(), element, fi, new ArrayList<>());
     }
 
     /**
@@ -213,25 +215,27 @@ public class FlowParser {
      * @param element the element containing ports
      * @return a list of ProcessGroupDTOs representing the found process groups
      */
-    private List<ProcessGroupDTO> getProcessGroups(String parentId,
-                                                   Element element,
-                                                   FlowEncodingVersion encodingVersion,
-                                                   List<ProcessGroupDTO> processorGroup) {
+    private FlowInfo getProcessGroups(String parentId, Element element,
+                                      FlowInfo fi,
+                                      List<ProcessGroupDTO> processorGroup) {
+
         // add process group
+
         final List<Element> processGroupNodeList = getChildrenByTagName(element, NifiType.PROCESS_GROUP.type);
         for (final Element processGroupElement : processGroupNodeList) {
             final ProcessGroupDTO processGroupDTO = FlowFromDOMFactory.
                     getProcessGroup(parentId,
                             processGroupElement,
-                            DEFAULT_ENCRYPTOR, encodingVersion);
+                            DEFAULT_ENCRYPTOR, fi.getFlowEncodingVersion());
             processorGroup.add(processGroupDTO);
+            fi.setProcessGroups(processorGroup);
 
-            getProcessGroups(processGroupDTO.getId(), processGroupElement, encodingVersion, processorGroup);
+            getProcessGroups(processGroupDTO.getId(), processGroupElement, fi, processorGroup);
 
 
         }
 
-        return processorGroup;
+        return fi;
     }
 
     /**
