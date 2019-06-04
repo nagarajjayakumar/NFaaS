@@ -60,6 +60,39 @@ public class FlowParser {
     }
 
     /**
+     * Finds child elements with the given tagName.
+     *
+     * @param element the parent element
+     * @param tagName the child element name to find
+     * @return a list of matching child elements
+     */
+    private static List<Element> getChildrenByTagName(final Element element, final String tagName) {
+        final List<Element> matches = new ArrayList<>();
+        final NodeList nodeList = element.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            final Node node = nodeList.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }
+
+            final Element child = (Element) nodeList.item(i);
+            if (child.getNodeName().equals(tagName)) {
+                matches.add(child);
+            }
+        }
+
+        return matches;
+    }
+
+    public static void main(String[] args) throws Exception {
+        FlowParser fp = new FlowParser();
+        FlowInfo fi = fp.parse(new File("/Users/njayakumar/Downloads/flow.xml.gz"));
+        System.out.println(fi.getRootGroupId());
+        System.out.println(fi.getProcessGroups().get(0).getName());
+
+    }
+
+    /**
      * Extracts the root group id from the flow configuration file provided in nifi.properties, and extracts
      * the root group input ports and output ports, and their access controls.
      */
@@ -131,6 +164,8 @@ public class FlowParser {
             fi.setRootGroupId(rootGroupId);
             fi.setRootGroupName(rootGroupName);
             fi.setFlowEncodingVersion(encodingVersion);
+            fi.setProcessGroups(new ArrayList<>());
+            fi.setProcessors(new ArrayList<>());
 
             final List<PortDTO> ports = new ArrayList<>();
             ports.addAll(getPorts(rootGroupElement, "inputPort"));
@@ -177,13 +212,7 @@ public class FlowParser {
     }
 
     private List<ProcessorDTO> getProcessors(Element element) {
-
-        List<ProcessorDTO> processors = new ArrayList<>();
-        final List<Element> processGroupNodeList = getChildrenByTagName(element, NifiType.PROCESS_GROUP.type);
-        for (final Element processGroupElement : processGroupNodeList) {
-            getProcessors(processGroupElement, processors);
-        }
-        return processors;
+        return getProcessors(element, new ArrayList<>());
     }
 
     /**
@@ -206,7 +235,7 @@ public class FlowParser {
     }
 
     private FlowInfo getProcessGroups(Element element, FlowInfo fi) {
-        return this.getProcessGroups(fi.getRootGroupId(), element, fi, new ArrayList<>());
+        return this.getProcessGroups(fi.getRootGroupId(), element, fi, fi.getProcessGroups());
     }
 
     /**
@@ -223,6 +252,7 @@ public class FlowParser {
 
         final List<Element> processGroupNodeList = getChildrenByTagName(element, NifiType.PROCESS_GROUP.type);
         for (final Element processGroupElement : processGroupNodeList) {
+
             final ProcessGroupDTO processGroupDTO = FlowFromDOMFactory.
                     getProcessGroup(parentId,
                             processGroupElement,
@@ -230,45 +260,18 @@ public class FlowParser {
             processorGroup.add(processGroupDTO);
             fi.setProcessGroups(processorGroup);
 
+            if ("dae2291a-016a-1000-985b-23f9ea93a026".equalsIgnoreCase(processGroupDTO.getId())) {
+                System.out.println("break");
+            }
+
+            fi.getProcessors().addAll(getProcessors(processGroupElement));
+
             getProcessGroups(processGroupDTO.getId(), processGroupElement, fi, processorGroup);
 
 
         }
 
         return fi;
-    }
-
-    /**
-     * Finds child elements with the given tagName.
-     *
-     * @param element the parent element
-     * @param tagName the child element name to find
-     * @return a list of matching child elements
-     */
-    private static List<Element> getChildrenByTagName(final Element element, final String tagName) {
-        final List<Element> matches = new ArrayList<>();
-        final NodeList nodeList = element.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            final Node node = nodeList.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }
-
-            final Element child = (Element) nodeList.item(i);
-            if (child.getNodeName().equals(tagName)) {
-                matches.add(child);
-            }
-        }
-
-        return matches;
-    }
-
-    public static void main(String[] args) throws Exception {
-        FlowParser fp = new FlowParser();
-        FlowInfo fi = fp.parse(new File("/Users/njayakumar/Downloads/flow.xml.gz"));
-        System.out.println(fi.getRootGroupId());
-        System.out.println(fi.getProcessGroups().get(0).getName());
-
     }
 
 }

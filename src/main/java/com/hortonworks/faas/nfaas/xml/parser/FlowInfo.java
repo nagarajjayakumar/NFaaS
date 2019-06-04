@@ -35,8 +35,9 @@ public class FlowInfo {
     }
 
     public void setProcessGroups(List<ProcessGroupDTO> processGroups) {
-        this.processGroups = (processGroups == null ? Collections.unmodifiableList(Collections.EMPTY_LIST) :
-                Collections.unmodifiableList(new ArrayList<>(processGroups)));
+//        this.processGroups = (processGroups == null ? Collections.unmodifiableList(Collections.EMPTY_LIST) :
+//                Collections.unmodifiableList(new ArrayList<>(processGroups)));
+        this.processGroups = processGroups;
     }
 
     public String getRootGroupId() {
@@ -52,8 +53,9 @@ public class FlowInfo {
     }
 
     public void setPorts(List<PortDTO> ports) {
-        this.ports = (ports == null ? Collections.unmodifiableList(Collections.EMPTY_LIST) :
-                Collections.unmodifiableList(new ArrayList<>(ports)));
+//        this.ports = (ports == null ? Collections.unmodifiableList(Collections.EMPTY_LIST) :
+//                Collections.unmodifiableList(new ArrayList<>(ports)));
+        this.ports = ports;
     }
 
     public String getRootGroupName() {
