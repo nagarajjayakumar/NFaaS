@@ -111,12 +111,19 @@ public class FlowParser {
             }
 
             final Element rootGroupIdElement = (Element) rootGroupElement.getElementsByTagName("id").item(0);
+            final Element rootGroupNameElement = (Element) rootGroupElement.getElementsByTagName("name").item(0);
             if (rootGroupIdElement == null) {
                 logger.warn("id element not found under rootGroup in Flow Configuration file");
                 return null;
             }
 
+            if (rootGroupNameElement == null) {
+                logger.warn("name element not found under rootGroup in Flow Configuration file");
+                return null;
+            }
+
             final String rootGroupId = rootGroupIdElement.getTextContent();
+            final String rootGroupName = rootGroupNameElement.getTextContent();
 
             final FlowEncodingVersion encodingVersion = FlowEncodingVersion.parse(rootGroupElement);
 
@@ -125,10 +132,14 @@ public class FlowParser {
             ports.addAll(getPorts(rootGroupElement, "outputPort"));
 
             final List<ProcessGroupDTO> processGroups = new ArrayList<>();
-            processGroups.addAll(getProcessGroups(rootGroupId, rootGroupElement, DEFAULT_ENCRYPTOR, encodingVersion, NifiType.PROCESS_GROUP.type));
+            processGroups.addAll(getProcessGroups(rootGroupId, rootGroupElement, encodingVersion));
+
+            final List<ProcessorDTO> processors = new ArrayList<>();
+            processors.addAll(getProcessors(rootGroupElement));
 
             FlowInfo fi = new FlowInfo();
             fi.setRootGroupId(rootGroupId);
+            fi.setRootGroupName(rootGroupName);
             fi.setPorts(ports);
             fi.setProcessGroups(processGroups);
 
@@ -161,21 +172,29 @@ public class FlowParser {
         return ports;
     }
 
+    private List<ProcessorDTO> getProcessors(Element element) {
+
+        List<ProcessorDTO> processors = new ArrayList<>();
+        final List<Element> processGroupNodeList = getChildrenByTagName(element, NifiType.PROCESS_GROUP.type);
+        for (final Element processGroupElement : processGroupNodeList) {
+            getProcessors(processGroupElement, processors);
+        }
+        return processors;
+    }
+
     /**
-     * Gets the ports that are direct children of the given element.
+     * Gets the processor that are direct children of the given element.
      *
      * @param element the element containing ports
-     * @param type    the type of port to find (inputPort or outputPort)
      * @return a list of PortDTOs representing the found ports
      */
-    private List<ProcessorDTO> getProcessors(final Element element, final String type) {
-        final List<ProcessorDTO> processors = new ArrayList<>();
+    private List<ProcessorDTO> getProcessors(final Element element, List<ProcessorDTO> processors) {
 
-        // add input ports
-        final List<Element> portNodeList = getChildrenByTagName(element, type);
-        for (final Element portElement : portNodeList) {
-            final ProcessorDTO processorDTO = FlowFromDOMFactory.getProcessor(portElement, DEFAULT_ENCRYPTOR);
-            processorDTO.setType(type);
+        // add input processor
+        final List<Element> processorNodeList = getChildrenByTagName(element, NifiType.PROCESSOR.type);
+        for (final Element processorElement : processorNodeList) {
+            final ProcessorDTO processorDTO = FlowFromDOMFactory.getProcessor(processorElement, DEFAULT_ENCRYPTOR);
+            processorDTO.setType(NifiType.PROCESSOR.type);
             processors.add(processorDTO);
         }
 
@@ -183,30 +202,32 @@ public class FlowParser {
     }
 
     private List<ProcessGroupDTO> getProcessGroups(String parentId,
-                                                   Element element, StringEncryptor encryptor,
-                                                   FlowEncodingVersion encodingVersion, final String type) {
-        return this.getProcessGroups(parentId,element,encryptor,encodingVersion,type,new ArrayList<>());
+                                                   Element element,
+                                                   FlowEncodingVersion encodingVersion) {
+        return this.getProcessGroups(parentId, element, encodingVersion, new ArrayList<>());
     }
+
     /**
-     * Gets the ports that are direct children of the given element.
+     * Gets the process group that are direct children of the given element.
      *
      * @param element the element containing ports
-     * @param type    the type of port to find (inputPort or outputPort)
-     * @return a list of PortDTOs representing the found ports
+     * @return a list of ProcessGroupDTOs representing the found process groups
      */
     private List<ProcessGroupDTO> getProcessGroups(String parentId,
-                                                   Element element, StringEncryptor encryptor,
-                                                   FlowEncodingVersion encodingVersion, final String type, List<ProcessGroupDTO> processorGroup) {
+                                                   Element element,
+                                                   FlowEncodingVersion encodingVersion,
+                                                   List<ProcessGroupDTO> processorGroup) {
         // add process group
-        final List<Element> processGroupNodeList = getChildrenByTagName(element, type);
+        final List<Element> processGroupNodeList = getChildrenByTagName(element, NifiType.PROCESS_GROUP.type);
         for (final Element processGroupElement : processGroupNodeList) {
             final ProcessGroupDTO processGroupDTO = FlowFromDOMFactory.
                     getProcessGroup(parentId,
                             processGroupElement,
                             DEFAULT_ENCRYPTOR, encodingVersion);
-            getProcessGroups(processGroupDTO.getId(), processGroupElement, DEFAULT_ENCRYPTOR, encodingVersion, NifiType.PROCESS_GROUP.type, processorGroup);
-
             processorGroup.add(processGroupDTO);
+
+            getProcessGroups(processGroupDTO.getId(), processGroupElement, encodingVersion, processorGroup);
+
 
         }
 

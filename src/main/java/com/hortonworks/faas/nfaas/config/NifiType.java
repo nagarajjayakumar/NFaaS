@@ -2,11 +2,12 @@ package com.hortonworks.faas.nfaas.config;
 
 public enum NifiType {
 
-    PROCESS_GROUP("processGroup");
+    PROCESS_GROUP("processGroup"),
+    PROCESSOR("processor");
 
     public String type;
 
-    private NifiType(String type) {
+    NifiType(String type) {
         this.type = type;
     }
 

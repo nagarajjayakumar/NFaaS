@@ -3,7 +3,6 @@ package com.hortonworks.faas.nfaas.xml.parser;
 
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
-import org.apache.nifi.web.api.dto.ProcessorDTO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,11 +10,14 @@ import java.util.List;
 
 public class FlowInfo {
 
-    private  String rootGroupId;
+    private String rootGroupId;
 
-    private  List<PortDTO> ports;
+    private String rootGroupName;
 
-    private  List<ProcessGroupDTO> processGroups;
+
+    private List<PortDTO> ports;
+
+    private List<ProcessGroupDTO> processGroups;
 
     /*public FlowInfo() {
         this.rootGroupId = rootGroupId;
@@ -26,7 +28,6 @@ public class FlowInfo {
     public void setRootGroupId(String rootGroupId) {
         this.rootGroupId = rootGroupId;
     }
-
 
 
     public void setPorts(List<PortDTO> ports) {
@@ -51,4 +52,11 @@ public class FlowInfo {
         return ports;
     }
 
+    public String getRootGroupName() {
+        return rootGroupName;
+    }
+
+    public void setRootGroupName(String rootGroupName) {
+        this.rootGroupName = rootGroupName;
+    }
 }
