@@ -7,6 +7,7 @@ import org.apache.nifi.controller.serialization.FlowEncodingVersion;
 import org.apache.nifi.controller.serialization.FlowFromDOMFactory;
 import org.apache.nifi.encrypt.StringEncryptor;
 import org.apache.nifi.security.util.EncryptionMethod;
+import org.apache.nifi.web.api.dto.ConnectionDTO;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
@@ -46,6 +47,8 @@ public class FlowParser {
     private static final String FLOW_XSD = "/FlowConfiguration" + FLOW_XSD_VERSION + ".xsd";
 
     private final String DEFAULT_SENSITIVE_PROPS_KEY = "nififtw!";
+
+    //private final String DEFAULT_SENSITIVE_PROPS_KEY = "";
 
     final StringEncryptor DEFAULT_ENCRYPTOR = new StringEncryptor(EncryptionMethod.MD5_256AES.getAlgorithm(),
             EncryptionMethod.MD5_256AES.getProvider(),
@@ -166,6 +169,7 @@ public class FlowParser {
             fi.setFlowEncodingVersion(encodingVersion);
             fi.setProcessGroups(new ArrayList<>());
             fi.setProcessors(new ArrayList<>());
+            fi.setConnections(new ArrayList<>());
 
             final List<PortDTO> ports = new ArrayList<>();
             ports.addAll(getPorts(rootGroupElement, "inputPort"));
@@ -178,6 +182,8 @@ public class FlowParser {
 //            processors.addAll(getProcessors(rootGroupElement));
 
             fi = getProcessGroups(rootGroupElement, fi);
+            fi.getConnections().addAll(getConnections(rootGroupElement,rootGroupId));
+
             fi.setPorts(ports);
             //fi.setProcessGroups(processGroups);
             //fi.setProcessors(processors);
@@ -235,6 +241,34 @@ public class FlowParser {
         return processors;
     }
 
+
+    private List<ConnectionDTO> getConnections(final Element element, final String pgId) {
+        return getConnections(element, pgId, new ArrayList<>());
+    }
+    /**
+     * Gets the Connections that are direct children of the given element.
+     *
+     * @param element the element containing ports
+     * @return a list of connectionDTOS representing the found ports
+     */
+    private List<ConnectionDTO> getConnections(final Element element, final String pgId, List<ConnectionDTO> connections) {
+
+        // add input processor
+        final List<Element> connectionNodeList = getChildrenByTagName(element, NifiType.CONNECTION.type);
+        for (final Element connectionElement : connectionNodeList) {
+            final ConnectionDTO connectionDTO = FlowFromDOMFactory.getConnection(connectionElement);
+            connectionDTO.setParentGroupId(pgId);
+
+            if("2858cf99-016b-1000-e414-4383ff5bda18".equalsIgnoreCase(connectionDTO.getId()))
+                System.out.println("break");
+            // only add the connections where the source and destination group id is different for efficiency
+            if(! connectionDTO.getSource().getGroupId().equalsIgnoreCase(connectionDTO.getDestination().getGroupId()))
+                 connections.add(connectionDTO);
+        }
+
+        return connections;
+    }
+
     private FlowInfo getProcessGroups(Element element, FlowInfo fi) {
         return this.getProcessGroups(fi.getRootGroupId(), element, fi, fi.getProcessGroups());
     }
@@ -266,6 +300,8 @@ public class FlowParser {
             }
 
             fi.getProcessors().addAll(getProcessors(processGroupElement, processGroupDTO.getId()));
+
+            fi.getConnections().addAll(getConnections(processGroupElement,processGroupDTO.getId()));
 
             getProcessGroups(processGroupDTO.getId(), processGroupElement, fi, processorGroup);
 

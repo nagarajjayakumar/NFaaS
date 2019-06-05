@@ -2,6 +2,7 @@ package com.hortonworks.faas.nfaas.xml.parser;
 
 
 import org.apache.nifi.controller.serialization.FlowEncodingVersion;
+import org.apache.nifi.web.api.dto.ConnectionDTO;
 import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
@@ -21,6 +22,8 @@ public class FlowInfo {
     private List<ProcessGroupDTO> processGroups;
 
     private List<ProcessorDTO> processors;
+
+    private List<ConnectionDTO> connections;
 
     private FlowEncodingVersion flowEncodingVersion;
 
@@ -80,5 +83,13 @@ public class FlowInfo {
 
     public void setFlowEncodingVersion(FlowEncodingVersion flowEncodingVersion) {
         this.flowEncodingVersion = flowEncodingVersion;
+    }
+
+    public List<ConnectionDTO> getConnections() {
+        return connections;
+    }
+
+    public void setConnections(List<ConnectionDTO> connections) {
+        this.connections = connections;
     }
 }

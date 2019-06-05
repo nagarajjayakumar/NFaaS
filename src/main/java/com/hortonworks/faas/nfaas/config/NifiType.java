@@ -3,7 +3,9 @@ package com.hortonworks.faas.nfaas.config;
 public enum NifiType {
 
     PROCESS_GROUP("processGroup"),
-    PROCESSOR("processor");
+    PROCESSOR("processor"),
+    CONNECTION("connection");
+
 
     public String type;
 

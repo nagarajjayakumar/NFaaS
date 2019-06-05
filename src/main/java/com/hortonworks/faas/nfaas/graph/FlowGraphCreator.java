@@ -4,6 +4,8 @@ package com.hortonworks.faas.nfaas.graph;
 import com.hortonworks.faas.nfaas.config.NifiType;
 import com.hortonworks.faas.nfaas.xml.parser.FlowInfo;
 import com.hortonworks.faas.nfaas.xml.parser.FlowParser;
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.nifi.web.api.dto.ConnectionDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.apache.tinkerpop.gremlin.process.traversal.Path;
@@ -26,9 +28,15 @@ public class FlowGraphCreator {
         //System.out.println("Gremlin version is: " + Gremlin.version());
 
         FlowParser fp = new FlowParser();
+        //FlowInfo fi = fp.parse(new File("/Users/njayakumar/Desktop/new-realflow.xml.gz"));
         FlowInfo fi = fp.parse(new File("/Users/njayakumar/Downloads/flow.xml.gz"));
+
+        BaseConfiguration conf = new BaseConfiguration();
+        conf.setProperty("gremlin.tinkergraph.vertexIdManager","LONG");
+        conf.setProperty("gremlin.tinkergraph.edgeIdManager","LONG");
+        conf.setProperty("gremlin.tinkergraph.vertexPropertyIdManager","LONG");
         // Create a new (empty) TinkerGrap
-        TinkerGraph tg = TinkerGraph.open();
+        TinkerGraph tg = TinkerGraph.open(conf);
 
         // Create a Traversal source object
         GraphTraversalSource g = tg.traversal();
@@ -61,10 +69,16 @@ public class FlowGraphCreator {
 
 
             for(String propKey : processorProperties.keySet()){
-                gts.property(propKey,processorProperties.get(propKey));
+              // gts.property(propKey,processorProperties.get(propKey));
             }
 
             gts.as(processor.getId()).addE("parent").to(processor.getId()).from(processor.getParentGroupId());
+        }
+
+        List<ConnectionDTO> connections = fi.getConnections();
+
+        for(ConnectionDTO connection : connections){
+            gts.addE("dependent").to(connection.getDestination().getGroupId()).from(connection.getSource().getGroupId());
         }
 
         gts.iterate();
