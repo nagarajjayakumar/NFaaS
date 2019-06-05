@@ -5,6 +5,7 @@ import com.hortonworks.faas.nfaas.config.NifiType;
 import com.hortonworks.faas.nfaas.xml.parser.FlowInfo;
 import com.hortonworks.faas.nfaas.xml.parser.FlowParser;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
+import org.apache.nifi.web.api.dto.ProcessorDTO;
 import org.apache.tinkerpop.gremlin.process.traversal.Path;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -50,6 +51,22 @@ public class FlowGraphCreator {
                     .as(processGroup.getId()).addE("parent").to(processGroup.getId()).from(processGroup.getParentGroupId());
         }
 
+        List<ProcessorDTO> processors = fi.getProcessors();
+
+        for(ProcessorDTO processor : processors){
+            Map<String, String> processorProperties = processor.getConfig().getProperties();
+            gts.addV(NifiType.PROCESSOR.type)
+                    .property("procName", processor.getName())
+                    .property("procId", processor.getId());
+
+
+            for(String propKey : processorProperties.keySet()){
+                gts.property(propKey,processorProperties.get(propKey));
+            }
+
+            gts.as(processor.getId()).addE("parent").to(processor.getId()).from(processor.getParentGroupId());
+        }
+
         gts.iterate();
 
 //        g.addV("dadb47f2-016a-1000-19a1-7aaa9f611417").property("isRoot", true).as("dadb47f2-016a-1000-19a1-7aaa9f611417").iterate();
@@ -85,7 +102,8 @@ public class FlowGraphCreator {
 
         // Dislpay the code property as well as the label and id.
         for (Map m : vm) {
-            System.out.println(((List) (m.get("pgName"))).get(0) + " " + m.get(T.id) + " " + m.get(T.label));
+            if(null != m.get("pgName"))
+                System.out.println(((List) (m.get("pgName"))).get(0) + " " + m.get(T.id) + " " + m.get(T.label));
         }
         System.out.println();
 
@@ -94,7 +112,7 @@ public class FlowGraphCreator {
 
         List<Path> paths = new ArrayList<Path>();
 
-        paths = g.V().outE().inV().path().by("pgId").by().toList();
+        //paths = g.V().outE().inV().path().by("pgId").by().toList();
 
         for (Path p : paths) {
             System.out.println(p.toString());

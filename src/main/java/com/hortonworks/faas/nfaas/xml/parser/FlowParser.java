@@ -211,8 +211,8 @@ public class FlowParser {
         return ports;
     }
 
-    private List<ProcessorDTO> getProcessors(Element element) {
-        return getProcessors(element, new ArrayList<>());
+    private List<ProcessorDTO> getProcessors(Element element, String pgId) {
+        return getProcessors(element, pgId, new ArrayList<>());
     }
 
     /**
@@ -221,13 +221,14 @@ public class FlowParser {
      * @param element the element containing ports
      * @return a list of PortDTOs representing the found ports
      */
-    private List<ProcessorDTO> getProcessors(final Element element, List<ProcessorDTO> processors) {
+    private List<ProcessorDTO> getProcessors(final Element element, final String pgId, List<ProcessorDTO> processors) {
 
         // add input processor
         final List<Element> processorNodeList = getChildrenByTagName(element, NifiType.PROCESSOR.type);
         for (final Element processorElement : processorNodeList) {
             final ProcessorDTO processorDTO = FlowFromDOMFactory.getProcessor(processorElement, DEFAULT_ENCRYPTOR);
             processorDTO.setType(NifiType.PROCESSOR.type);
+            processorDTO.setParentGroupId(pgId);
             processors.add(processorDTO);
         }
 
@@ -264,7 +265,7 @@ public class FlowParser {
                 System.out.println("break");
             }
 
-            fi.getProcessors().addAll(getProcessors(processGroupElement));
+            fi.getProcessors().addAll(getProcessors(processGroupElement, processGroupDTO.getId()));
 
             getProcessGroups(processGroupDTO.getId(), processGroupElement, fi, processorGroup);
 
