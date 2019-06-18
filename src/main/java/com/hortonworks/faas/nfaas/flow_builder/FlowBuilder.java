@@ -14,7 +14,4 @@ public class FlowBuilder {
         hiveDdlGenerator.doWork(fbo);
     }
 
-    public void getProcessGroup(String pgName){
-
-    }
 }

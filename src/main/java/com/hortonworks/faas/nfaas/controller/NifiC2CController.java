@@ -1,12 +1,22 @@
 package com.hortonworks.faas.nfaas.controller;
 
+import com.beust.jcommander.JCommander;
+import com.hortonworks.faas.nfaas.graph.FlowGraphBuilderOptions;
+import com.hortonworks.faas.nfaas.graph.FlowGraphLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class NifiC2CController extends BasicFlowController {
@@ -38,6 +48,7 @@ public class NifiC2CController extends BasicFlowController {
     private final String hive_extenal_table_location= "hdfs://AWHDP-QAHA/tmp/aw_hive_stg/";
     private final String  period= ".";
     private final String  fwd_slash = "/";
+    private String nifiGraphMlPath = "/etc/hdfm/flow.xml.gz";
 
     @Autowired
     NifiC2CController(Environment env) {
@@ -55,6 +66,8 @@ public class NifiC2CController extends BasicFlowController {
 
         this.enableRPG = Boolean.parseBoolean(env.getProperty("bootrest.enableRPG"));
         this.nifiSecuredCluster = Boolean.parseBoolean(env.getProperty("nifi.securedCluster"));
+        this.nifiGraphMlPath = env.getProperty("nifi.graphml.path");
+
     }
 
     @Autowired
@@ -62,5 +75,38 @@ public class NifiC2CController extends BasicFlowController {
 
     @Autowired
     private ResourceLoader resourceLoader;
+
+    @Autowired
+    FlowGraphLoader flowGraphLoader;
+
+    /**
+     * create hive table .. call the processor group and create the hive tables
+     */
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/faas/loadnifigraph", produces = "application/json")
+    public @ResponseBody
+    String loadNifiGraph() {
+
+        String loadNifiGraph = "{\"task\":\"load nifi graph done !\"}";
+
+        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
+
+        List<String> args = new ArrayList<>();
+        args.add("-nifiGraphMlPath");
+        args.add(this.nifiGraphMlPath);
+
+        JCommander.newBuilder()
+                .addObject(gbo)
+                .build()
+                .parse(args.toArray(new String[0]));
+
+        flowGraphLoader.loadGraph(gbo);
+
+
+
+        return loadNifiGraph;
+    }
 
 }

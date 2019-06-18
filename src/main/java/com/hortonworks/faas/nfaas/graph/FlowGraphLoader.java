@@ -1,5 +1,6 @@
 package com.hortonworks.faas.nfaas.graph;
 
+import com.beust.jcommander.JCommander;
 import com.hortonworks.faas.nfaas.config.NifiType;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
@@ -8,10 +9,13 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+@Configuration
 public class FlowGraphLoader
 {
     private TinkerGraph tg;
@@ -20,7 +24,7 @@ public class FlowGraphLoader
     // -------------------------------------------------------------
     // Try to create a new graph and load the specified GraphML file
     // -------------------------------------------------------------
-    public boolean loadGraph(String name)
+    public boolean loadGraph(FlowGraphBuilderOptions gbo )
     {
         // Make sure index ID values are set as LONG values.
         // If this is not done, when we try to sort results by vertex
@@ -35,13 +39,13 @@ public class FlowGraphLoader
         tg = TinkerGraph.open(conf) ;
 
         // Load the graph and time how long it takes.
-        System.out.println("Loading " + name);
+        System.out.println("Loading " + gbo.nifiGraphMlPath);
         long t1 = System.currentTimeMillis();
         System.out.println(t1);
 
         try
         {
-            tg.io(GraphMLIo.build()).readGraph(name);
+            tg.io(GraphMLIo.build()).readGraph(gbo.nifiGraphMlPath);
         }
         catch( IOException e )
         {
@@ -118,7 +122,19 @@ public class FlowGraphLoader
 
         FlowGraphLoader fgl = new FlowGraphLoader();
 
-        if ( fgl.loadGraph("nifi-graph.graphml"))
+
+        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
+
+        List<String> args1 = new ArrayList<>();
+        args1.add("-nifiGraphMlPath");
+        args1.add("nifi-graph.graphml");
+
+        JCommander.newBuilder()
+                .addObject(gbo)
+                .build()
+                .parse(args1.toArray(new String[0]));
+
+        if ( fgl.loadGraph(gbo))
         {
             fgl.listProcessGroup(required);
         }
