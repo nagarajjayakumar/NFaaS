@@ -43,6 +43,8 @@
 			<!-- Maven plugins -->
 			<cargo-maven2-plugin.version>1.4.19</cargo-maven2-plugin.version>
             <tinkerpop.version>3.4.1</tinkerpop.version>
+
+             <jackson.version>2.9.8</jackson.version>
 			
         </properties> 
         
@@ -220,10 +222,25 @@
         
         <!-- marshalling -->
 
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+
+
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -322,6 +339,18 @@
             <version>1.8.0</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.apache.nifi.registry</groupId>
+            <artifactId>nifi-registry-framework</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.nifi.registry</groupId>
+            <artifactId>nifi-registry-flow-diff</artifactId>
+            <version>0.4.0</version>
+        </dependency>
 
         
         <!-- https://mvnrepository.com/artifact/com.wordnik/swagger-core -->

@@ -13,7 +13,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.io.IoCore;
+import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import java.io.File;
@@ -52,6 +53,7 @@ public class FlowGraphCreator {
                 .as(fi.getRootGroupId());
 
         for(ProcessGroupDTO processGroup : processGroups){
+            //if(gts.V().has(NifiType.PROCESS_GROUP.type,"pgId",processGroup.getId()).has
             gts.addV(NifiType.PROCESS_GROUP.type)
                     .property("isRoot", false)
                     .property("pgName", processGroup.getName())
@@ -152,10 +154,10 @@ public class FlowGraphCreator {
         // Save the graph we just created as GraphML (XML) or GraphSON (JSON)
         try {
             // If you want to save the graph as GraphML uncomment the next line
-            tg.io(IoCore.graphml()).writeGraph("mygraph.graphml");
+            tg.io(GraphMLIo.build()).writeGraph("nifi-graph.graphml");
 
             // If you want to save the graph as JSON uncomment the next line
-            //tg.io(IoCore.graphson()).writeGraph("mygraph.json");
+            tg.io(GraphSONIo.build()).writeGraph("nifi-graph.json");
         } catch (IOException ioe) {
             System.out.println("Graph failed to save");
         }
