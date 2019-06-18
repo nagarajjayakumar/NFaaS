@@ -85,7 +85,7 @@ public class NifiC2CController extends BasicFlowController {
 
     @CrossOrigin
     @PreAuthorize("#oauth2.hasScope('read')")
-    @RequestMapping(value = "/faas/loadnifigraph", produces = "application/json")
+    @RequestMapping(value = "/faas/graph/loadnifigraph", produces = "application/json")
     public @ResponseBody
     String loadNifiGraph() {
 
@@ -107,6 +107,31 @@ public class NifiC2CController extends BasicFlowController {
 
 
         return loadNifiGraph;
+    }
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/faas/graph/listprocessgroup", produces = "application/json")
+    public @ResponseBody
+    String listProcessGroup(int max) {
+        String listProcessGroup = "{\"task\":\"list nifi graph done !\"}";
+
+        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
+
+        List<String> args = new ArrayList<>();
+        args.add("-nifiGraphMlPath");
+        args.add(this.nifiGraphMlPath);
+
+        JCommander.newBuilder()
+                .addObject(gbo)
+                .build()
+                .parse(args.toArray(new String[0]));
+
+        flowGraphLoader.listProcessGroup(max);
+
+
+
+        return listProcessGroup;
     }
 
 }
