@@ -53,7 +53,7 @@ public class FlowGraphCreator {
                 .as(fi.getRootGroupId());
 
         for(ProcessGroupDTO processGroup : processGroups){
-            //if(gts.V().has(NifiType.PROCESS_GROUP.type,"pgId",processGroup.getId()).has
+
             gts.addV(NifiType.PROCESS_GROUP.type)
                     .property("isRoot", false)
                     .property("pgName", processGroup.getName())

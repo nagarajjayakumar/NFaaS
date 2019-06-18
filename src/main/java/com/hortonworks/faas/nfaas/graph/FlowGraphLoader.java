@@ -78,6 +78,7 @@ public class FlowGraphLoader
         String pgName; // 4 process group name
         String pgId; // process group id
 
+
         for (Vertex v : vlist)
         {
             id   = (Long)v.id();
@@ -85,7 +86,9 @@ public class FlowGraphLoader
             pgName = (String)v.values("pgName").next();
             pgId = (String)v.values("pgId").next();
 
-            System.out.format("%5d %10s %100s  %25s  \n",
+
+
+            System.out.format("%5d %10s %30s %15s  \n",
                     id,isRoot,pgName,pgId);
         }
     }
