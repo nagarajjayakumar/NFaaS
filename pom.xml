@@ -226,7 +226,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+<!--            <version>${jackson.version}</version>-->
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -340,17 +340,17 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>org.apache.nifi.registry</groupId>
-            <artifactId>nifi-registry-framework</artifactId>
-            <version>0.4.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.nifi.registry</groupId>-->
+<!--            <artifactId>nifi-registry-framework</artifactId>-->
+<!--            <version>0.4.0</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.apache.nifi.registry</groupId>
-            <artifactId>nifi-registry-flow-diff</artifactId>
-            <version>0.4.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.nifi.registry</groupId>-->
+<!--            <artifactId>nifi-registry-flow-diff</artifactId>-->
+<!--            <version>0.4.0</version>-->
+<!--        </dependency>-->
 
         
         <!-- https://mvnrepository.com/artifact/com.wordnik/swagger-core -->

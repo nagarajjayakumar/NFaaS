@@ -37,6 +37,7 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-guava:2.9.8" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-afterburner:2.9.8" level="project" />
     <orderEntry type="library" name="Maven: io.dropwizard:dropwizard-validation:0.9.3" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish:javax.el:3.0.0" level="project" />
     <orderEntry type="library" name="Maven: io.dropwizard:dropwizard-configuration:0.9.3" level="project" />
     <orderEntry type="library" name="Maven: io.dropwizard:dropwizard-logging:0.9.3" level="project" />
     <orderEntry type="library" name="Maven: io.dropwizard.metrics:metrics-logback:3.1.2" level="project" />
@@ -168,6 +169,7 @@
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:4.2.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-commons:1.1.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-rsa:1.0.3.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.55" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-starter-hystrix:1.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-netflix-core:1.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.netflix.hystrix:hystrix-core:1.5.6" level="project" />
@@ -281,27 +283,13 @@
     <orderEntry type="library" name="Maven: org.apache.curator:curator-framework:2.11.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.curator:curator-client:2.11.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.curator:curator-recipes:2.11.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-flow-diff:0.3.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-client:0.3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-security-utils:0.3.0" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.media:jersey-media-json-jackson:2.25.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.ext:jersey-entity-filtering:2.25.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.inject:jersey-hk2:2.26" level="project" />
     <orderEntry type="library" name="Maven: org.apache.nifi:nifi-authorizer:1.8.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-framework:0.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-properties:0.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-security-utils:0.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.55" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-bundle-utils:0.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-ldap:4.2.2.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.ldap:spring-ldap-core:2.3.1.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish:javax.el:3.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-validation:1.5.3.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:3.2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jgit:org.eclipse.jgit:4.11.0.201803080745-r" level="project" />
-    <orderEntry type="library" name="Maven: com.jcraft:jzlib:1.1.1" level="project" />
-    <orderEntry type="library" name="Maven: com.googlecode.javaewah:JavaEWAH:1.1.6" level="project" />
-    <orderEntry type="library" name="Maven: com.jcraft:jsch:0.1.54" level="project" />
-    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.17" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.nifi.registry:nifi-registry-flow-diff:0.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.wordnik:swagger-core:1.5.3-M1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-joda:2.9.8" level="project" />
@@ -322,6 +310,7 @@
     <orderEntry type="library" name="Maven: commons-configuration:commons-configuration:1.10" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.17" level="project" />
     <orderEntry type="library" name="Maven: org.javatuples:javatuples:1.2" level="project" />
     <orderEntry type="library" name="Maven: com.carrotsearch:hppc:0.7.1" level="project" />
     <orderEntry type="library" name="Maven: com.jcabi:jcabi-manifests:1.1" level="project" />
