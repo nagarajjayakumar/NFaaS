@@ -111,10 +111,10 @@ public class NifiC2CController extends BasicFlowController {
 
     @CrossOrigin
     @PreAuthorize("#oauth2.hasScope('read')")
-    @RequestMapping(value = "/faas/graph/listprocessgroup", produces = "application/json")
+    @RequestMapping(value = "/faas/graph/listprocessgroups", produces = "application/json")
     public @ResponseBody
-    String listProcessGroup(int max) {
-        String listProcessGroup = "{\"task\":\"list nifi graph done !\"}";
+    String listProcessGroups(int max) {
+        String listProcessGroup = "{\"task\":\"list nifi processor group from graph done !\"}";
 
         FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
 
@@ -127,11 +127,32 @@ public class NifiC2CController extends BasicFlowController {
                 .build()
                 .parse(args.toArray(new String[0]));
 
-        flowGraphLoader.listProcessGroup(max);
-
-
+        flowGraphLoader.listProcessGroups(max);
 
         return listProcessGroup;
+    }
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/faas/graph/listprocessors", produces = "application/json")
+    public @ResponseBody
+    String listprocessors(int max) {
+        String listprocessors = "{\"task\":\"list nifi processor from done !\"}";
+
+        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
+
+        List<String> args = new ArrayList<>();
+        args.add("-nifiGraphMlPath");
+        args.add(this.nifiGraphMlPath);
+
+        JCommander.newBuilder()
+                .addObject(gbo)
+                .build()
+                .parse(args.toArray(new String[0]));
+
+        flowGraphLoader.listProcessors(max);
+
+        return listprocessors;
     }
 
 }
