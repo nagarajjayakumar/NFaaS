@@ -153,10 +153,10 @@ public class NifiC2CController extends BasicFlowController {
     @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(value = "/faas/graph/getprocbyid", produces = "application/json")
     public @ResponseBody
-    String getProcessorById(String procId) {
+    String getProcessorById(String procId, int maxDepth) {
 
         String jsonString = "{\"task\":\"get nifi processor by ID from graph done !\"}";;
-        FlowProcessor processor = flowGraphService.getProcessorById(procId);
+        FlowProcessor processor = flowGraphService.getProcessorById(procId, maxDepth);
         ObjectMapper mapper = new ObjectMapper();
         try {
             jsonString = mapper.writeValueAsString(processor);

@@ -201,14 +201,41 @@ public class FlowGraphService {
         return procGrp;
     }
 
+    public List<FlowProcessGroup> getFlowProcessGroupTreeById( int depthMax, int currentDepth, Boolean isRoot,
+                                                               String pgId, List<FlowProcessGroup> fpgs) {
+
+        if(g == null)
+            throw new RuntimeException("FATAL :: Load the graph first !!!");
+
+        fpgs.add(getFlowProcessGroupById(pgId));
+
+        if (isRoot) return fpgs;
+        if (currentDepth > depthMax) return fpgs;
+
+        List<Edge> parentVlist =
+                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId",pgId).bothE("parent").
+                        order().by(__.id(), Order.incr).
+                        limit(depthMax).
+                        toList();
+
+        // take first proc can be part of one processor group
+        // your assumption is 100 percentage
+
+        Edge parentProcessGroup = parentVlist.get(0);
+
+        String currentPgId = parentProcessGroup.outVertex().value("pgId");
+        Boolean currentPgIsRoot = parentProcessGroup.outVertex().value("isRoot");
+        return getFlowProcessGroupTreeById(depthMax, currentDepth+1, currentPgIsRoot, currentPgId, fpgs);
+
+    }
 
     /***
      * this is the method to get the processor by ID
      * @param procId
      * @return
      */
-    public FlowProcessor getProcessorById(String procId) {
-        int max=5 ;
+    public FlowProcessor getProcessorById(String procId, int maxDepth) {
+        //int max=5 ;
         if(g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
@@ -217,13 +244,19 @@ public class FlowGraphService {
         List<Vertex> vlist =
                 g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).
                         order().by(__.id(), Order.incr).
-                        limit(max).
+                        limit(maxDepth).
                         toList();
 
         List<Edge> parentVlist =
                 g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).bothE("parent").
                         order().by(__.id(), Order.incr).
-                        limit(max).
+                        limit(maxDepth).
+                        toList();
+
+        List<Edge> dependentVlist =
+                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).bothE("dependent").
+                        order().by(__.id(), Order.incr).
+                        limit(maxDepth).
                         toList();
 
         if(null == vlist || vlist.isEmpty())
@@ -247,6 +280,7 @@ public class FlowGraphService {
             procIdFromGraph = (String) v.values("procId").next();
 
             String pgId = parentProcessGroup.outVertex().value("pgId");
+            Boolean isRoot = parentProcessGroup.outVertex().value("isRoot");
 
             logger.debug(String.format("%5d %10s %30s %15s \n",
                     id, procId, procName,pgId));
@@ -255,8 +289,10 @@ public class FlowGraphService {
             proc.setId(id);
             proc.setProcId(procIdFromGraph);
             proc.setProcName(procName);
-            FlowProcessGroup fpg =  getFlowProcessGroupById(pgId);
-            proc.setFlowProcessGroup(fpg);
+            List<FlowProcessGroup> fpgs =  getFlowProcessGroupTreeById(maxDepth,1,isRoot,pgId, new ArrayList<>());
+
+
+            proc.setParentFlowProcessGroups(fpgs);
         }
 
         return proc;
@@ -296,7 +332,7 @@ public class FlowGraphService {
         if (fgl.loadGraph(gbo)) {
             //fgl.listProcessGroups(required);
             //fgl.listProcessors(required);
-            fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b");
+            System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b",10));
         }
 
     }

@@ -1,11 +1,15 @@
 package com.hortonworks.faas.nfaas.dto;
 
+import java.util.List;
+
 public class FlowProcessor {
 
     private Long id;   // Vertex ID
     private String procName; // 3 Processor Name
     private String procId; // 4 processor ID
-    private FlowProcessGroup flowProcessGroup;
+    private List<FlowProcessGroup> parentFlowProcessGroups;
+    private List<FlowProcessGroup> upstreamDependentProcessGroups;
+    private List<FlowProcessGroup> downstreamDependentProcessGroups;
 
     public Long getId() {
         return id;
@@ -31,12 +35,28 @@ public class FlowProcessor {
         this.procId = procId;
     }
 
-    public FlowProcessGroup getFlowProcessGroup() {
-        return flowProcessGroup;
+    public List<FlowProcessGroup> getParentFlowProcessGroups() {
+        return parentFlowProcessGroups;
     }
 
-    public void setFlowProcessGroup(FlowProcessGroup flowProcessGroup) {
-        this.flowProcessGroup = flowProcessGroup;
+    public void setParentFlowProcessGroups(List<FlowProcessGroup> parentFlowProcessGroups) {
+        this.parentFlowProcessGroups = parentFlowProcessGroups;
+    }
+
+    public List<FlowProcessGroup> getUpstreamDependentProcessGroups() {
+        return upstreamDependentProcessGroups;
+    }
+
+    public void setUpstreamDependentProcessGroups(List<FlowProcessGroup> upstreamDependentProcessGroups) {
+        this.upstreamDependentProcessGroups = upstreamDependentProcessGroups;
+    }
+
+    public List<FlowProcessGroup> getDownstreamDependentProcessGroups() {
+        return downstreamDependentProcessGroups;
+    }
+
+    public void setDownstreamDependentProcessGroups(List<FlowProcessGroup> downstreamDependentProcessGroups) {
+        this.downstreamDependentProcessGroups = downstreamDependentProcessGroups;
     }
 
     @Override
@@ -45,7 +65,9 @@ public class FlowProcessor {
                 "id=" + id +
                 ", procName='" + procName + '\'' +
                 ", procId='" + procId + '\'' +
-                ", flowProcessGroup=" + flowProcessGroup +
+                ", parentFlowProcessGroups=" + parentFlowProcessGroups +
+                ", upstreamDependentProcessGroups=" + upstreamDependentProcessGroups +
+                ", downstreamDependentProcessGroups=" + downstreamDependentProcessGroups +
                 '}';
     }
 }
