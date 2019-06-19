@@ -186,17 +186,62 @@ public class FlowGraphService {
             id = (Long) v.id();
             isRoot = (Boolean) v.values("isRoot").next();
             pgName = (String) v.values("pgName").next();
-            pgId = (String) v.values("pgId").next();
+            pgIdFromGraph = (String) v.values("pgId").next();
             logger.debug(String.format("%5d %10s %30s %15s  \n",
                     id, isRoot, pgName, pgId));
             procGrp.setId(id);
-            procGrp.setPgId(pgId);
+            procGrp.setPgId(pgIdFromGraph);
             procGrp.setPgName(pgName);
             procGrp.setRoot(isRoot);
 
         }
 
         return procGrp;
+    }
+
+
+    /***
+     * this is the method to get the processor by ID
+     * @param procId
+     * @return
+     */
+    public FlowProcessor getProcessorById(String procId) {
+        int max=5 ;
+        if(g == null)
+            throw new RuntimeException("FATAL :: Load the graph first !!!");
+
+        // Try to find the requested number of processor.
+        // Note the use of the "__." and "Order" prefixes.
+        List<Vertex> vlist =
+                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).
+                        order().by(__.id(), Order.incr).
+                        limit(max).
+                        toList();
+
+        if(null == vlist || vlist.isEmpty())
+            logger.debug("unable to find the processor by id " + procId);
+
+        Long id;   // Vertex ID
+        String procName; // 3 Processor Name
+        String procIdFromGraph; // 4 processor ID
+
+        FlowProcessor proc = new FlowProcessor();
+
+        for (Vertex v : vlist) {
+
+            id = (Long) v.id();
+            procName = (String) v.values("procName").next();
+            procIdFromGraph = (String) v.values("procId").next();
+            logger.debug(String.format("%5d %10s %30s   \n",
+                    id, procId, procName));
+
+            proc = new FlowProcessor();
+            proc.setId(id);
+            proc.setProcId(procIdFromGraph);
+            proc.setProcName(procName);
+        }
+
+        return proc;
     }
     // ---------------------------------------
     // Try to load a graph and run a few tests
