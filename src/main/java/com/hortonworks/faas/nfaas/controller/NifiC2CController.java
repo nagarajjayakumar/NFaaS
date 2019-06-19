@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hortonworks.faas.nfaas.dto.ProcessGroups;
 import com.hortonworks.faas.nfaas.dto.Processors;
 import com.hortonworks.faas.nfaas.graph.FlowGraphBuilderOptions;
-import com.hortonworks.faas.nfaas.graph.FlowGraphLoader;
+import com.hortonworks.faas.nfaas.graph.FlowGraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +81,7 @@ public class NifiC2CController extends BasicFlowController {
     private ResourceLoader resourceLoader;
 
     @Autowired
-    FlowGraphLoader flowGraphLoader;
+    FlowGraphService flowGraphService;
 
     /**
      * create hive table .. call the processor group and create the hive tables
@@ -94,7 +94,7 @@ public class NifiC2CController extends BasicFlowController {
     String loadNifiGraph() {
         String loadNifiGraph = "{\"task\":\"load nifi graph done !\"}";
         FlowGraphBuilderOptions gbo = CreateGraphBuilderOptions("nifiGraphMlPath");
-        flowGraphLoader.loadGraph(gbo);
+        flowGraphService.loadGraph(gbo);
         return loadNifiGraph;
     }
 
@@ -104,7 +104,7 @@ public class NifiC2CController extends BasicFlowController {
     public @ResponseBody
     String listProcessGroups(int max)  {
         //String listProcessGroup = "{\"task\":\"list nifi processor group from graph done !\"}";
-        List<ProcessGroups> pgs = flowGraphLoader.listProcessGroups(max);
+        List<ProcessGroups> pgs = flowGraphService.listProcessGroups(max);
         ObjectMapper mapper = new ObjectMapper();
         String jsonString = "{\"task\":\"list nifi processor group from graph done !\"}";;
         try {
@@ -122,7 +122,7 @@ public class NifiC2CController extends BasicFlowController {
     String listprocessors(int max) {
 
         String jsonString = "{\"task\":\"list nifi processor group from graph done !\"}";;
-        List<Processors> procs = flowGraphLoader.listProcessors(max);
+        List<Processors> procs = flowGraphService.listProcessors(max);
         ObjectMapper mapper = new ObjectMapper();
         try {
             jsonString = mapper.writeValueAsString(procs);

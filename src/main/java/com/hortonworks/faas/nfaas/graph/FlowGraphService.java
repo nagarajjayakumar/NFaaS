@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-public class FlowGraphLoader {
-    private static final Logger logger = LoggerFactory.getLogger(FlowGraphLoader.class);
+public class FlowGraphService {
+    private static final Logger logger = LoggerFactory.getLogger(FlowGraphService.class);
     private TinkerGraph tg;
     private GraphTraversalSource g;
 
@@ -174,7 +174,7 @@ public class FlowGraphLoader {
             System.exit(1);
         }
 
-        FlowGraphLoader fgl = new FlowGraphLoader();
+        FlowGraphService fgl = new FlowGraphService();
 
 
         FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
