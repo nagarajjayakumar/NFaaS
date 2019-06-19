@@ -1,6 +1,6 @@
 package com.hortonworks.faas.nfaas.dto;
 
-public class Processors {
+public class FlowProcessor {
 
     private Long id;   // Vertex ID
     private String procName; // 3 Processor Name

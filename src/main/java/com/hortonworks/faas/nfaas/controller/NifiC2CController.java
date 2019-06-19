@@ -3,8 +3,8 @@ package com.hortonworks.faas.nfaas.controller;
 import com.beust.jcommander.JCommander;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hortonworks.faas.nfaas.dto.ProcessGroups;
-import com.hortonworks.faas.nfaas.dto.Processors;
+import com.hortonworks.faas.nfaas.dto.FlowProcessGroup;
+import com.hortonworks.faas.nfaas.dto.FlowProcessor;
 import com.hortonworks.faas.nfaas.graph.FlowGraphBuilderOptions;
 import com.hortonworks.faas.nfaas.graph.FlowGraphService;
 import org.slf4j.Logger;
@@ -104,7 +104,7 @@ public class NifiC2CController extends BasicFlowController {
     public @ResponseBody
     String listProcessGroups(int max)  {
         //String listProcessGroup = "{\"task\":\"list nifi processor group from graph done !\"}";
-        List<ProcessGroups> pgs = flowGraphService.listProcessGroups(max);
+        List<FlowProcessGroup> pgs = flowGraphService.listProcessGroups(max);
         ObjectMapper mapper = new ObjectMapper();
         String jsonString = "{\"task\":\"list nifi processor group from graph done !\"}";;
         try {
@@ -122,7 +122,7 @@ public class NifiC2CController extends BasicFlowController {
     String listprocessors(int max) {
 
         String jsonString = "{\"task\":\"list nifi processor group from graph done !\"}";;
-        List<Processors> procs = flowGraphService.listProcessors(max);
+        List<FlowProcessor> procs = flowGraphService.listProcessors(max);
         ObjectMapper mapper = new ObjectMapper();
         try {
             jsonString = mapper.writeValueAsString(procs);

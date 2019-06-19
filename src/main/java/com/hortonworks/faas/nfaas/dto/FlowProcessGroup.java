@@ -1,6 +1,6 @@
 package com.hortonworks.faas.nfaas.dto;
 
-public class ProcessGroups {
+public class FlowProcessGroup {
 
     private Boolean isRoot;
 

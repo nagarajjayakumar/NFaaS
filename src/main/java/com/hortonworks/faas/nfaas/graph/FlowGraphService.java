@@ -2,8 +2,8 @@ package com.hortonworks.faas.nfaas.graph;
 
 import com.beust.jcommander.JCommander;
 import com.hortonworks.faas.nfaas.config.NifiType;
-import com.hortonworks.faas.nfaas.dto.ProcessGroups;
-import com.hortonworks.faas.nfaas.dto.Processors;
+import com.hortonworks.faas.nfaas.dto.FlowProcessGroup;
+import com.hortonworks.faas.nfaas.dto.FlowProcessor;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -65,15 +65,15 @@ public class FlowGraphService {
      * @param max
      * @return
      */
-    public List<ProcessGroups>  listProcessGroups(int max) {
-        List<ProcessGroups> pgs = new ArrayList<>();
+    public List<FlowProcessGroup>  listProcessGroups(int max) {
+        List<FlowProcessGroup> pgs = new ArrayList<>();
 
         if (max < -1) return pgs;
 
         if(g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
-        // Try to find the requested number of airports.
+        // Try to find the requested number of process groups.
         // Note the use of the "__." and "Order" prefixes.
         List<Vertex> vlist =
                 g.V().hasLabel(NifiType.PROCESS_GROUP.type).
@@ -86,9 +86,9 @@ public class FlowGraphService {
         String pgName; // 4 process group name
         String pgId; // process group id
 
-        ProcessGroups procGrp =  null;
+        FlowProcessGroup procGrp =  null;
         for (Vertex v : vlist) {
-            procGrp = new ProcessGroups();
+            procGrp = new FlowProcessGroup();
             id = (Long) v.id();
             isRoot = (Boolean) v.values("isRoot").next();
             pgName = (String) v.values("pgName").next();
@@ -114,16 +114,16 @@ public class FlowGraphService {
      * @param max
      * @return
      */
-    public List<Processors> listProcessors(int max) {
+    public List<FlowProcessor> listProcessors(int max) {
 
-        List<Processors> procs = new ArrayList<>();
+        List<FlowProcessor> procs = new ArrayList<>();
 
         if (max < -1) return procs;
 
         if(g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
-        // Try to find the requested number of airports.
+        // Try to find the requested number of processor.
         // Note the use of the "__." and "Order" prefixes.
         List<Vertex> vlist =
                 g.V().hasLabel(NifiType.PROCESSOR.type).
@@ -135,7 +135,7 @@ public class FlowGraphService {
         String procName; // 3 Processor Name
         String procId; // 4 processor ID
 
-        Processors proc = null;
+        FlowProcessor proc = null;
         for (Vertex v : vlist) {
 
             id = (Long) v.id();
@@ -144,7 +144,7 @@ public class FlowGraphService {
             logger.debug(String.format("%5d %10s %30s   \n",
                     id, procId, procName));
 
-            proc = new Processors();
+            proc = new FlowProcessor();
             proc.setId(id);
             proc.setProcId(procId);
             proc.setProcName(procName);
@@ -156,6 +156,48 @@ public class FlowGraphService {
         return procs;
     }
 
+
+    /***
+     * get the flow process group by ID
+     * @param pgId
+     * @return
+     */
+    public FlowProcessGroup getFlowProcessGroupById(String pgId) {
+        int max = 5;
+        if(g == null)
+            throw new RuntimeException("FATAL :: Load the graph first !!!");
+
+        // Try to find the requested number of airports.
+        // Note the use of the "__." and "Order" prefixes.
+        List<Vertex> vlist =
+                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId",pgId).
+                        order().by(__.id(), Order.incr).
+                        limit(max).
+                        toList();
+
+        Long id;   // Vertex ID
+        Boolean isRoot; // 3 print is root
+        String pgName; // 4 process group name
+        String pgIdFromGraph; // process group id
+
+        FlowProcessGroup procGrp =  new FlowProcessGroup();
+        for (Vertex v : vlist) {
+            procGrp = new FlowProcessGroup();
+            id = (Long) v.id();
+            isRoot = (Boolean) v.values("isRoot").next();
+            pgName = (String) v.values("pgName").next();
+            pgId = (String) v.values("pgId").next();
+            logger.debug(String.format("%5d %10s %30s %15s  \n",
+                    id, isRoot, pgName, pgId));
+            procGrp.setId(id);
+            procGrp.setPgId(pgId);
+            procGrp.setPgName(pgName);
+            procGrp.setRoot(isRoot);
+
+        }
+
+        return procGrp;
+    }
     // ---------------------------------------
     // Try to load a graph and run a few tests
     // ---------------------------------------
