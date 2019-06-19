@@ -247,19 +247,15 @@ public class FlowGraphService {
             procIdFromGraph = (String) v.values("procId").next();
 
             String pgId = parentProcessGroup.outVertex().value("pgId");
-            String pgName = parentProcessGroup.outVertex().value("pgName");
-            logger.debug(String.format("%5d %10s %30s %15s %30s  \n",
-                    id, procId, procName,pgId,pgName));
+
+            logger.debug(String.format("%5d %10s %30s %15s \n",
+                    id, procId, procName,pgId));
 
             proc = new FlowProcessor();
             proc.setId(id);
             proc.setProcId(procIdFromGraph);
             proc.setProcName(procName);
-
-            FlowProcessGroup fpg =  new FlowProcessGroup();
-            fpg.setPgId(pgId);
-            fpg.setPgName(pgName);
-
+            FlowProcessGroup fpg =  getFlowProcessGroupById(pgId);
             proc.setFlowProcessGroup(fpg);
         }
 
