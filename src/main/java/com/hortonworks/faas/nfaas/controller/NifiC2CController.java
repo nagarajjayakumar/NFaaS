@@ -117,6 +117,23 @@ public class NifiC2CController extends BasicFlowController {
 
     @CrossOrigin
     @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/faas/graph/getpgbyid", produces = "application/json")
+    public @ResponseBody
+    String getProcessGroupById(String pgId)  {
+        //String listProcessGroup = "{\"task\":\"list nifi processor group from graph done !\"}";
+        FlowProcessGroup fpg = flowGraphService.getFlowProcessGroupById(pgId);
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = "{\"task\":\"get nifi processor group by ID from graph done !\"}";;
+        try {
+            jsonString = mapper.writeValueAsString(fpg);
+        } catch (JsonProcessingException e) {
+            new RuntimeException("unable to process Json " + e.getMessage());
+        }
+        return jsonString;
+    }
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(value = "/faas/graph/listprocessors", produces = "application/json")
     public @ResponseBody
     String listprocessors(int max) {
