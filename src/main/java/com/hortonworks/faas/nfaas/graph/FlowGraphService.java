@@ -8,6 +8,8 @@ import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -218,6 +220,12 @@ public class FlowGraphService {
                         limit(max).
                         toList();
 
+        List<Edge> parentVlist =
+                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).bothE("parent").
+                        order().by(__.id(), Order.incr).
+                        limit(max).
+                        toList();
+
         if(null == vlist || vlist.isEmpty())
             logger.debug("unable to find the processor by id " + procId);
 
@@ -227,18 +235,32 @@ public class FlowGraphService {
 
         FlowProcessor proc = new FlowProcessor();
 
+        // take first proc can be part of one processor group
+        // your assumption is 100 percentage
+
+        Edge parentProcessGroup = parentVlist.get(0);
+
         for (Vertex v : vlist) {
 
             id = (Long) v.id();
             procName = (String) v.values("procName").next();
             procIdFromGraph = (String) v.values("procId").next();
-            logger.debug(String.format("%5d %10s %30s   \n",
-                    id, procId, procName));
+
+            String pgId = parentProcessGroup.outVertex().value("pgId");
+            String pgName = parentProcessGroup.outVertex().value("pgName");
+            logger.debug(String.format("%5d %10s %30s %15s %30s  \n",
+                    id, procId, procName,pgId,pgName));
 
             proc = new FlowProcessor();
             proc.setId(id);
             proc.setProcId(procIdFromGraph);
             proc.setProcName(procName);
+
+            FlowProcessGroup fpg =  new FlowProcessGroup();
+            fpg.setPgId(pgId);
+            fpg.setPgName(pgName);
+
+            proc.setFlowProcessGroup(fpg);
         }
 
         return proc;
@@ -276,8 +298,9 @@ public class FlowGraphService {
                 .parse(args1.toArray(new String[0]));
 
         if (fgl.loadGraph(gbo)) {
-            fgl.listProcessGroups(required);
-            fgl.listProcessors(required);
+            //fgl.listProcessGroups(required);
+            //fgl.listProcessors(required);
+            fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b");
         }
 
     }

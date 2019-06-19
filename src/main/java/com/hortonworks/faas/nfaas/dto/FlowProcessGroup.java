@@ -41,4 +41,14 @@ public class FlowProcessGroup {
     public void setPgId(String pgId) {
         this.pgId = pgId;
     }
+
+    @Override
+    public String toString() {
+        return "FlowProcessGroup{" +
+                "isRoot=" + isRoot +
+                ", id=" + id +
+                ", pgName='" + pgName + '\'' +
+                ", pgId='" + pgId + '\'' +
+                '}';
+    }
 }

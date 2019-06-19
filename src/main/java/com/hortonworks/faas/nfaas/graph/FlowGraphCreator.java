@@ -150,6 +150,8 @@ public class FlowGraphCreator {
         Long ne = g.E().hasLabel("parent").count().next();
         System.out.println("The graph has " + nv + " process groups and " + ne + " connectivity");
 
+        g.V().hasLabel(NifiType.PROCESSOR.type).
+                has("procId","db1e4631-016a-1000-29b7-5401a7d27f8b").bothE("parent");
 
         // Save the graph we just created as GraphML (XML) or GraphSON (JSON)
         try {
