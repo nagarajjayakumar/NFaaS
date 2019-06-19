@@ -60,11 +60,11 @@ public class FlowGraphLoader {
         return true;
     }
 
-    // ----------------------------------------------
-    // Display some information about the selected
-    // number of airports. A value of -1 means select
-    // all airports.
-    // ----------------------------------------------
+    /***
+     * this is the method to get the list of all process groups
+     * @param max
+     * @return
+     */
     public List<ProcessGroups>  listProcessGroups(int max) {
         List<ProcessGroups> pgs = new ArrayList<>();
 
@@ -109,6 +109,11 @@ public class FlowGraphLoader {
         return pgs;
     }
 
+    /***
+     * this is the method to get the list of all processor based on the max supplied
+     * @param max
+     * @return
+     */
     public List<Processors> listProcessors(int max) {
 
         List<Processors> procs = new ArrayList<>();
