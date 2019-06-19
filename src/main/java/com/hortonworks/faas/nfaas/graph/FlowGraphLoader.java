@@ -2,6 +2,8 @@ package com.hortonworks.faas.nfaas.graph;
 
 import com.beust.jcommander.JCommander;
 import com.hortonworks.faas.nfaas.config.NifiType;
+import com.hortonworks.faas.nfaas.dto.ProcessGroups;
+import com.hortonworks.faas.nfaas.dto.Processors;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -63,8 +65,10 @@ public class FlowGraphLoader {
     // number of airports. A value of -1 means select
     // all airports.
     // ----------------------------------------------
-    public void listProcessGroups(int max) {
-        if (max < -1) return;
+    public List<ProcessGroups>  listProcessGroups(int max) {
+        List<ProcessGroups> pgs = new ArrayList<>();
+
+        if (max < -1) return pgs;
 
         if(g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
@@ -82,8 +86,9 @@ public class FlowGraphLoader {
         String pgName; // 4 process group name
         String pgId; // process group id
 
-
+        ProcessGroups procGrp =  null;
         for (Vertex v : vlist) {
+            procGrp = new ProcessGroups();
             id = (Long) v.id();
             isRoot = (Boolean) v.values("isRoot").next();
             pgName = (String) v.values("pgName").next();
@@ -92,11 +97,23 @@ public class FlowGraphLoader {
 
             logger.debug(String.format("%5d %10s %30s %15s  \n",
                     id, isRoot, pgName, pgId));
+
+            procGrp.setId(id);
+            procGrp.setPgId(pgId);
+            procGrp.setPgName(pgName);
+            procGrp.setRoot(isRoot);
+
+            pgs.add(procGrp);
         }
+
+        return pgs;
     }
 
-    public void listProcessors(int max) {
-        if (max < -1) return;
+    public List<Processors> listProcessors(int max) {
+
+        List<Processors> procs = new ArrayList<>();
+
+        if (max < -1) return procs;
 
         if(g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
@@ -113,14 +130,25 @@ public class FlowGraphLoader {
         String procName; // 3 Processor Name
         String procId; // 4 processor ID
 
+        Processors proc = null;
         for (Vertex v : vlist) {
+
             id = (Long) v.id();
             procName = (String) v.values("procName").next();
             procId = (String) v.values("procId").next();
-
             logger.debug(String.format("%5d %10s %30s   \n",
                     id, procId, procName));
+
+            proc = new Processors();
+            proc.setId(id);
+            proc.setProcId(procId);
+            proc.setProcName(procName);
+
+            procs.add(proc);
+
         }
+
+        return procs;
     }
 
     // ---------------------------------------

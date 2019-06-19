@@ -1,6 +1,10 @@
 package com.hortonworks.faas.nfaas.controller;
 
 import com.beust.jcommander.JCommander;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hortonworks.faas.nfaas.dto.ProcessGroups;
+import com.hortonworks.faas.nfaas.dto.Processors;
 import com.hortonworks.faas.nfaas.graph.FlowGraphBuilderOptions;
 import com.hortonworks.faas.nfaas.graph.FlowGraphLoader;
 import org.slf4j.Logger;
@@ -88,24 +92,9 @@ public class NifiC2CController extends BasicFlowController {
     @RequestMapping(value = "/faas/graph/loadnifigraph", produces = "application/json")
     public @ResponseBody
     String loadNifiGraph() {
-
         String loadNifiGraph = "{\"task\":\"load nifi graph done !\"}";
-
-        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
-
-        List<String> args = new ArrayList<>();
-        args.add("-nifiGraphMlPath");
-        args.add(this.nifiGraphMlPath);
-
-        JCommander.newBuilder()
-                .addObject(gbo)
-                .build()
-                .parse(args.toArray(new String[0]));
-
+        FlowGraphBuilderOptions gbo = CreateGraphBuilderOptions("nifiGraphMlPath");
         flowGraphLoader.loadGraph(gbo);
-
-
-
         return loadNifiGraph;
     }
 
@@ -113,23 +102,17 @@ public class NifiC2CController extends BasicFlowController {
     @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(value = "/faas/graph/listprocessgroups", produces = "application/json")
     public @ResponseBody
-    String listProcessGroups(int max) {
-        String listProcessGroup = "{\"task\":\"list nifi processor group from graph done !\"}";
-
-        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
-
-        List<String> args = new ArrayList<>();
-        args.add("-nifiGraphMlPath");
-        args.add(this.nifiGraphMlPath);
-
-        JCommander.newBuilder()
-                .addObject(gbo)
-                .build()
-                .parse(args.toArray(new String[0]));
-
-        flowGraphLoader.listProcessGroups(max);
-
-        return listProcessGroup;
+    String listProcessGroups(int max)  {
+        //String listProcessGroup = "{\"task\":\"list nifi processor group from graph done !\"}";
+        List<ProcessGroups> pgs = flowGraphLoader.listProcessGroups(max);
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = "{\"task\":\"list nifi processor group from graph done !\"}";;
+        try {
+            jsonString = mapper.writeValueAsString(pgs);
+        } catch (JsonProcessingException e) {
+            new RuntimeException("unable to process Json " + e.getMessage());
+        }
+        return jsonString;
     }
 
     @CrossOrigin
@@ -137,22 +120,30 @@ public class NifiC2CController extends BasicFlowController {
     @RequestMapping(value = "/faas/graph/listprocessors", produces = "application/json")
     public @ResponseBody
     String listprocessors(int max) {
-        String listprocessors = "{\"task\":\"list nifi processor from done !\"}";
 
+        String jsonString = "{\"task\":\"list nifi processor group from graph done !\"}";;
+        List<Processors> procs = flowGraphLoader.listProcessors(max);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            jsonString = mapper.writeValueAsString(procs);
+        } catch (JsonProcessingException e) {
+            new RuntimeException("unable to process Json " + e.getMessage());
+        }
+        return jsonString;
+    }
+
+    private FlowGraphBuilderOptions CreateGraphBuilderOptions(String propertyName) {
         FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
-
         List<String> args = new ArrayList<>();
-        args.add("-nifiGraphMlPath");
+        args.add("-"+propertyName);
         args.add(this.nifiGraphMlPath);
 
         JCommander.newBuilder()
                 .addObject(gbo)
                 .build()
                 .parse(args.toArray(new String[0]));
-
-        flowGraphLoader.listProcessors(max);
-
-        return listprocessors;
+        return gbo;
     }
+
 
 }
