@@ -71,7 +71,7 @@ public class FlowGraphCreator {
 
 
             for(String propKey : processorProperties.keySet()){
-              // gts.property(propKey,processorProperties.get(propKey));
+               gts.property(propKey,processorProperties.get(propKey));
             }
 
             gts.as(processor.getId()).addE("parent").to(processor.getId()).from(processor.getParentGroupId());
