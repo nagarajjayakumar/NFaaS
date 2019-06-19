@@ -230,6 +230,38 @@ public class FlowGraphService {
     }
 
     /***
+     * this is the method to get the dependent process groups
+     * @param depthMax
+     * @param pgId
+     * @param fpgs
+     * @return
+     */
+    public List<FlowProcessGroup> getDependentProcessGroups( String pgId, int depthMax, List<FlowProcessGroup> fpgs) {
+
+        if(g == null)
+            throw new RuntimeException("FATAL :: Load the graph first !!!");
+
+        //fpgs.add(getFlowProcessGroupById(pgId));
+
+        List<Edge> dependentVlist =
+                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId",pgId).bothE("dependent").
+                        order().by(__.id(), Order.incr).
+                        limit(depthMax).
+                        toList();
+
+        // take first proc can be part of one processor group
+        // your assumption is 100 percentage
+
+
+        for(Edge dependentProcessGroup : dependentVlist) {
+            String currentPgId = dependentProcessGroup.outVertex().value("pgId");
+            fpgs.add(getFlowProcessGroupById(currentPgId));
+        }
+        return fpgs;
+
+    }
+
+    /***
      * this is the method to get the processor by ID
      * @param procId
      * @return
@@ -333,6 +365,7 @@ public class FlowGraphService {
             //fgl.listProcessGroups(required);
             //fgl.listProcessors(required);
             System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b",10));
+            System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3",10,new ArrayList<>()));
         }
 
     }
