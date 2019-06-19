@@ -7,7 +7,7 @@ public class FlowProcessor {
     private Long id;   // Vertex ID
     private String procName; // 3 Processor Name
     private String procId; // 4 processor ID
-    private List<FlowProcessGroup> parentFlowProcessGroups;
+    private List<FlowProcessGroup> parentProcessGroups;
     private List<FlowProcessGroup> upstreamDependentProcessGroups;
     private List<FlowProcessGroup> downstreamDependentProcessGroups;
 
@@ -35,12 +35,12 @@ public class FlowProcessor {
         this.procId = procId;
     }
 
-    public List<FlowProcessGroup> getParentFlowProcessGroups() {
-        return parentFlowProcessGroups;
+    public List<FlowProcessGroup> getParentProcessGroups() {
+        return parentProcessGroups;
     }
 
-    public void setParentFlowProcessGroups(List<FlowProcessGroup> parentFlowProcessGroups) {
-        this.parentFlowProcessGroups = parentFlowProcessGroups;
+    public void setParentProcessGroups(List<FlowProcessGroup> parentProcessGroups) {
+        this.parentProcessGroups = parentProcessGroups;
     }
 
     public List<FlowProcessGroup> getUpstreamDependentProcessGroups() {
@@ -65,7 +65,7 @@ public class FlowProcessor {
                 "id=" + id +
                 ", procName='" + procName + '\'' +
                 ", procId='" + procId + '\'' +
-                ", parentFlowProcessGroups=" + parentFlowProcessGroups +
+                ", parentProcessGroups=" + parentProcessGroups +
                 ", upstreamDependentProcessGroups=" + upstreamDependentProcessGroups +
                 ", downstreamDependentProcessGroups=" + downstreamDependentProcessGroups +
                 '}';

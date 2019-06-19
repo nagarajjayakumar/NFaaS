@@ -292,7 +292,7 @@ public class FlowGraphService {
             List<FlowProcessGroup> fpgs =  getFlowProcessGroupTreeById(maxDepth,1,isRoot,pgId, new ArrayList<>());
 
 
-            proc.setParentFlowProcessGroups(fpgs);
+            proc.setParentProcessGroups(fpgs);
         }
 
         return proc;
