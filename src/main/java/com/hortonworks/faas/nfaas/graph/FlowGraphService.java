@@ -230,13 +230,32 @@ public class FlowGraphService {
     }
 
     /***
+     * this is the method to get the dependent downstream process group
+     * @param pgId
+     * @param depthMax
+     * @return
+     */
+    public List<FlowProcessGroup> getDownstreamProcessGroups( String pgId, int depthMax){
+        return getDependentProcessGroups(pgId,depthMax,new ArrayList<>(), true);
+    }
+
+    /***
+     * this is the method to get the dependent upstream process group
+     * @param pgId
+     * @param depthMax
+     * @return
+     */
+    public List<FlowProcessGroup> getUpstreamProcessGroups( String pgId, int depthMax){
+        return getDependentProcessGroups(pgId,depthMax,new ArrayList<>(), false);
+    }
+    /***
      * this is the method to get the dependent process groups
      * @param depthMax
      * @param pgId
      * @param fpgs
      * @return
      */
-    public List<FlowProcessGroup> getDependentProcessGroups( String pgId, int depthMax, List<FlowProcessGroup> fpgs) {
+    public List<FlowProcessGroup> getDependentProcessGroups( String pgId, int depthMax, List<FlowProcessGroup> fpgs, Boolean downstreamProcessGroup) {
 
         if(g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
@@ -252,11 +271,22 @@ public class FlowGraphService {
         // take first proc can be part of one processor group
         // your assumption is 100 percentage
 
-
-        for(Edge dependentProcessGroup : dependentVlist) {
-            String currentPgId = dependentProcessGroup.outVertex().value("pgId");
-            fpgs.add(getFlowProcessGroupById(currentPgId));
+        // if it is upstream process group then look for the out Vertex
+        if(! downstreamProcessGroup) {
+            for (Edge dependentProcessGroup : dependentVlist) {
+                String currentPgId = dependentProcessGroup.outVertex().value("pgId");
+                fpgs.add(getFlowProcessGroupById(currentPgId));
+            }
         }
+
+        // if it is the downstream process group then look for the In vertex
+        if(downstreamProcessGroup) {
+            for (Edge dependentProcessGroup : dependentVlist) {
+                String currentPgId = dependentProcessGroup.inVertex().value("pgId");
+                fpgs.add(getFlowProcessGroupById(currentPgId));
+            }
+        }
+
         return fpgs;
 
     }
@@ -365,7 +395,7 @@ public class FlowGraphService {
             //fgl.listProcessGroups(required);
             //fgl.listProcessors(required);
             System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b",10));
-            System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3",10,new ArrayList<>()));
+            System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3",10,new ArrayList<>(), false));
         }
 
     }
