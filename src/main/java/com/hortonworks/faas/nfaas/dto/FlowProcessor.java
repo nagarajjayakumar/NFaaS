@@ -7,6 +7,7 @@ public class FlowProcessor {
     private Long id;   // Vertex ID
     private String procName; // 3 Processor Name
     private String procId; // 4 processor ID
+    private String immediateParentPgId;
     private List<FlowProcessGroup> parentProcessGroups;
     private List<FlowProcessGroup> upstreamDependentProcessGroups;
     private List<FlowProcessGroup> downstreamDependentProcessGroups;
@@ -59,12 +60,21 @@ public class FlowProcessor {
         this.downstreamDependentProcessGroups = downstreamDependentProcessGroups;
     }
 
+    public String getImmediateParentPgId() {
+        return immediateParentPgId;
+    }
+
+    public void setImmediateParentPgId(String immediateParentPgId) {
+        this.immediateParentPgId = immediateParentPgId;
+    }
+
     @Override
     public String toString() {
         return "FlowProcessor{" +
                 "id=" + id +
                 ", procName='" + procName + '\'' +
                 ", procId='" + procId + '\'' +
+                ", immediateParentPgId='" + immediateParentPgId + '\'' +
                 ", parentProcessGroups=" + parentProcessGroups +
                 ", upstreamDependentProcessGroups=" + upstreamDependentProcessGroups +
                 ", downstreamDependentProcessGroups=" + downstreamDependentProcessGroups +

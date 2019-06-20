@@ -8,7 +8,6 @@ import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
-import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
@@ -67,12 +66,12 @@ public class FlowGraphService {
      * @param max
      * @return
      */
-    public List<FlowProcessGroup>  listProcessGroups(int max) {
+    public List<FlowProcessGroup> listProcessGroups(int max) {
         List<FlowProcessGroup> pgs = new ArrayList<>();
 
         if (max < -1) return pgs;
 
-        if(g == null)
+        if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
         // Try to find the requested number of process groups.
@@ -88,7 +87,7 @@ public class FlowGraphService {
         String pgName; // 4 process group name
         String pgId; // process group id
 
-        FlowProcessGroup procGrp =  null;
+        FlowProcessGroup procGrp = null;
         for (Vertex v : vlist) {
             procGrp = new FlowProcessGroup();
             id = (Long) v.id();
@@ -122,7 +121,7 @@ public class FlowGraphService {
 
         if (max < -1) return procs;
 
-        if(g == null)
+        if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
         // Try to find the requested number of processor.
@@ -158,7 +157,6 @@ public class FlowGraphService {
         return procs;
     }
 
-
     /***
      * get the flow process group by ID
      * @param pgId
@@ -166,13 +164,13 @@ public class FlowGraphService {
      */
     public FlowProcessGroup getFlowProcessGroupById(String pgId) {
         int max = 5;
-        if(g == null)
+        if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
         // Try to find the requested number of airports.
         // Note the use of the "__." and "Order" prefixes.
         List<Vertex> vlist =
-                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId",pgId).
+                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId", pgId).
                         order().by(__.id(), Order.incr).
                         limit(max).
                         toList();
@@ -182,7 +180,7 @@ public class FlowGraphService {
         String pgName; // 4 process group name
         String pgIdFromGraph; // process group id
 
-        FlowProcessGroup procGrp =  new FlowProcessGroup();
+        FlowProcessGroup procGrp = new FlowProcessGroup();
         for (Vertex v : vlist) {
             procGrp = new FlowProcessGroup();
             id = (Long) v.id();
@@ -201,10 +199,14 @@ public class FlowGraphService {
         return procGrp;
     }
 
-    public List<FlowProcessGroup> getFlowProcessGroupTreeById( int depthMax, int currentDepth, Boolean isRoot,
-                                                               String pgId, List<FlowProcessGroup> fpgs) {
+    public List<FlowProcessGroup> getFlowProcessGroupTreeById(int depthMax, String pgId, Boolean isRoot) {
+        return getFlowProcessGroupTreeById(depthMax, 1, isRoot, pgId, new ArrayList<>());
+    }
 
-        if(g == null)
+    public List<FlowProcessGroup> getFlowProcessGroupTreeById(int depthMax, int currentDepth, Boolean isRoot,
+                                                              String pgId, List<FlowProcessGroup> fpgs) {
+
+        if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
         fpgs.add(getFlowProcessGroupById(pgId));
@@ -213,7 +215,7 @@ public class FlowGraphService {
         if (currentDepth > depthMax) return fpgs;
 
         List<Edge> parentVlist =
-                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId",pgId).bothE("parent").
+                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId", pgId).bothE("parent").
                         order().by(__.id(), Order.incr).
                         limit(depthMax).
                         toList();
@@ -225,65 +227,68 @@ public class FlowGraphService {
 
         String currentPgId = parentProcessGroup.outVertex().value("pgId");
         Boolean currentPgIsRoot = parentProcessGroup.outVertex().value("isRoot");
-        return getFlowProcessGroupTreeById(depthMax, currentDepth+1, currentPgIsRoot, currentPgId, fpgs);
+        return getFlowProcessGroupTreeById(depthMax, currentDepth + 1, currentPgIsRoot, currentPgId, fpgs);
 
     }
 
     /***
      * this is the method to get the dependent downstream process group
      * @param pgId
-     * @param depthMax
+     * @param maxDepth
      * @return
      */
-    public List<FlowProcessGroup> getDownstreamProcessGroups( String pgId, int depthMax){
-        return getDependentProcessGroups(pgId,depthMax,new ArrayList<>(), true);
+    public List<FlowProcessGroup> getDownstreamProcessGroups(int maxDepth, String pgId) {
+        return getDependentProcessGroups(pgId, maxDepth, new ArrayList<>(), true);
     }
 
     /***
      * this is the method to get the dependent upstream process group
      * @param pgId
-     * @param depthMax
+     * @param maxDepth
      * @return
      */
-    public List<FlowProcessGroup> getUpstreamProcessGroups( String pgId, int depthMax){
-        return getDependentProcessGroups(pgId,depthMax,new ArrayList<>(), false);
+    public List<FlowProcessGroup> getUpstreamProcessGroups(int maxDepth, String pgId) {
+        return getDependentProcessGroups(pgId, maxDepth, new ArrayList<>(), false);
     }
+
     /***
      * this is the method to get the dependent process groups
-     * @param depthMax
+     * @param maxDepth
      * @param pgId
      * @param fpgs
      * @return
      */
-    public List<FlowProcessGroup> getDependentProcessGroups( String pgId, int depthMax, List<FlowProcessGroup> fpgs, Boolean downstreamProcessGroup) {
+    public List<FlowProcessGroup> getDependentProcessGroups(String pgId, int maxDepth, List<FlowProcessGroup> fpgs, Boolean downstreamProcessGroup) {
 
-        if(g == null)
+        if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
         //fpgs.add(getFlowProcessGroupById(pgId));
 
         List<Edge> dependentVlist =
-                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId",pgId).bothE("dependent").
+                g.V().hasLabel(NifiType.PROCESS_GROUP.type).has("pgId", pgId).bothE("dependent").
                         order().by(__.id(), Order.incr).
-                        limit(depthMax).
+                        limit(maxDepth).
                         toList();
 
         // take first proc can be part of one processor group
         // your assumption is 100 percentage
 
         // if it is upstream process group then look for the out Vertex
-        if(! downstreamProcessGroup) {
+        if (!downstreamProcessGroup) {
             for (Edge dependentProcessGroup : dependentVlist) {
                 String currentPgId = dependentProcessGroup.outVertex().value("pgId");
-                fpgs.add(getFlowProcessGroupById(currentPgId));
+                if(! pgId.equalsIgnoreCase(currentPgId))
+                    fpgs.add(getFlowProcessGroupById(currentPgId));
             }
         }
 
         // if it is the downstream process group then look for the In vertex
-        if(downstreamProcessGroup) {
+        if (downstreamProcessGroup) {
             for (Edge dependentProcessGroup : dependentVlist) {
                 String currentPgId = dependentProcessGroup.inVertex().value("pgId");
-                fpgs.add(getFlowProcessGroupById(currentPgId));
+                if(! pgId.equalsIgnoreCase(currentPgId))
+                    fpgs.add(getFlowProcessGroupById(currentPgId));
             }
         }
 
@@ -298,30 +303,24 @@ public class FlowGraphService {
      */
     public FlowProcessor getProcessorById(String procId, int maxDepth) {
         //int max=5 ;
-        if(g == null)
+        if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
         // Try to find the requested number of processor.
         // Note the use of the "__." and "Order" prefixes.
         List<Vertex> vlist =
-                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).
+                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId", procId).
                         order().by(__.id(), Order.incr).
                         limit(maxDepth).
                         toList();
 
         List<Edge> parentVlist =
-                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).bothE("parent").
+                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId", procId).bothE("parent").
                         order().by(__.id(), Order.incr).
                         limit(maxDepth).
                         toList();
 
-        List<Edge> dependentVlist =
-                g.V().hasLabel(NifiType.PROCESSOR.type).has("procId",procId).bothE("dependent").
-                        order().by(__.id(), Order.incr).
-                        limit(maxDepth).
-                        toList();
-
-        if(null == vlist || vlist.isEmpty())
+        if (null == vlist || vlist.isEmpty())
             logger.debug("unable to find the processor by id " + procId);
 
         Long id;   // Vertex ID
@@ -345,20 +344,26 @@ public class FlowGraphService {
             Boolean isRoot = parentProcessGroup.outVertex().value("isRoot");
 
             logger.debug(String.format("%5d %10s %30s %15s \n",
-                    id, procId, procName,pgId));
+                    id, procId, procName, pgId));
 
             proc = new FlowProcessor();
             proc.setId(id);
             proc.setProcId(procIdFromGraph);
             proc.setProcName(procName);
-            List<FlowProcessGroup> fpgs =  getFlowProcessGroupTreeById(maxDepth,1,isRoot,pgId, new ArrayList<>());
+            proc.setImmediateParentPgId(pgId);
+            List<FlowProcessGroup> parentFpgs = getFlowProcessGroupTreeById(maxDepth,pgId, isRoot);
+            proc.setParentProcessGroups(parentFpgs);
 
+            List<FlowProcessGroup> upstreamFpgs = getUpstreamProcessGroups(maxDepth, pgId);
+            proc.setUpstreamDependentProcessGroups(upstreamFpgs);
 
-            proc.setParentProcessGroups(fpgs);
+            List<FlowProcessGroup> downstreamFpgs = getDownstreamProcessGroups(maxDepth, pgId);
+            proc.setDownstreamDependentProcessGroups(downstreamFpgs);
         }
 
         return proc;
     }
+
     // ---------------------------------------
     // Try to load a graph and run a few tests
     // ---------------------------------------
@@ -394,10 +399,11 @@ public class FlowGraphService {
         if (fgl.loadGraph(gbo)) {
             //fgl.listProcessGroups(required);
             //fgl.listProcessors(required);
-            System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b",10));
-            System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3",10,new ArrayList<>(), false));
+            System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b", 10));
+            System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3", 10, new ArrayList<>(), true));
         }
 
     }
+
 
 }

@@ -63,20 +63,22 @@ public class FlowGraphCreator {
 
         List<ProcessorDTO> processors = fi.getProcessors();
 
-        for(ProcessorDTO processor : processors){
-            Map<String, String> processorProperties = processor.getConfig().getProperties();
-            gts.addV(NifiType.PROCESSOR.type)
-                    .property("procName", processor.getName())
-                    .property("procId", processor.getId());
+        if(true) {
+            for (ProcessorDTO processor : processors) {
+                Map<String, String> processorProperties = processor.getConfig().getProperties();
+                gts.addV(NifiType.PROCESSOR.type)
+                        .property("procName", processor.getName())
+                        .property("procId", processor.getId());
 
 
-            for(String propKey : processorProperties.keySet()){
-               gts.property(propKey,processorProperties.get(propKey));
+                for (String propKey : processorProperties.keySet()) {
+                    gts.property(propKey,processorProperties.get(propKey));
+                }
+
+                gts.as(processor.getId()).addE("parent").to(processor.getId()).from(processor.getParentGroupId());
             }
 
-            gts.as(processor.getId()).addE("parent").to(processor.getId()).from(processor.getParentGroupId());
         }
-
         List<ConnectionDTO> connections = fi.getConnections();
 
         for(ConnectionDTO connection : connections){
