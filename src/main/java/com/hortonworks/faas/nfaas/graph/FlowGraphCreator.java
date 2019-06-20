@@ -95,7 +95,7 @@ public class FlowGraphCreator {
 //        // Add some nodes and vertices - Note the use of "iterate".
 //        g.addV("airport").property("code", "AUS").as("aus").
 //                addV("airport").property("code", "DFW").as("dfw").
-//                addV("airport").property("code", "LAX").as("lax").
+//                addV("axmlirport").property("code", "LAX").as("lax").
 //                addV("airport").property("code", "JFK").as("jfk").
 //                addV("airport").property("code", "ATL").as("atl").
 //                addE("route").from("aus").to("dfw").
