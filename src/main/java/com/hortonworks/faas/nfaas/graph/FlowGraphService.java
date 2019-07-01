@@ -6,6 +6,7 @@ import com.hortonworks.faas.nfaas.dto.FlowProcessGroup;
 import com.hortonworks.faas.nfaas.dto.FlowProcessor;
 import com.hortonworks.faas.nfaas.xml.util.NfaasStringUtil;
 import com.hortonworks.faas.nfaas.xml.util.NfaasUtil;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -20,10 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 public class FlowGraphService {
@@ -420,6 +418,7 @@ public class FlowGraphService {
      */
     public List<FlowProcessor> getProcessorBySearchString(String searchString, int maxDepth, boolean withdependency) {
         List<FlowProcessor> searchMatchingProcessor = new ArrayList<>();
+        Map<String, Integer> occurenceTable = new HashMap();
 
         //int max=5 ;
         if (g == null)
@@ -428,8 +427,10 @@ public class FlowGraphService {
         List<Map<String, Object>> propertyMap = new ArrayList<Map<String, Object>>();
         propertyMap = g.V().propertyMap().toList();
 
+        int index = 0 ;
         for (Map mp : propertyMap) {
             Iterator it = mp.entrySet().iterator();
+            //logger.debug("Index "+index ++);
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
 
@@ -439,11 +440,14 @@ public class FlowGraphService {
 
                 if (NfaasStringUtil.containsIgnoreCase(tvpPropValue, searchString)) {
                     String procIdFromGraph = tvp.element().value("procId");
-                    FlowProcessor fp = getProcessorById(procIdFromGraph, maxDepth, withdependency);
-                    if (!NfaasUtil.isEmptyFlowProcessor(fp))
-                        searchMatchingProcessor.add(fp);
-                    // log only the matched key value pair
-                    logger.debug(pair.getKey() + " = " + pair.getValue());
+                    if(! occurenceTable.containsKey(procIdFromGraph)) {
+                        occurenceTable.put(procIdFromGraph,index);
+                        FlowProcessor fp = getProcessorById(procIdFromGraph, maxDepth, withdependency);
+                        if (!NfaasUtil.isEmptyFlowProcessor(fp))
+                            searchMatchingProcessor.add(fp);
+                        // log only the matched key value pair
+                        logger.debug(pair.getKey() + " = " + pair.getValue());
+                    }
                 }
                 it.remove(); // avoids a ConcurrentModificationException
             }
