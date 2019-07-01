@@ -66,7 +66,7 @@ public class FlowGraphService {
         if (fgl.loadGraph(gbo)) {
             //fgl.listProcessGroups(required);
             //fgl.listProcessors(required);
-            System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b", 10,true));
+            System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b", 10, true));
             System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3", 10, new ArrayList<>(), true));
         }
 
@@ -438,13 +438,13 @@ public class FlowGraphService {
                 String tvpPropValue = tvp.value().toString();
 
                 if (NfaasStringUtil.containsIgnoreCase(tvpPropValue, searchString)) {
-                    String procIdFromGraph =  tvp.element().value("procId");
-                    FlowProcessor fp = getProcessorById(procIdFromGraph, maxDepth,withdependency);
+                    String procIdFromGraph = tvp.element().value("procId");
+                    FlowProcessor fp = getProcessorById(procIdFromGraph, maxDepth, withdependency);
                     if (!NfaasUtil.isEmptyFlowProcessor(fp))
                         searchMatchingProcessor.add(fp);
+                    // log only the matched key value pair
+                    logger.debug(pair.getKey() + " = " + pair.getValue());
                 }
-
-                logger.debug(pair.getKey() + " = " + pair.getValue());
                 it.remove(); // avoids a ConcurrentModificationException
             }
         }
