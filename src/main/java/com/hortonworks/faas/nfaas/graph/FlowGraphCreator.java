@@ -143,14 +143,6 @@ public class FlowGraphCreator {
                 List propValue = (ArrayList) pair.getValue();
                 TinkerVertexProperty tvp = (TinkerVertexProperty) propValue.get(0);
                 String tvpPropValue = tvp.value().toString();
-
-                if (NfaasStringUtil.containsIgnoreCase(tvpPropValue, searchString)) {
-                    String procIdFromGraph = (String) tvp.element().value("procId");
-                    FlowProcessor fp1 = fgs.getProcessorById(procIdFromGraph, 10,true);
-                    if (!NfaasUtil.isEmptyFlowProcessor(fp1))
-                        System.out.println(fp1);
-                }
-
                 System.out.println((pair.getKey() + " = " + pair.getValue()));
                 it.remove(); // avoids a ConcurrentModificationException
             }
