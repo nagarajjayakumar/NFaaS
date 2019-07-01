@@ -364,6 +364,24 @@ public class FlowGraphService {
         return proc;
     }
 
+    /***
+     * this is the method to get the processor by the search string
+     * @param searchString
+     * @param maxDepth
+     * @return
+     */
+    public List<FlowProcessor> getProcessorBySearchString(String searchString, int maxDepth) {
+        List<FlowProcessor> searchMatchingProcessor = new ArrayList<>();
+
+        //int max=5 ;
+        if (g == null)
+            throw new RuntimeException("FATAL :: Load the graph first !!!");
+
+
+
+        return searchMatchingProcessor;
+    }
+
     // ---------------------------------------
     // Try to load a graph and run a few tests
     // ---------------------------------------
