@@ -2,8 +2,11 @@ package com.hortonworks.faas.nfaas.graph;
 
 
 import com.hortonworks.faas.nfaas.config.NifiType;
+import com.hortonworks.faas.nfaas.dto.FlowProcessor;
 import com.hortonworks.faas.nfaas.xml.parser.FlowInfo;
 import com.hortonworks.faas.nfaas.xml.parser.FlowParser;
+import com.hortonworks.faas.nfaas.xml.util.NfaasStringUtil;
+import com.hortonworks.faas.nfaas.xml.util.NfaasUtil;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.nifi.web.api.dto.ConnectionDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
@@ -16,12 +19,11 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerVertexProperty;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FlowGraphCreator {
     public static void main(String[] args) throws Exception {
@@ -109,6 +111,7 @@ public class FlowGraphCreator {
 //                addE("route").from("lax").to("dfw").iterate();
 
         System.out.println(g);
+        System.out.println("VALUEEEEEE MAP");
         System.out.println(g.V().valueMap(true).toList());
         System.out.println(g.E().valueMap(true).toList());
 
@@ -124,6 +127,34 @@ public class FlowGraphCreator {
                 System.out.println(((List) (m.get("pgName"))).get(0) + " " + m.get(T.id) + " " + m.get(T.label));
         }
         System.out.println();
+
+        List<Map<String, Object>> propertyMap = new ArrayList<Map<String, Object>>();
+
+        propertyMap = g.V().hasLabel(NifiType.PROCESSOR.type).propertyMap().toList();
+
+        String searchString = "2019-05-21 11:56:55,313";
+        FlowGraphService fgs = new FlowGraphService();
+        // Dislpay the code property as well as the label and id.
+        for (Map mp : propertyMap) {
+            Iterator it = mp.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+
+                List propValue = (ArrayList) pair.getValue();
+                TinkerVertexProperty tvp = (TinkerVertexProperty) propValue.get(0);
+                String tvpPropValue = tvp.value().toString();
+
+                if (NfaasStringUtil.containsIgnoreCase(tvpPropValue, searchString)) {
+                    String procIdFromGraph = (String) tvp.element().value("procId");
+                    FlowProcessor fp1 = fgs.getProcessorById(procIdFromGraph, 10,true);
+                    if (!NfaasUtil.isEmptyFlowProcessor(fp1))
+                        System.out.println(fp1);
+                }
+
+                System.out.println((pair.getKey() + " = " + pair.getValue()));
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+        }
 
         // Display the routes in the graph we just created.
         // Each path will include the vertex code values and the edge.

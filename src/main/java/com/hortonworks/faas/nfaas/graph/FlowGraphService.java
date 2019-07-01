@@ -4,6 +4,8 @@ import com.beust.jcommander.JCommander;
 import com.hortonworks.faas.nfaas.config.NifiType;
 import com.hortonworks.faas.nfaas.dto.FlowProcessGroup;
 import com.hortonworks.faas.nfaas.dto.FlowProcessor;
+import com.hortonworks.faas.nfaas.xml.util.NfaasStringUtil;
+import com.hortonworks.faas.nfaas.xml.util.NfaasUtil;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -12,19 +14,63 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerVertexProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class FlowGraphService {
     private static final Logger logger = LoggerFactory.getLogger(FlowGraphService.class);
     private TinkerGraph tg;
     private GraphTraversalSource g;
+
+    // ---------------------------------------
+    // Try to load a graph and run a few tests
+    // ---------------------------------------
+    public static void main(String[] args) {
+        int required = 10;
+        boolean failed = false;
+
+        try {
+            if (args.length > 0) required = Integer.parseInt(args[0]);
+        } catch (Exception e) {
+            failed = true;
+        }
+
+        if (failed || required < -1) {
+            logger.debug("Argument should be -1, 0 or any positive integer");
+            System.exit(1);
+        }
+
+        FlowGraphService fgl = new FlowGraphService();
+
+
+        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
+
+        List<String> args1 = new ArrayList<>();
+        args1.add("-nifiGraphMlPath");
+        args1.add("nifi-graph.graphml");
+
+        JCommander.newBuilder()
+                .addObject(gbo)
+                .build()
+                .parse(args1.toArray(new String[0]));
+
+        if (fgl.loadGraph(gbo)) {
+            //fgl.listProcessGroups(required);
+            //fgl.listProcessors(required);
+            System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b", 10,true));
+            System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3", 10, new ArrayList<>(), true));
+        }
+
+    }
 
     // -------------------------------------------------------------
     // Try to create a new graph and load the specified GraphML file
@@ -278,7 +324,7 @@ public class FlowGraphService {
         if (!downstreamProcessGroup) {
             for (Edge dependentProcessGroup : dependentVlist) {
                 String currentPgId = dependentProcessGroup.outVertex().value("pgId");
-                if(! pgId.equalsIgnoreCase(currentPgId))
+                if (!pgId.equalsIgnoreCase(currentPgId))
                     fpgs.add(getFlowProcessGroupById(currentPgId));
             }
         }
@@ -287,7 +333,7 @@ public class FlowGraphService {
         if (downstreamProcessGroup) {
             for (Edge dependentProcessGroup : dependentVlist) {
                 String currentPgId = dependentProcessGroup.inVertex().value("pgId");
-                if(! pgId.equalsIgnoreCase(currentPgId))
+                if (!pgId.equalsIgnoreCase(currentPgId))
                     fpgs.add(getFlowProcessGroupById(currentPgId));
             }
         }
@@ -301,7 +347,7 @@ public class FlowGraphService {
      * @param procId
      * @return
      */
-    public FlowProcessor getProcessorById(String procId, int maxDepth) {
+    public FlowProcessor getProcessorById(String procId, int maxDepth, Boolean withDependents) {
         //int max=5 ;
         if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
@@ -351,14 +397,16 @@ public class FlowGraphService {
             proc.setProcId(procIdFromGraph);
             proc.setProcName(procName);
             proc.setImmediateParentPgId(pgId);
-            List<FlowProcessGroup> parentFpgs = getFlowProcessGroupTreeById(maxDepth,pgId, isRoot);
+            List<FlowProcessGroup> parentFpgs = getFlowProcessGroupTreeById(maxDepth, pgId, isRoot);
             proc.setParentProcessGroups(parentFpgs);
 
-            List<FlowProcessGroup> upstreamFpgs = getUpstreamProcessGroups(maxDepth, pgId);
-            proc.setUpstreamDependentProcessGroups(upstreamFpgs);
+            if (withDependents) {
+                List<FlowProcessGroup> upstreamFpgs = getUpstreamProcessGroups(maxDepth, pgId);
+                proc.setUpstreamDependentProcessGroups(upstreamFpgs);
 
-            List<FlowProcessGroup> downstreamFpgs = getDownstreamProcessGroups(maxDepth, pgId);
-            proc.setDownstreamDependentProcessGroups(downstreamFpgs);
+                List<FlowProcessGroup> downstreamFpgs = getDownstreamProcessGroups(maxDepth, pgId);
+                proc.setDownstreamDependentProcessGroups(downstreamFpgs);
+            }
         }
 
         return proc;
@@ -370,57 +418,38 @@ public class FlowGraphService {
      * @param maxDepth
      * @return
      */
-    public List<FlowProcessor> getProcessorBySearchString(String searchString, int maxDepth) {
+    public List<FlowProcessor> getProcessorBySearchString(String searchString, int maxDepth, boolean withdependency) {
         List<FlowProcessor> searchMatchingProcessor = new ArrayList<>();
 
         //int max=5 ;
         if (g == null)
             throw new RuntimeException("FATAL :: Load the graph first !!!");
 
+        List<Map<String, Object>> propertyMap = new ArrayList<Map<String, Object>>();
+        propertyMap = g.V().propertyMap().toList();
 
+        for (Map mp : propertyMap) {
+            Iterator it = mp.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+
+                List propValue = (ArrayList) pair.getValue();
+                TinkerVertexProperty tvp = (TinkerVertexProperty) propValue.get(0);
+                String tvpPropValue = tvp.value().toString();
+
+                if (NfaasStringUtil.containsIgnoreCase(tvpPropValue, searchString)) {
+                    String procIdFromGraph =  tvp.element().value("procId");
+                    FlowProcessor fp = getProcessorById(procIdFromGraph, maxDepth,withdependency);
+                    if (!NfaasUtil.isEmptyFlowProcessor(fp))
+                        searchMatchingProcessor.add(fp);
+                }
+
+                logger.debug(pair.getKey() + " = " + pair.getValue());
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+        }
 
         return searchMatchingProcessor;
-    }
-
-    // ---------------------------------------
-    // Try to load a graph and run a few tests
-    // ---------------------------------------
-    public static void main(String[] args) {
-        int required = 10;
-        boolean failed = false;
-
-        try {
-            if (args.length > 0) required = Integer.parseInt(args[0]);
-        } catch (Exception e) {
-            failed = true;
-        }
-
-        if (failed || required < -1) {
-            logger.debug("Argument should be -1, 0 or any positive integer");
-            System.exit(1);
-        }
-
-        FlowGraphService fgl = new FlowGraphService();
-
-
-        FlowGraphBuilderOptions gbo = new FlowGraphBuilderOptions();
-
-        List<String> args1 = new ArrayList<>();
-        args1.add("-nifiGraphMlPath");
-        args1.add("nifi-graph.graphml");
-
-        JCommander.newBuilder()
-                .addObject(gbo)
-                .build()
-                .parse(args1.toArray(new String[0]));
-
-        if (fgl.loadGraph(gbo)) {
-            //fgl.listProcessGroups(required);
-            //fgl.listProcessors(required);
-            System.out.println(fgl.getProcessorById("db1e4631-016a-1000-29b7-5401a7d27f8b", 10));
-            System.out.println(fgl.getDependentProcessGroups("cf8cbced-9c51-3722-a71f-1767f07906f3", 10, new ArrayList<>(), true));
-        }
-
     }
 
 

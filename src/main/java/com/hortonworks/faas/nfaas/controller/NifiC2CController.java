@@ -153,10 +153,27 @@ public class NifiC2CController extends BasicFlowController {
     @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(value = "/faas/graph/getprocbyid", produces = "application/json")
     public @ResponseBody
-    String getProcessorById(String procId, int maxDepth) {
+    String getProcessorById(String procId, int maxDepth,boolean withdependency) {
 
         String jsonString = "{\"task\":\"get nifi processor by ID from graph done !\"}";;
-        FlowProcessor processor = flowGraphService.getProcessorById(procId, maxDepth);
+        FlowProcessor processor = flowGraphService.getProcessorById(procId, maxDepth,withdependency);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            jsonString = mapper.writeValueAsString(processor);
+        } catch (JsonProcessingException e) {
+            new RuntimeException("unable to process Json " + e.getMessage());
+        }
+        return jsonString;
+    }
+
+    @CrossOrigin
+    @PreAuthorize("#oauth2.hasScope('read')")
+    @RequestMapping(value = "/faas/graph/getprocbysearchstr", produces = "application/json")
+    public @ResponseBody
+    String getProcessorBySearchString(String searchString, int maxDepth,boolean withdependency) {
+
+        String jsonString = "{\"task\":\"get nifi processor by ID from graph done !\"}";;
+        List<FlowProcessor> processor = flowGraphService.getProcessorBySearchString(searchString, maxDepth,withdependency);
         ObjectMapper mapper = new ObjectMapper();
         try {
             jsonString = mapper.writeValueAsString(processor);
