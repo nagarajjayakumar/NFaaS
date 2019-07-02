@@ -7,6 +7,8 @@ import com.hortonworks.faas.nfaas.dto.FlowProcessGroup;
 import com.hortonworks.faas.nfaas.dto.FlowProcessor;
 import com.hortonworks.faas.nfaas.graph.FlowGraphBuilderOptions;
 import com.hortonworks.faas.nfaas.graph.FlowGraphService;
+import com.hortonworks.faas.nfaas.xml.util.NfaasUtil;
+import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,9 +176,10 @@ public class NifiC2CController extends BasicFlowController {
 
         String jsonString = "{\"task\":\"get nifi processor by search string from graph done !\"}";;
         List<FlowProcessor> processor = flowGraphService.getProcessorBySearchString(searchString, maxDepth,withdependency);
+        List<FlowProcessor> activeProcessor = getProcessorOnlyWithActiveProcessGroup(processor);
         ObjectMapper mapper = new ObjectMapper();
         try {
-            jsonString = mapper.writeValueAsString(processor);
+            jsonString = mapper.writeValueAsString(activeProcessor);
         } catch (JsonProcessingException e) {
             new RuntimeException("unable to process Json " + e.getMessage());
         }
@@ -196,5 +199,43 @@ public class NifiC2CController extends BasicFlowController {
         return gbo;
     }
 
+    public List<FlowProcessor> getProcessorOnlyWithActiveProcessGroup (List<FlowProcessor> processor ){
+        List<FlowProcessor> activeProcessor = new ArrayList<>();
+        for(FlowProcessor fp : processor){
+            if(isActiveProcessGroup(fp.getImmediateParentPgId())){
+                activeProcessor.add(fp);
+            }
+        }
+        return activeProcessor;
+    }
+    public boolean isActiveProcessGroup (String pgId) {
+        Boolean isActivePG = true;
+        restTemplate = security.ignoreCertAndHostVerification(restTemplate);
+        ProcessGroupEntity pge = processGroup.getLatestProcessGroupEntity(pgId);
+
+        Integer runningCount = pge.getRunningCount();
+        Integer stoppedCount = pge.getStoppedCount();
+        Integer invalidCount = pge.getDisabledCount();
+        Integer disabledCount = pge.getInvalidCount();
+
+        Integer totalProcessorCount = runningCount + stoppedCount + invalidCount + disabledCount;
+
+        if(totalProcessorCount <= 0 ) {
+            logger.debug("pgID is inactive "+pgId + " totalProcessorCount " + totalProcessorCount);
+            return false;
+        }
+
+        double activeProcessorPercentage = NfaasUtil.calculatePercentage(runningCount,totalProcessorCount);
+        logger.debug("activeProcessorPercentage " +activeProcessorPercentage);
+        if (activeProcessorPercentage <= 10.0){
+            logger.debug("pgID is inactive "+pgId +
+                         " activeProcessorPercentage " + activeProcessorPercentage +
+                         " running proc count " + runningCount +
+                         " total proc count " + totalProcessorCount );
+            isActivePG = false;
+        }
+
+        return isActivePG;
+    }
 
 }
