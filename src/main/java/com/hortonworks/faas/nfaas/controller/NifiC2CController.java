@@ -172,7 +172,7 @@ public class NifiC2CController extends BasicFlowController {
     public @ResponseBody
     String getProcessorBySearchString(String searchString, int maxDepth,boolean withdependency) {
 
-        String jsonString = "{\"task\":\"get nifi processor by ID from graph done !\"}";;
+        String jsonString = "{\"task\":\"get nifi processor by search string from graph done !\"}";;
         List<FlowProcessor> processor = flowGraphService.getProcessorBySearchString(searchString, maxDepth,withdependency);
         ObjectMapper mapper = new ObjectMapper();
         try {
