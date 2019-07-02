@@ -446,7 +446,7 @@ public class FlowGraphService {
                         if (!NfaasUtil.isEmptyFlowProcessor(fp))
                             searchMatchingProcessor.add(fp);
                         // log only the matched key value pair
-                        logger.debug(pair.getKey() + " = " + pair.getValue());
+                        logger.debug("Matched --> "+pair.getKey() + " = " + tvpPropValue);
                     }
                 }
                 it.remove(); // avoids a ConcurrentModificationException

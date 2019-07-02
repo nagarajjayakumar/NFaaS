@@ -226,10 +226,10 @@ public class NifiC2CController extends BasicFlowController {
         }
 
         double activeProcessorPercentage = NfaasUtil.calculatePercentage(runningCount,totalProcessorCount);
-        logger.debug("activeProcessorPercentage " +activeProcessorPercentage);
+        logger.debug( pge.getComponent().getName() + " activeProcessorPercentage " +activeProcessorPercentage);
         if (activeProcessorPercentage <= 10.0){
-            logger.debug("pgID is inactive "+pgId +
-                         " activeProcessorPercentage " + activeProcessorPercentage +
+            logger.debug(pge.getComponent().getName() + " is inactive ["+pgId +
+                         "] activeProcessorPercentage " + activeProcessorPercentage +
                          " running proc count " + runningCount +
                          " total proc count " + totalProcessorCount );
             isActivePG = false;
