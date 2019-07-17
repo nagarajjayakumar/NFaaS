@@ -2,11 +2,8 @@ package com.hortonworks.faas.nfaas.graph;
 
 
 import com.hortonworks.faas.nfaas.config.NifiType;
-import com.hortonworks.faas.nfaas.dto.FlowProcessor;
 import com.hortonworks.faas.nfaas.xml.parser.FlowInfo;
 import com.hortonworks.faas.nfaas.xml.parser.FlowParser;
-import com.hortonworks.faas.nfaas.xml.util.NfaasStringUtil;
-import com.hortonworks.faas.nfaas.xml.util.NfaasUtil;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.nifi.web.api.dto.ConnectionDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
@@ -23,7 +20,10 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerVertexProperty;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class FlowGraphCreator {
     public static void main(String[] args) throws Exception {
@@ -31,8 +31,9 @@ public class FlowGraphCreator {
         //System.out.println("Gremlin version is: " + Gremlin.version());
 
         FlowParser fp = new FlowParser();
-        //FlowInfo fi = fp.parse(new File("/Users/njayakumar/Desktop/new-realflow.xml.gz"));
+        //FlowInfo fi = fp.parse(new File("/root/hawqi/new-realflow.xml.gz"));
         FlowInfo fi = fp.parse(new File("/Users/njayakumar/Downloads/flow.xml.gz"));
+        //FlowInfo fi = fp.parse(new File("/Users/njayakumar/Desktop/graph/new-realflow.xml.gz"));
 
         BaseConfiguration conf = new BaseConfiguration();
         conf.setProperty("gremlin.tinkergraph.vertexIdManager","LONG");
@@ -66,7 +67,9 @@ public class FlowGraphCreator {
         List<ProcessorDTO> processors = fi.getProcessors();
 
         if(true) {
+            int indexProcessor = 1;
             for (ProcessorDTO processor : processors) {
+                System.out.println("processing processor " + indexProcessor ++ +" processor name " + processor.getName());
                 Map<String, String> processorProperties = processor.getConfig().getProperties();
                 gts.addV(NifiType.PROCESSOR.type)
                         .property("procName", processor.getName())
@@ -77,17 +80,17 @@ public class FlowGraphCreator {
                     gts.property(propKey,processorProperties.get(propKey));
                 }
 
-                gts.as(processor.getId()).addE("parent").to(processor.getId()).from(processor.getParentGroupId());
+              gts.as(processor.getId()).addE("parent").to(processor.getId()).from(processor.getParentGroupId());
             }
 
         }
         List<ConnectionDTO> connections = fi.getConnections();
 
         for(ConnectionDTO connection : connections){
-            gts.addE("dependent").to(connection.getDestination().getGroupId()).from(connection.getSource().getGroupId());
+          gts.addE("dependent").to(connection.getDestination().getGroupId()).from(connection.getSource().getGroupId());
         }
 
-        gts.iterate();
+       gts.iterate();
 
 //        g.addV("dadb47f2-016a-1000-19a1-7aaa9f611417").property("isRoot", true).as("dadb47f2-016a-1000-19a1-7aaa9f611417").iterate();
 //                g.addV("dae2291a-016a-1000-985b-23f9ea93a026").property("isRoot", false).as("dae2291a-016a-1000-985b-23f9ea93a026").
@@ -110,75 +113,76 @@ public class FlowGraphCreator {
 //                addE("route").from("lax").to("aus").
 //                addE("route").from("lax").to("dfw").iterate();
 
-        System.out.println(g);
-        System.out.println("VALUEEEEEE MAP");
-        System.out.println(g.V().valueMap(true).toList());
-        System.out.println(g.E().valueMap(true).toList());
+//        System.out.println(g);
+//        System.out.println("VALUEEEEEE MAP");
+//        System.out.println(g.V().valueMap(true).toList());
+//        System.out.println(g.E().valueMap(true).toList());
 
-        // Simple example of how to work with the results we get back from a query
+//        // Simple example of how to work with the results we get back from a query
+//
+//        List<Map<Object, Object>> vm = new ArrayList<Map<Object, Object>>();
+//
+//        vm = g.V().valueMap(true).toList();
+//
+//        // Dislpay the code property as well as the label and id.
+//        for (Map m : vm) {
+//            if(null != m.get("pgName"))
+//                System.out.println(((List) (m.get("pgName"))).get(0) + " " + m.get(T.id) + " " + m.get(T.label));
+//        }
+//        System.out.println();
+//
+//        List<Map<String, Object>> propertyMap = new ArrayList<Map<String, Object>>();
+//
+//        propertyMap = g.V().hasLabel(NifiType.PROCESSOR.type).propertyMap().toList();
+//
+//        String searchString = "2019-05-21 11:56:55,313";
+//        FlowGraphService fgs = new FlowGraphService();
+//        // Dislpay the code property as well as the label and id.
+//        for (Map mp : propertyMap) {
+//            Iterator it = mp.entrySet().iterator();
+//            while (it.hasNext()) {
+//                Map.Entry pair = (Map.Entry) it.next();
+//
+//                List propValue = (ArrayList) pair.getValue();
+//                TinkerVertexProperty tvp = (TinkerVertexProperty) propValue.get(0);
+//                String tvpPropValue = tvp.value().toString();
+//                System.out.println((pair.getKey() + " = " + pair.getValue()));
+//                it.remove(); // avoids a ConcurrentModificationException
+//            }
+//        }
 
-        List<Map<Object, Object>> vm = new ArrayList<Map<Object, Object>>();
-
-        vm = g.V().valueMap(true).toList();
-
-        // Dislpay the code property as well as the label and id.
-        for (Map m : vm) {
-            if(null != m.get("pgName"))
-                System.out.println(((List) (m.get("pgName"))).get(0) + " " + m.get(T.id) + " " + m.get(T.label));
-        }
-        System.out.println();
-
-        List<Map<String, Object>> propertyMap = new ArrayList<Map<String, Object>>();
-
-        propertyMap = g.V().hasLabel(NifiType.PROCESSOR.type).propertyMap().toList();
-
-        String searchString = "2019-05-21 11:56:55,313";
-        FlowGraphService fgs = new FlowGraphService();
-        // Dislpay the code property as well as the label and id.
-        for (Map mp : propertyMap) {
-            Iterator it = mp.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-
-                List propValue = (ArrayList) pair.getValue();
-                TinkerVertexProperty tvp = (TinkerVertexProperty) propValue.get(0);
-                String tvpPropValue = tvp.value().toString();
-                System.out.println((pair.getKey() + " = " + pair.getValue()));
-                it.remove(); // avoids a ConcurrentModificationException
-            }
-        }
-
-        // Display the routes in the graph we just created.
-        // Each path will include the vertex code values and the edge.
-
-        List<Path> paths = new ArrayList<Path>();
-
-        //paths = g.V().outE().inV().path().by("pgId").by().toList();
-
-        for (Path p : paths) {
-            System.out.println(p.toString());
-        }
-
-        // Count how many vertices and edges we just created.
-        // Using groupCount is overkill when we only have one label
-        // but typically you will have more so this is a useful technique
-        // to be aware of.
-        System.out.println("\nWe just created");
-        List verts = g.V().groupCount().by(T.label).toList();
-        System.out.println(((Map) verts.get(0)).get(NifiType.PROCESS_GROUP.type) + " processorGroups");
-        List edges = g.E().groupCount().by(T.label).toList();
-        System.out.println(((Map) edges.get(0)).get("parent") + " Parents");
-
-        // Note that we could also use the following code for a simple
-        // case where we are only interested in specific labels.
-        Long nv = g.V().hasLabel(NifiType.PROCESS_GROUP.type).count().next();
-        Long ne = g.E().hasLabel("parent").count().next();
-        System.out.println("The graph has " + nv + " process groups and " + ne + " connectivity");
-
-        g.V().hasLabel(NifiType.PROCESSOR.type).
-                has("procId","db1e4631-016a-1000-29b7-5401a7d27f8b").bothE("parent");
+//        // Display the routes in the graph we just created.
+//        // Each path will include the vertex code values and the edge.
+//
+//        List<Path> paths = new ArrayList<Path>();
+//
+//        //paths = g.V().outE().inV().path().by("pgId").by().toList();
+//
+//        for (Path p : paths) {
+//            System.out.println(p.toString());
+//        }
+//
+//        // Count how many vertices and edges we just created.
+//        // Using groupCount is overkill when we only have one label
+//        // but typically you will have more so this is a useful technique
+//        // to be aware of.
+//        System.out.println("\nWe just created");
+//        List verts = g.V().groupCount().by(T.label).toList();
+//        System.out.println(((Map) verts.get(0)).get(NifiType.PROCESS_GROUP.type) + " processorGroups");
+//        List edges = g.E().groupCount().by(T.label).toList();
+//        System.out.println(((Map) edges.get(0)).get("parent") + " Parents");
+//
+//        // Note that we could also use the following code for a simple
+//        // case where we are only interested in specific labels.
+//        Long nv = g.V().hasLabel(NifiType.PROCESS_GROUP.type).count().next();
+//        Long ne = g.E().hasLabel("parent").count().next();
+//        System.out.println("The graph has " + nv + " process groups and " + ne + " connectivity");
+//
+//        g.V().hasLabel(NifiType.PROCESSOR.type).
+//                has("procId","db1e4631-016a-1000-29b7-5401a7d27f8b").bothE("parent");
 
         // Save the graph we just created as GraphML (XML) or GraphSON (JSON)
+        System.out.println("before saving graph ml and graph json");
         try {
             // If you want to save the graph as GraphML uncomment the next line
             tg.io(GraphMLIo.build()).writeGraph("nifi-graph.graphml");

@@ -6,7 +6,6 @@ import com.hortonworks.faas.nfaas.dto.FlowProcessGroup;
 import com.hortonworks.faas.nfaas.dto.FlowProcessor;
 import com.hortonworks.faas.nfaas.xml.util.NfaasStringUtil;
 import com.hortonworks.faas.nfaas.xml.util.NfaasUtil;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.Order;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
