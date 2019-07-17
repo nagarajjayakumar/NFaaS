@@ -1,7 +1,6 @@
 package com.hortonworks.faas.nfaas.controller;
 
 import com.beust.jcommander.JCommander;
-import com.hortonworks.faas.nfaas.core.ProcessGroupFlow;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import com.hortonworks.faas.nfaas.flow_builder.task.HanaDmlGenerator;
 import com.hortonworks.faas.nfaas.flow_builder.task.HiveDdlGenerator;

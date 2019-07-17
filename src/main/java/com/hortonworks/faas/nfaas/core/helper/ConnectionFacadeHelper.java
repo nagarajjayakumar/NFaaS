@@ -1,6 +1,5 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
-import com.hortonworks.faas.nfaas.config.EntityState;
 import org.apache.nifi.web.api.dto.ConnectionDTO;
 import org.apache.nifi.web.api.entity.ConnectionEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupFlowEntity;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class ConnectionFacadeHelper extends BaseFacadeHelper {

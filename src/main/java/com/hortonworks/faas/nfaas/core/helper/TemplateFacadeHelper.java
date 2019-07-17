@@ -1,10 +1,6 @@
 package com.hortonworks.faas.nfaas.core.helper;
 
-import org.apache.nifi.web.api.dto.PortDTO;
-import org.apache.nifi.web.api.dto.ProcessorDTO;
-import org.apache.nifi.web.api.dto.RemoteProcessGroupDTO;
-import org.apache.nifi.web.api.dto.ConnectionDTO;
-import org.apache.nifi.web.api.dto.TemplateDTO;
+import org.apache.nifi.web.api.dto.*;
 import org.apache.nifi.web.api.entity.FlowEntity;
 import org.apache.nifi.web.api.entity.ProcessGroupEntity;
 import org.apache.nifi.web.api.entity.TemplateEntity;

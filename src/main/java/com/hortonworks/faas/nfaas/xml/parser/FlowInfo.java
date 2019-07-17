@@ -7,8 +7,6 @@ import org.apache.nifi.web.api.dto.PortDTO;
 import org.apache.nifi.web.api.dto.ProcessGroupDTO;
 import org.apache.nifi.web.api.dto.ProcessorDTO;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class FlowInfo {

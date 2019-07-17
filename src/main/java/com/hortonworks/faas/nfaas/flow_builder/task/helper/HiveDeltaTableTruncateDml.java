@@ -1,12 +1,9 @@
 package com.hortonworks.faas.nfaas.flow_builder.task.helper;
 
-import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 
 @Configuration

@@ -1,7 +1,5 @@
 package com.hortonworks.faas.nfaas.dto;
 
-import org.joda.time.DateTime;
-
 import javax.persistence.*;
 import java.util.Date;
 

@@ -4,7 +4,6 @@ import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;

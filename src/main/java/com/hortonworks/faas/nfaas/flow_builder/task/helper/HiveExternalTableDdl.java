@@ -1,6 +1,5 @@
 package com.hortonworks.faas.nfaas.flow_builder.task.helper;
 
-import com.hortonworks.faas.nfaas.dto.ActiveObject;
 import com.hortonworks.faas.nfaas.dto.ActiveObjectDetail;
 import com.hortonworks.faas.nfaas.flow_builder.FlowBuilderOptions;
 import org.slf4j.Logger;
