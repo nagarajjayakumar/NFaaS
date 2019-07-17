@@ -71,6 +71,22 @@ Hana Ingestion Pipe Line Sample Rest URL
 http://localhost:8084/faas/hanaingestionpipeline?namespace=_SYS_BIC&package_id=DataLake.Deltaviews.TransactionViews&db_object_name=InstallationOwnershipTS&buckets=32&clustered_by=installation
 ```
 
+Flow Graph Creator Standalone
+========================================
+
+Step 1: Unwrap the War file.
+
+jar -xvf MyWar.war
+
+Step 2: move into the directory
+
+cd WEB-INF
+
+Step 3: Run your main with all dependendecies
+
+java -classpath "lib/*:classes/." my.packages.destination.FileToRun
+
+
 SIGN : Naga Jay @nagajay_
 
 Contributor : Adam Michalsky @Michalsky_
